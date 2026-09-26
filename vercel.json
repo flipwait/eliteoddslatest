@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "installCommand": "echo 'no deps'",
+  "buildCommand": "echo 'no build'",
+  "outputDirectory": "public",
+  "functions": {
+    "api/**/*.js": {
+      "maxDuration": 30
+    }
+  }
+}
