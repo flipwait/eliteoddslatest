@@ -662,7 +662,7 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
     }
 
     // Game-level cards (moneyline / all)
-    const games = events.map((ev) => {
+    let games = events.map((ev) => {
       const markets = ev.markets || [];
       const typed = markets.map((m) => ({ m, type: classifyMarket(m) }));
       let focus = typed;
