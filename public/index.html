@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.7</title>
+  <title>EliteOdds v3.4.9</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -671,7 +671,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.1</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.9</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1362,19 +1362,29 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.1</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.9</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
           </div>
-          <details class="group rounded-lg border border-bb-border bg-bb-bg/80 open:shadow-sm">
+          <details open class="group rounded-lg border border-bb-border bg-bb-bg/80 open:shadow-sm">
             <summary class="cursor-pointer list-none px-3 py-2 text-xs font-semibold text-white flex items-center justify-between">
               <span>Changelog</span>
               <span class="text-bb-muted font-normal group-open:hidden">Show</span>
               <span class="text-bb-muted font-normal hidden group-open:inline">Hide</span>
             </summary>
             <div id="changelog-body" class="px-3 pb-3 space-y-4 text-[11px] text-bb-muted border-t border-bb-border pt-3">
-              <!-- filled by JS from APP_CHANGELOG -->
+              <div class="border-l-2 border-violet-500/40 pl-3">
+                <div class="flex flex-wrap items-baseline gap-2">
+                  <span class="text-white font-semibold font-mono">v3.4.9</span>
+                  <span class="text-[10px] text-bb-muted">2026-09-26</span>
+                </div>
+                <p class="text-violet-200/90 font-medium mt-0.5">Changelog display fix</p>
+                <ul class="mt-1.5 space-y-1 list-disc pl-4">
+                  <li class="leading-snug">Release notes always populate in Settings (static fallback + JS render).</li>
+                  <li class="leading-snug">Version badge stays in sync with APP_VERSION.</li>
+                </ul>
+              </div>
             </div>
           </details>
           <p class="text-[10px] text-bb-muted">Tip: after each deploy, confirm this version matches the zip you uploaded (Settings → About).</p>
@@ -1702,8 +1712,28 @@
   };
 
   
-  var APP_VERSION = '3.4.7';
+  var APP_VERSION = '3.4.9';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.9',
+      date: '2026-09-26',
+      title: 'Changelog display fix',
+      items: [
+        'Release notes always show in Settings (JS render + HTML fallback).',
+        'Version badge updates from APP_VERSION when Settings opens.',
+        'Changelog panel opens by default so notes are visible immediately.'
+      ]
+    },
+    {
+      version: '3.4.8',
+      date: '2026-09-26',
+      title: 'Hide Final games · no false Tomorrow labels',
+      items: [
+        'Completed games (Final / ended) are removed from Scan — not shown as Elite open bets.',
+        'ESPN completed status forces ended and clears live.',
+        'Date line never says Tomorrow for Finals; past listed starts show calendar date instead of future day labels.'
+      ]
+    },
     {
       version: '3.4.7',
       date: '2026-09-26',
@@ -1823,25 +1853,37 @@
   ];
 
   function renderChangelog() {
+    var ver = (typeof APP_VERSION !== 'undefined' && APP_VERSION) ? String(APP_VERSION) : '3.4.9';
+    var vEls = document.querySelectorAll('#app-version, #settings-version');
+    for (var i = 0; i < vEls.length; i++) {
+      if (vEls[i]) vEls[i].textContent = 'v' + ver;
+    }
     var el = document.getElementById('changelog-body');
     if (!el) return;
-    el.innerHTML = APP_CHANGELOG.map(function (rel) {
-      var items = (rel.items || []).map(function (x) {
-        return '<li class="leading-snug">' + String(x).replace(/</g, '') + '</li>';
-      }).join('');
-      return (
-        '<div class="border-l-2 border-violet-500/40 pl-3">' +
+    var list = (typeof APP_CHANGELOG !== 'undefined' && APP_CHANGELOG && APP_CHANGELOG.length) ? APP_CHANGELOG : [];
+    if (!list.length) {
+      el.innerHTML = '<p class="text-bb-muted">No release notes loaded. Hard-refresh after deploy.</p>';
+      return;
+    }
+    var htmlOut = '';
+    for (var r = 0; r < list.length; r++) {
+      var rel = list[r] || {};
+      var items = rel.items || [];
+      var lis = '';
+      for (var j = 0; j < items.length; j++) {
+        lis += '<li class="leading-snug">' + String(items[j]).replace(/</g, '') + '</li>';
+      }
+      htmlOut +=
+        '<div class="border-l-2 border-violet-500/40 pl-3 mb-3">' +
           '<div class="flex flex-wrap items-baseline gap-2">' +
-            '<span class="text-white font-semibold font-mono">v' + String(rel.version).replace(/</g,'') + '</span>' +
+            '<span class="text-white font-semibold font-mono">v' + String(rel.version || '').replace(/</g,'') + '</span>' +
             '<span class="text-[10px] text-bb-muted">' + String(rel.date || '').replace(/</g,'') + '</span>' +
           '</div>' +
           '<p class="text-violet-200/90 font-medium mt-0.5">' + String(rel.title || '').replace(/</g,'') + '</p>' +
-          '<ul class="mt-1.5 space-y-1 list-disc pl-4">' + items + '</ul>' +
-        '</div>'
-      );
-    }).join('');
-    var vEls = document.querySelectorAll('#app-version, #settings-version');
-    vEls.forEach(function (n) { if (n) n.textContent = 'v' + APP_VERSION; });
+          '<ul class="mt-1.5 space-y-1 list-disc pl-4">' + lis + '</ul>' +
+        '</div>';
+    }
+    el.innerHTML = htmlOut;
   }
 
   var sport = 'mlb', mode = 'both', marketType = 'all', venue = 'polymarket';
@@ -1876,16 +1918,21 @@
     if (r === 'good') return 'rank-good';
     return 'rank-pass';
   }
-  function formatGameWhen(iso, isLive) {
+  function formatGameWhen(iso, isLive, isFinal) {
     var d = iso ? new Date(iso) : null;
     var valid = d && !isNaN(d.getTime());
     var timeStr = valid ? d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : '';
+    if (isFinal) {
+      if (!valid) return 'Final';
+      // Finals: always calendar date of the contest, never "Tomorrow"
+      var dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      return 'Final · ' + dateStr + ' · ' + timeStr;
+    }
     // Live games must never read as "Tomorrow" even if listed start is off
     if (isLive) {
       if (valid) {
-        var now = new Date();
-        // if scheduled in the future while marked live, show live + listed kickoff only
-        if (d.getTime() > now.getTime() + 30 * 60 * 1000) {
+        var nowL = new Date();
+        if (d.getTime() > nowL.getTime() + 30 * 60 * 1000) {
           return 'LIVE now · listed ' + timeStr;
         }
         return 'LIVE · started ' + timeStr;
@@ -1894,6 +1941,11 @@
     }
     if (!valid) return '';
     var now = new Date();
+    // If listed start is in the past by >4h and not live, treat as already played window
+    if (d.getTime() < now.getTime() - 4 * 3600 * 1000) {
+      var dateStr2 = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      return dateStr2 + ' · ' + timeStr + ' (past)';
+    }
     var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
     var startOfThat = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
     var dayDiff = Math.round((startOfThat - startOfToday) / 86400000);
@@ -1933,7 +1985,8 @@
         paintSports();
   try { renderChangelog(); } catch (e0) {}
         paintCats();
-        loadGames();
+        try { renderChangelog(); } catch (eCl2) {}
+  loadGames();
       };
     }
     document.querySelectorAll('#sport-rail .sport-btn').forEach(function (btn) {
@@ -2251,10 +2304,10 @@
       '<div class="flex justify-between gap-2">' +
         '<div class="min-w-0"><p class="text-[9px] uppercase tracking-wide mb-0.5 ' + (isKalshi ? 'text-bb-green' : 'text-violet-300') + '">' + (isKalshi ? 'Kalshi' : 'Polymarket') + '</p>' +'<p class="font-medium text-sm leading-snug">' + title + '</p>' +
         '<p class="text-[10px] text-bb-muted mt-0.5">' + String(g.league || '').toUpperCase() +
-        (g.live ? ' · <span class="text-bb-red">LIVE</span>' : '') +
+        (g.ended || /final/i.test(String(g.period||'')) ? ' · <span class="text-bb-muted">FINAL</span>' : (g.live ? ' · <span class="text-bb-red">LIVE</span>' : '')) +
         (g.period ? ' · ' + String(g.period).replace(/</g,'') : '') +
         (g.score ? ' · ' + String(g.score).replace(/</g,'') : '') +
-        (g.startTime || g.live ? ' · <span class="text-white/80">' + formatGameWhen(g.startTime, !!(g.live || g.isLive)) + '</span>' : '') +
+        (g.startTime || g.live || g.ended ? ' · <span class="text-white/80">' + formatGameWhen(g.startTime, !!(g.live || g.isLive), !!(g.ended || /final/i.test(String(g.period||'')))) + '</span>' : '') +
         '</p></div>' +
         '<div class="flex items-center gap-1.5 shrink-0">' +'<span class="' + rankClass(g.rank) + ' text-[10px] font-bold px-2.5 py-1 rounded-full h-fit tracking-wide">' + String(g.rank || 'PASS').toUpperCase() + '</span>' +'<span class="text-[9px] text-bb-muted">' + (g.score10 != null ? g.score10 : Math.max(1, Math.min(10, Math.round((g.betScore||50)/10)))) + '/10</span></div></div>' +
       '<p class="text-sm font-semibold ' + (isKalshi ? 'text-bb-green' : 'text-violet-300') + '">Model pick · ' + (function(){
@@ -3445,11 +3498,16 @@
 
   function filterGamesClient(list) {
     list = list || [];
-    // Drop expired / resolved junk (F5 after 5th, locked 0%/100% markets)
+    // Drop completed Finals + expired / resolved junk
     list = list.filter(function (g) {
+      if (g.ended || g.isFinal) return false;
+      var per0 = String(g.period || g.score || g.status || '').toLowerCase();
+      if (/\bfinal\b|\bft\b|game over|ended|complete/.test(per0)) return false;
       var mkt = g.market_probability != null ? Number(g.market_probability) : null;
       if (mkt != null) {
         if (mkt > 1) mkt = mkt / 100;
+        // Locked post-result prices — hide unless truly live
+        if ((mkt >= 0.97 || mkt <= 0.03) && !g.live) return false;
         if (mkt >= 0.97 || mkt <= 0.03) return false;
       }
       var mt = String(g.marketType || '').toLowerCase();

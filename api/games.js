@@ -462,7 +462,11 @@ module.exports = async function handler(req, res) {
       events = await fetchAllSportsEvents({ limitPerLeague: 14 });
     }
     if (mode === 'live') events = events.filter((e) => e.live && !e.ended);
-    if (mode === 'upcoming') events = events.filter((e) => !e.live && !e.ended);
+    else if (mode === 'upcoming') events = events.filter((e) => !e.live && !e.ended);
+    else {
+      // all / both — still drop completed (no value as open bets)
+      events = events.filter((e) => !e.ended);
+    }
     // safety filter
     if (league && league !== 'esports' && league !== 'all') events = events.filter((e) => String(e.league).toLowerCase() === league);
     if (league === 'esports') events = events.filter((e) => ['lol', 'cs2', 'dota2', 'valorant', 'cod'].includes(String(e.league).toLowerCase()));
@@ -768,6 +772,23 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
     games.forEach((g) => {
       try { g.liveAnalysis = buildLiveAnalysis(g); } catch (eLa) {}
     });
+    function looksEnded(x) {
+      if (!x) return false;
+      if (x.ended) return true;
+      const per = String(x.period || x.score || '').toLowerCase();
+      if (/\bfinal\b|ft\b|ended|complete/.test(per)) return true;
+      // market locked at 0 or 100 after result
+      let m = x.market_probability;
+      if (m != null) {
+        if (m > 1) m = m / 100;
+        if (m >= 0.98 || m <= 0.02) {
+          // only treat as ended if not live
+          if (!x.live) return true;
+        }
+      }
+      return false;
+    }
+    games = games.filter((x) => !looksEnded(x));
     let filtered = games;
     if (minEdge > 0) {
       filtered = filtered.filter(

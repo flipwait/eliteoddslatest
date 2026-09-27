@@ -225,6 +225,12 @@ module.exports = async function handler(req, res) {
     }
     out.length = 0;
     out.push(...deduped);
+    // Drop completed / Final (not actionable)
+    for (let i = out.length - 1; i >= 0; i--) {
+      const x = out[i];
+      const per = String((x && (x.period || x.score)) || '').toLowerCase();
+      if ((x && x.ended) || /\bfinal\b|\bft\b|ended/.test(per)) out.splice(i, 1);
+    }
 
     if (typeof attachEspnLiveBatch === 'function') {
       try { await attachEspnLiveBatch(out); } catch (e) {}
