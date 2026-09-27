@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.10</title>
+  <title>EliteOdds v3.4.11</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1712,8 +1712,18 @@
   };
 
   
-  var APP_VERSION = '3.4.10';
+  var APP_VERSION = '3.4.11';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.11',
+      date: '2026-09-26',
+      title: 'Clear stale LIVE on finished games',
+      items: [
+        'ESPN FINAL status overrides Polymarket live flags.',
+        'MLB games still marked live more than ~5.5 hours after listed start are treated as finished unless ESPN confirms in-progress.',
+        'Finished games are removed from Scan so they cannot show as Elite LIVE.'
+      ]
+    },
     {
       version: '3.4.10',
       date: '2026-09-26',
@@ -3508,9 +3518,19 @@
     list = list || [];
     // Drop completed Finals + expired / resolved junk
     list = list.filter(function (g) {
-      if (g.ended || g.isFinal) return false;
+      if (g.ended || g.isFinal || g.staleLiveCleared) return false;
+      if (g.espnLive && (g.espnLive.ended || g.espnLive.remainingFrac === 0)) return false;
       var per0 = String(g.period || g.score || g.status || '').toLowerCase();
       if (/\bfinal\b|\bft\b|game over|ended|complete/.test(per0)) return false;
+      var startMs = g.startTime ? new Date(g.startTime).getTime() : NaN;
+      if (g.live && Number.isFinite(startMs)) {
+        var ageH = (Date.now() - startMs) / 3600000;
+        var lg = String(g.league || '').toLowerCase();
+        var maxH = lg === 'mlb' ? 5.5 : (lg === 'nfl' || lg === 'cfb') ? 5 : 4.5;
+        var espnLive = g.espnLive && g.espnLive.live && !g.espnLive.ended;
+        if (ageH > maxH && !espnLive) return false;
+        if (ageH > maxH + 1.5) return false;
+      }
       var mkt = g.market_probability != null ? Number(g.market_probability) : null;
       if (mkt != null) {
         if (mkt > 1) mkt = mkt / 100;

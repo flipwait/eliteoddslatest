@@ -774,17 +774,25 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
     });
     function looksEnded(x) {
       if (!x) return false;
-      if (x.ended) return true;
-      const per = String(x.period || x.score || '').toLowerCase();
-      if (/\bfinal\b|ft\b|ended|complete/.test(per)) return true;
-      // market locked at 0 or 100 after result
+      if (x.ended || x.isFinal || x.staleLiveCleared) return true;
+      if (x.espnLive && x.espnLive.ended) return true;
+      if (x.espnLive && x.espnLive.remainingFrac === 0) return true;
+      const per = String(x.period || x.score || x.status || '').toLowerCase();
+      if (/\bfinal\b|\bft\b|ended|complete|game over/.test(per)) return true;
+      // Stale: listed start many hours ago still flagged live without ESPN in-play confirm
+      const startMs = x.startTime ? new Date(x.startTime).getTime() : NaN;
+      if (Number.isFinite(startMs) && x.live) {
+        const ageH = (Date.now() - startMs) / 3600000;
+        const lg = String(x.league || '').toLowerCase();
+        const maxH = lg === 'mlb' ? 5.5 : lg === 'nfl' || lg === 'cfb' ? 5 : 4.5;
+        const espnLive = x.espnLive && x.espnLive.live && !x.espnLive.ended;
+        if (ageH > maxH && !espnLive) return true;
+        if (ageH > maxH + 1.5) return true;
+      }
       let m = x.market_probability;
       if (m != null) {
         if (m > 1) m = m / 100;
-        if (m >= 0.98 || m <= 0.02) {
-          // only treat as ended if not live
-          if (!x.live) return true;
-        }
+        if (m >= 0.98 || m <= 0.02) return true;
       }
       return false;
     }
