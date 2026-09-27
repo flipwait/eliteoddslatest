@@ -459,12 +459,12 @@ module.exports = async function handler(req, res) {
       events = await fetchLeagueEvents(league, { limit: 35 });
     } else {
       // all sports + all markets
-      events = await fetchAllSportsEvents({ limitPerLeague: 18 });
+      events = await fetchAllSportsEvents({ limitPerLeague: 14 });
     }
     if (mode === 'live') events = events.filter((e) => e.live && !e.ended);
     if (mode === 'upcoming') events = events.filter((e) => !e.live && !e.ended);
     // safety filter
-    if (league && league !== 'esports') events = events.filter((e) => String(e.league).toLowerCase() === league);
+    if (league && league !== 'esports' && league !== 'all') events = events.filter((e) => String(e.league).toLowerCase() === league);
     if (league === 'esports') events = events.filter((e) => ['lol', 'cs2', 'dota2', 'valorant', 'cod'].includes(String(e.league).toLowerCase()));
 
     events.sort((a, b) => {
@@ -505,7 +505,7 @@ module.exports = async function handler(req, res) {
         const lg = (ev.league || league || 'mlb').toLowerCase();
         if (!title || seen.has(title)) continue;
         seen.add(title);
-        if (jobs.length >= 12) break;
+        if (jobs.length >= (league && league !== "all" ? 12 : 8)) break;
         jobs.push(
           matchupForEvent(lg, title)
             .then(async (m) => {
@@ -622,10 +622,10 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
         if (a.live !== b.live) return a.live ? -1 : 1;
         return (b.betScore || 0) - (a.betScore || 0);
       });
-      if (typeof attachEspnLiveBatch === 'function') {
+      if (typeof attachEspnLiveBatch === 'function' && capped.length <= 60) {
         try { await attachEspnLiveBatch(capped); } catch (eLive) {}
       }
-      capped.forEach((g) => { g.liveAnalysis = buildLiveAnalysis(g); });
+      capped.forEach((g) => { try { g.liveAnalysis = buildLiveAnalysis(g); } catch (eA) {} });
       let out = capped;
       if (minEdge > 0) out = out.filter((g) => Math.abs(g.netEdge || 0) >= minEdge);
       if (minScore > 0) out = out.filter((g) => (g.betScore || 0) >= minScore);
@@ -762,10 +762,12 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
       };
     });
 
-    if (typeof attachEspnLiveBatch === 'function') {
+    if (typeof attachEspnLiveBatch === 'function' && games.length <= 60) {
       try { await attachEspnLiveBatch(games); } catch (eLive) {}
     }
-    games.forEach((g) => { g.liveAnalysis = buildLiveAnalysis(g); });
+    games.forEach((g) => {
+      try { g.liveAnalysis = buildLiveAnalysis(g); } catch (eLa) {}
+    });
     let filtered = games;
     if (minEdge > 0) {
       filtered = filtered.filter(

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.4</title>
+  <title>EliteOdds v3.4.7</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -673,9 +673,9 @@
       <header class="eo-top">
         <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.1</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
+          <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
-          <button type="button" data-mode="upcoming" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Upcoming</button>
-          <button type="button" data-mode="all" class="mode-btn pill-on px-3 py-1.5 rounded-full border border-bb-border text-[11px]">All</button>
+          <button type="button" data-mode="both" class="mode-btn pill-on px-3 py-1.5 rounded-full border border-bb-border text-[11px]">Live + Pregame</button>
         </div>
         <div id="venue-toggle" class="eo-mobile-only-venue flex gap-1 items-center ml-auto sm:ml-2">
           <button type="button" data-venue="polymarket" class="venue-btn pill-on px-3 py-1.5 rounded-full border border-bb-border text-[11px]">Polymarket</button>
@@ -707,9 +707,9 @@
           <div class="eo-filters">
             <label class="text-bb-muted flex items-center gap-1">Rank
               <select id="f-rank">
-                <option value="elite" selected>Elite only</option>
+                <option value="" selected>All ranks</option>
+                <option value="elite">Elite only</option>
                 <option value="good">Good + Elite</option>
-                <option value="">All ranks</option>
                 <option value="pass">Pass only</option>
               </select>
             </label>
@@ -758,6 +758,7 @@
                     <option value="mlb">MLB</option>
                     <option value="nfl">NFL</option>
                     <option value="nba">NBA</option>
+                    <option value="nhl">NHL</option>
                     <option value="cfb">CFB</option>
                     <option value="cbb">CBB</option>
                     <option value="esports">Esports</option>
@@ -941,6 +942,7 @@
                     <option value="mlb">MLB</option>
                     <option value="nfl">NFL</option>
                     <option value="nba">NBA</option>
+                    <option value="nhl">NHL</option>
                     <option value="cfb">CFB</option>
                     <option value="cbb">CBB</option>
                     <option value="esports">Esports</option>
@@ -1403,6 +1405,7 @@
                     <option value="mlb">MLB</option>
                     <option value="nfl">NFL</option>
                     <option value="nba">NBA</option>
+                    <option value="nhl">NHL</option>
                     <option value="cfb">CFB</option>
                     <option value="cbb">CBB</option>
                     <option value="esports">Esports</option>
@@ -1542,6 +1545,7 @@
     { id: 'nfl', label: 'NFL' },
     { id: 'cfb', label: 'CFB' },
     { id: 'nba', label: 'NBA' },
+    { id: 'nhl', label: 'NHL' },
     { id: 'wnba', label: 'WNBA' },
     { id: 'cbb', label: 'CBB' },
     { id: 'ufc', label: 'UFC' },
@@ -1563,6 +1567,16 @@
       { id: 'map_1', label: 'Map 1 (esports)' },
       { id: 'map_2', label: 'Map 2 (esports)' },
       { id: 'map_total', label: 'Map totals' }
+    ],
+    nhl: [
+      { id: 'all', label: 'All' },
+      { id: 'moneyline', label: 'ML (regulation/winner)' },
+      { id: 'spread', label: 'Puck line' },
+      { id: 'total', label: 'Full game O/U' },
+      { id: 'total_1h', label: '1st period O/U' },
+      { id: 'moneyline_1h', label: '1st period winner' },
+      { id: 'team_total_fg', label: 'Team total' },
+      { id: 'player_props', label: 'Player props' }
     ],
     mlb: [
       { id: 'all', label: 'All' },
@@ -1688,8 +1702,39 @@
   };
 
   
-  var APP_VERSION = '3.4.4';
+  var APP_VERSION = '3.4.7';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.7',
+      date: '2026-09-26',
+      title: 'Pregame / Live modes + Live Edge board markets',
+      items: [
+        'Mode tabs are Pregame, Live, and Live + Pregame (removed Upcoming/All labels).',
+        'Live cards no longer show Tomorrow when the game is already LIVE.',
+        'Live Focus adds a Board markets panel: ML, O/U, F5, and other markets for that game from the current Scan (Good/Elite first).'
+      ]
+    },
+    {
+      version: '3.4.6',
+      date: '2026-09-26',
+      title: 'NHL markets + form',
+      items: [
+        'NHL added on Polymarket US league list and Kalshi series (ML, puck line, totals, period markets when listed).',
+        'NHL form uses L10/L5, goal differential, H2H, home ice, and back-to-back rest adjustments (ESPN schedule).',
+        'Sport rail, All-sports scan, and Super Elite sport list include NHL.'
+      ]
+    },
+    {
+      version: '3.4.5',
+      date: '2026-09-26',
+      title: 'All sports / all markets board fix',
+      items: [
+        'Sport=All loads Polymarket leagues in parallel (MLB, NFL, NBA, CFB, …) so the board is not empty after a single timed-out request.',
+        'Default rank is All ranks (not Elite only) so markets remain visible while scanning.',
+        'Clearer empty state when Elite-only filter hides every card.',
+        'Kalshi all-sports pull trimmed for reliability; league=all no longer filtered away server-side.'
+      ]
+    },
     {
       version: '3.4.4',
       date: '2026-09-26',
@@ -1799,7 +1844,7 @@
     vEls.forEach(function (n) { if (n) n.textContent = 'v' + APP_VERSION; });
   }
 
-  var sport = 'mlb', mode = 'all', marketType = 'all', venue = 'polymarket';
+  var sport = 'mlb', mode = 'both', marketType = 'all', venue = 'polymarket';
   var games = [], ticket = [];
   try { ticket = JSON.parse(localStorage.getItem('bb_ticket') || '[]'); } catch (e) {}
 
@@ -1831,10 +1876,23 @@
     if (r === 'good') return 'rank-good';
     return 'rank-pass';
   }
-  function formatGameWhen(iso) {
-    if (!iso) return '';
-    var d = new Date(iso);
-    if (isNaN(d.getTime())) return '';
+  function formatGameWhen(iso, isLive) {
+    var d = iso ? new Date(iso) : null;
+    var valid = d && !isNaN(d.getTime());
+    var timeStr = valid ? d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : '';
+    // Live games must never read as "Tomorrow" even if listed start is off
+    if (isLive) {
+      if (valid) {
+        var now = new Date();
+        // if scheduled in the future while marked live, show live + listed kickoff only
+        if (d.getTime() > now.getTime() + 30 * 60 * 1000) {
+          return 'LIVE now · listed ' + timeStr;
+        }
+        return 'LIVE · started ' + timeStr;
+      }
+      return 'LIVE now';
+    }
+    if (!valid) return '';
     var now = new Date();
     var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
     var startOfThat = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
@@ -1844,7 +1902,6 @@
     else if (dayDiff === -1) dayLabel = 'Yesterday';
     else if (dayDiff > 1) dayLabel = d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
     else if (dayDiff < -1) dayLabel = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-    var timeStr = d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
     return dayLabel + ' · ' + timeStr;
   }
 
@@ -1853,7 +1910,7 @@
   }
 
   function paintSports() {
-    var ICO = { mlb:'⚾', nfl:'🏈', nba:'🏀', wnba:'🏀', cfb:'🏈', cbb:'🏀', ufc:'🥊', atp:'🎾', wta:'🎾', esports:'🎮', all:'▣' };
+    var ICO = { mlb:'⚾', nfl:'🏈', nba:'🏀', nhl:'🏒', wnba:'🏀', cfb:'🏈', cbb:'🏀', ufc:'🥊', atp:'🎾', wta:'🎾', esports:'🎮', all:'▣' };
     // Desktop icon rail
     if ($('sport-rail')) {
       $('sport-rail').innerHTML = SPORTS.map(function (s) {
@@ -2197,7 +2254,7 @@
         (g.live ? ' · <span class="text-bb-red">LIVE</span>' : '') +
         (g.period ? ' · ' + String(g.period).replace(/</g,'') : '') +
         (g.score ? ' · ' + String(g.score).replace(/</g,'') : '') +
-        (g.startTime ? ' · <span class="text-white/80">' + formatGameWhen(g.startTime) + '</span>' : '') +
+        (g.startTime || g.live ? ' · <span class="text-white/80">' + formatGameWhen(g.startTime, !!(g.live || g.isLive)) + '</span>' : '') +
         '</p></div>' +
         '<div class="flex items-center gap-1.5 shrink-0">' +'<span class="' + rankClass(g.rank) + ' text-[10px] font-bold px-2.5 py-1 rounded-full h-fit tracking-wide">' + String(g.rank || 'PASS').toUpperCase() + '</span>' +'<span class="text-[9px] text-bb-muted">' + (g.score10 != null ? g.score10 : Math.max(1, Math.min(10, Math.round((g.betScore||50)/10)))) + '/10</span></div></div>' +
       '<p class="text-sm font-semibold ' + (isKalshi ? 'text-bb-green' : 'text-violet-300') + '">Model pick · ' + (function(){
@@ -3464,24 +3521,79 @@
     }
     return list;
   }
-  function polyQuery(mt, rankF, minEv, minEdge, minSc, strict, allowMkt) {
-    var q = '/api/games?mode=' + encodeURIComponent(mode) +
-      '&marketType=' + encodeURIComponent(mt) +
-      '&minEdge=' + encodeURIComponent(minEdge) +
-      '&minScore=' + encodeURIComponent(minSc) +
-      '&strictTruth=' + encodeURIComponent(strict) +
-      '&allowMarketGood=' + allowMkt;
-    if (rankF) q += '&rank=' + encodeURIComponent(rankF);
+  function apiMode() {
+    // UI: pregame | live | both  →  API: upcoming | live | all
+    if (mode === 'pregame' || mode === 'upcoming') return 'upcoming';
+    if (mode === 'live') return 'live';
+    return 'all'; // both / all
+  }
+  function polyQuery(mt, rankF, minEv, minEdge, minSc, strict, allowMkt, leagueOverride) {
+    var q = '/api/games?mode=' + encodeURIComponent(apiMode()) +
+      '&marketType=' + encodeURIComponent(mt || 'all') +
+      '&minEdge=' + encodeURIComponent(minEdge || '0') +
+      '&minScore=' + encodeURIComponent(minSc || '0') +
+      '&strictTruth=' + encodeURIComponent(strict || '1') +
+      '&allowMarketGood=' + (allowMkt || '0');
+    // Rank filter applied client-side too — still pass for server summary
+    if (rankF && rankF !== 'all') q += '&rank=' + encodeURIComponent(rankF);
     if (Number(minEv) > 0) q += '&minGoodEv=' + encodeURIComponent(minEv);
     if (Number(minEdge) > 0) q += '&minGoodEdge=' + encodeURIComponent(minEdge);
-    if (sport && sport !== 'all') q += '&league=' + encodeURIComponent(sport);
-    // All sports + all markets → wider pull for auto-elite
-    if (sport === 'all' || mt === 'all') q += '&limit=80';
+    var lg = leagueOverride != null ? leagueOverride : sport;
+    if (lg && lg !== 'all') q += '&league=' + encodeURIComponent(lg);
+    else if (lg === 'all') q += '&league=all';
+    // Keep payloads smaller for multi-league scans
+    if (lg === 'all') q += '&limit=40';
+    else if (mt === 'all') q += '&limit=50';
+    else q += '&limit=40';
     return q;
+  }
+
+  /** Per-league fetch when Sport=All — batched so Vercel does not time out empty */
+  async function fetchPolyAllLeagues(mt, rankF, minEv, minEdge, minSc, strict, allowMkt) {
+    // Active books first; esports last (heavier / thinner)
+    var leagues = ['mlb', 'nfl', 'nba', 'nhl', 'cfb', 'cbb', 'wnba', 'ufc', 'esports'];
+    var merged = [];
+    var seen = {};
+    function addAll(arr) {
+      (arr || []).forEach(function (g) {
+        var id = String(g.id || g.slug || '') + '|' + String(g.eventTitle || '') + '|' +
+          String(g.marketType || '') + '|' + String(g.modelPick || '');
+        if (!id || seen[id]) return;
+        seen[id] = 1;
+        merged.push(g);
+      });
+    }
+    // Prefer server rank filter when Elite-only so each league returns less data faster
+    var rf = rankF || '';
+    async function oneLeague(lg) {
+      try {
+        var r = await fetch(polyQuery(mt || 'all', rf, minEv, minEdge, minSc, strict, allowMkt, lg));
+        var d = await r.json();
+        if (d && d.ok && d.games) return d.games;
+        return [];
+      } catch (e) {
+        return [];
+      }
+    }
+    // Batch of 3 to avoid 9 cold starts dying together
+    for (var i = 0; i < leagues.length; i += 3) {
+      var batch = leagues.slice(i, i + 3);
+      var parts = await Promise.all(batch.map(oneLeague));
+      parts.forEach(addAll);
+    }
+    // Fallback: single all-sports API if every league came back empty
+    if (!merged.length) {
+      try {
+        var rAll = await fetch(polyQuery(mt || 'all', rf, minEv, minEdge, minSc, strict, allowMkt, 'all'));
+        var dAll = await rAll.json();
+        if (dAll && dAll.ok && dAll.games) addAll(dAll.games);
+      } catch (e2) {}
+    }
+    return merged;
   }
   function kalQuery(mt, strict, allowMkt) {
     var lim = (sport === 'all' || mt === 'all') ? 60 : 35;
-    return '/api/kalshi-games?mode=' + encodeURIComponent(mode) +
+    return '/api/kalshi-games?mode=' + encodeURIComponent(apiMode()) +
       '&league=' + encodeURIComponent(sport && sport !== 'all' ? sport : 'all') +
       '&marketType=' + encodeURIComponent(mt || 'all') +
       '&strict=' + encodeURIComponent(strict) +
@@ -3491,7 +3603,11 @@
   function renderGameList(box, list) {
     if (!box) return;
     if (!list.length) {
-      box.innerHTML = '<p class="text-bb-muted text-sm p-3">No games for this filter.</p>';
+      var rk = ($('f-rank') && $('f-rank').value) || '';
+      var tip = rk === 'elite'
+        ? '<p class="text-bb-muted text-sm p-3">No games for this filter.<br><span class="text-[11px]">Elite only is on — switch <strong class="text-white">Rank</strong> to All ranks (or Good+) to see more markets across sports.</span></p>'
+        : '<p class="text-bb-muted text-sm p-3">No games for this filter.<br><span class="text-[11px]">Try Sport: MLB/NFL, Market: ML, or Mode: Pregame / Live + Pregame. Then refresh.</span></p>';
+      box.innerHTML = tip;
       return;
     }
     box.innerHTML = list.map(cardHtml).join('');
@@ -3516,8 +3632,11 @@
       var dual = typeof window.matchMedia === 'function' && window.matchMedia('(min-width: 1100px)').matches;
 
       if (dual) {
+        var polyPromise = sport === 'all'
+          ? fetchPolyAllLeagues(mt, rankF, minEv, minEdge, minSc, strict, allowMkt).then(function (g) { return { ok: true, games: g }; })
+          : fetch(polyQuery(mt, rankF, minEv, minEdge, minSc, strict, allowMkt)).then(function (r) { return r.json(); });
         var results = await Promise.all([
-          fetch(polyQuery(mt, rankF, minEv, minEdge, minSc, strict, allowMkt)).then(function (r) { return r.json(); }),
+          polyPromise,
           fetch(kalQuery(mt, strict, allowMkt)).then(function (r) { return r.json(); })
         ]);
         var polyG = filterGamesClient(dedupeGameCards((results[0] && results[0].ok ? results[0].games : []) || []));
@@ -3530,13 +3649,22 @@
         if (box) box.innerHTML = '';
         if ($('meta')) $('meta').textContent = 'Desktop dual · PM ' + polyG.length + ' · Kalshi ' + kalG.length;
       } else {
-        var q = venue === 'kalshi'
-          ? kalQuery(mt, strict, allowMkt)
-          : polyQuery(mt, rankF, minEv, minEdge, minSc, strict, allowMkt);
-        var r = await fetch(q);
-        var data = await r.json();
-        if (!data.ok) throw new Error(data.error || ('HTTP ' + r.status));
-        games = filterGamesClient(dedupeGameCards(data.games || []));
+        var list = [];
+        if (venue === 'kalshi') {
+          var rK = await fetch(kalQuery(mt, strict, allowMkt));
+          var dataK = await rK.json();
+          if (!dataK.ok) throw new Error(dataK.error || ('HTTP ' + rK.status));
+          list = dataK.games || [];
+        } else if (sport === 'all') {
+          // Parallel by league — avoids one timed-out all-sports call
+          list = await fetchPolyAllLeagues(mt, rankF, minEv, minEdge, minSc, strict, allowMkt);
+        } else {
+          var r = await fetch(polyQuery(mt, rankF, minEv, minEdge, minSc, strict, allowMkt));
+          var data = await r.json();
+          if (!data.ok) throw new Error(data.error || ('HTTP ' + r.status));
+          list = data.games || [];
+        }
+        games = filterGamesClient(dedupeGameCards(list));
         games.forEach(function (g) {
           if (venue === 'kalshi') { g.venue = 'kalshi'; g.source = 'kalshi'; }
           else { g.venue = g.venue || 'polymarket'; g.source = g.source || 'polymarket'; }
@@ -3544,7 +3672,11 @@
         renderGameList(box, games);
         if (boxP) boxP.innerHTML = '';
         if (boxK) boxK.innerHTML = '';
-        if ($('meta')) $('meta').textContent = String(venue).toUpperCase() + ' · ' + games.length + ' markets';
+        var hint = '';
+        if (!games.length && rankF === 'elite') {
+          hint = ' · try Rank: All ranks';
+        }
+        if ($('meta')) $('meta').textContent = String(venue).toUpperCase() + ' · ' + games.length + ' markets' + hint;
       }
       renderSlate();
       trackElitePicks(games);
@@ -4885,6 +5017,34 @@ function renderSlate() {
     if (!opts.silent) alert(r.ok ? ('Sent to Discord ' + channel + ' (' + (venue === 'kalshi' ? 'Kalshi' : 'Polymarket') + ') ✓') : ('Discord failed: ' + err));
   }
 
+
+  function relatedBoardMarkets(g) {
+    var list = typeof games !== 'undefined' && Array.isArray(games) ? games : [];
+    var ev = String(g.eventTitle || g.title || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    var slug = String(g.slug || g.eventSlug || '').toLowerCase();
+    var out = [];
+    var seen = {};
+    list.forEach(function (x) {
+      if (!x) return;
+      var ev2 = String(x.eventTitle || x.title || '').toLowerCase().replace(/\s+/g, ' ').trim();
+      var slug2 = String(x.slug || x.eventSlug || '').toLowerCase();
+      var same = (slug && slug2 && slug === slug2) || (ev && ev2 && (ev === ev2 || ev.indexOf(ev2.slice(0, 12)) >= 0 || ev2.indexOf(ev.slice(0, 12)) >= 0));
+      if (!same) return;
+      var key = String(x.marketType || '') + '|' + String(x.modelPick || x.pick || '');
+      if (seen[key]) return;
+      seen[key] = 1;
+      out.push(x);
+    });
+    // Prefer Good/Elite, then by betScore
+    out.sort(function (a, b) {
+      var ra = String(a.rank || '').toLowerCase() === 'elite' ? 2 : String(a.rank || '').toLowerCase() === 'good' ? 1 : 0;
+      var rb = String(b.rank || '').toLowerCase() === 'elite' ? 2 : String(b.rank || '').toLowerCase() === 'good' ? 1 : 0;
+      if (rb !== ra) return rb - ra;
+      return (b.betScore || 0) - (a.betScore || 0);
+    });
+    return out;
+  }
+
   function openModal(g) {
     $('modal').classList.remove('hidden');
     var la = g.liveAnalysis || {};
@@ -4914,9 +5074,33 @@ function renderSlate() {
         '</span><span class="text-[9px] text-bb-muted">' + tag + '</span></div>' +
         '<div class="text-bb-muted mt-0.5 leading-snug">' + String(o.detail || '').replace(/</g,'') + '</div></div>';
     }).join('');
-    if (!oppHtml) oppHtml = '<p class="text-[11px] text-bb-muted">No live edge ideas yet — need live score/period.</p>';
+    if (!oppHtml) oppHtml = '<p class="text-[11px] text-bb-muted">No pace ideas yet — need live score/period (ESPN).</p>';
+    // All related board markets (ML, O/U, F5, etc.) currently loaded for this game
+    var related = relatedBoardMarkets(g);
+    var boardHtml = related.map(function (x) {
+      var rk = String(x.rank || 'Pass');
+      var rkCol = rk.toLowerCase() === 'elite' ? 'text-bb-orange' : rk.toLowerCase() === 'good' ? 'text-bb-green' : 'text-bb-muted';
+      var mt = String(x.marketType || 'ml');
+      var pick = String(x.modelPick || x.pick || '—');
+      var mkt = x.market_probability != null ? Number(x.market_probability) : null;
+      if (mkt != null && mkt <= 1) mkt = Math.round(mkt * 1000) / 10;
+      else if (mkt != null) mkt = Math.round(mkt * 10) / 10;
+      var edge = x.netEdge != null ? Number(x.netEdge) : (x.probability_edge != null ? Number(x.probability_edge) : null);
+      var edgeStr = edge != null ? ((edge >= 0 ? '+' : '') + (Math.round(edge * 10) / 10) + 'pp') : '—';
+      var liveTag = x.live ? ' · LIVE' : '';
+      return '<div class="rounded-lg border border-bb-border bg-bb-bg/60 p-2 text-[11px] flex flex-col gap-0.5">' +
+        '<div class="flex justify-between gap-2">' +
+          '<span class="font-medium text-white">' + mt.replace(/_/g,' ') + liveTag + '</span>' +
+          '<span class="' + rkCol + ' font-semibold">' + rk + '</span>' +
+        '</div>' +
+        '<div class="text-violet-200">Pick · ' + pick.replace(/</g,'') + '</div>' +
+        '<div class="text-bb-muted">Mkt ' + (mkt != null ? mkt + '%' : '—') + ' · Edge ' + edgeStr +
+          (x.betScore != null ? (' · Score ' + x.betScore) : '') + '</div>' +
+      '</div>';
+    }).join('');
+    if (!boardHtml) boardHtml = '<p class="text-[11px] text-bb-muted">No other markets for this game on the current board. Set Market to All markets and Live + Pregame, then refresh.</p>';
     var ouLineShow = st.ouLine != null ? st.ouLine : (g.totalLine != null ? g.totalLine : '—');
-    var when = g.startTime ? formatGameWhen(g.startTime) : '';
+    var when = (g.startTime || g.live) ? formatGameWhen(g.startTime, !!(g.live || g.isLive)) : '';
     var desk =
       '<div class="mt-3 space-y-3 border-t border-bb-border pt-3 text-left">' +
         '<p class="text-[10px] uppercase tracking-wider text-bb-muted">Live Focus desk</p>' +
@@ -4945,6 +5129,12 @@ function renderSlate() {
             : '') +
           '<div class="space-y-1.5">' + oppHtml + '</div>' +
           '<p class="text-[9px] text-bb-muted">Guides only — confirm market still open. Pregame form is dampened live.</p>' +
+        '</div>' +
+        // Zone Live Edge — all board markets for this game
+        '<div class="rounded-xl border border-bb-green/30 bg-bb-green/5 p-2.5 space-y-1.5">' +
+          '<p class="text-[10px] text-bb-green uppercase tracking-wider font-semibold">★ Live Edge · board markets</p>' +
+          '<p class="text-[10px] text-bb-muted">ML · O/U · F5 · spreads on the current Scan board for this matchup (Good/Elite first).</p>' +
+          '<div class="space-y-1.5 max-h-48 overflow-y-auto">' + boardHtml + '</div>' +
         '</div>' +
         // Zone B — market
         '<div class="rounded-xl border border-bb-border bg-bb-elev/50 p-2.5 space-y-1">' +
@@ -5101,7 +5291,7 @@ function renderSlate() {
 
   document.querySelectorAll('.mode-btn').forEach(function (btn) {
     btn.onclick = function () {
-      mode = btn.getAttribute('data-mode');
+      mode = btn.getAttribute('data-mode') || 'both';
       document.querySelectorAll('.mode-btn').forEach(function (b) {
         b.classList.remove('pill-on');
         b.classList.add('text-bb-muted');
@@ -5210,7 +5400,7 @@ function renderSlate() {
   if ($('unit-size')) $('unit-size').value = st.unitSize != null ? st.unitSize : '';
   if ($('kelly-mode')) $('kelly-mode').value = st.kellyMode || 'off';
   if ($('max-units')) $('max-units').value = st.maxUnits != null ? st.maxUnits : '1';
-  if ($('f-rank') && !$('f-rank').dataset.init) { $('f-rank').value = 'elite'; $('f-rank').dataset.init = '1'; }
+  if ($('f-rank') && !$('f-rank').dataset.init) { $('f-rank').value = ''; $('f-rank').dataset.init = '1'; }
   paintSports();
   paintCats();
   renderTicket();
