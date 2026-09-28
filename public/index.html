@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.12</title>
+  <title>EliteOdds v3.4.13</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -671,7 +671,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.10</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.13</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1362,7 +1362,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.10</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.13</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1376,10 +1376,10 @@
             <div id="changelog-body" class="px-3 pb-3 space-y-4 text-[11px] text-bb-muted border-t border-bb-border pt-3">
               <div class="border-l-2 border-violet-500/40 pl-3">
                 <div class="flex flex-wrap items-baseline gap-2">
-                  <span class="text-white font-semibold font-mono">v3.4.10</span>
-                  <span class="text-[10px] text-bb-muted">2026-09-26</span>
+                  <span class="text-white font-semibold font-mono">v3.4.13</span>
+                  <span class="text-[10px] text-bb-muted">2026-09-27</span>
                 </div>
-                <p class="text-violet-200/90 font-medium mt-0.5">Changelog display fix</p>
+                <p class="text-violet-200/90 font-medium mt-0.5">Version badge sync</p>
                 <ul class="mt-1.5 space-y-1 list-disc pl-4">
                   <li class="leading-snug">Release notes always populate in Settings (static fallback + JS render).</li>
                   <li class="leading-snug">Version badge stays in sync with APP_VERSION.</li>
@@ -1713,8 +1713,17 @@
   };
 
   
-  var APP_VERSION = '3.4.12';
+  var APP_VERSION = '3.4.13';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.13',
+      date: '2026-09-27',
+      title: 'Version badge sync',
+      items: [
+        'Header, Settings badge, tab title, and APP_VERSION all show the same number.',
+        'Fixed mismatch where tab said 3.4.12 but app still showed 3.4.10.'
+      ]
+    },
     {
       version: '3.4.12',
       date: '2026-09-27',
@@ -1882,7 +1891,7 @@
   ];
 
   function renderChangelog() {
-    var ver = (typeof APP_VERSION !== 'undefined' && APP_VERSION) ? String(APP_VERSION) : '3.4.9';
+    var ver = (typeof APP_VERSION !== 'undefined' && APP_VERSION) ? String(APP_VERSION) : '3.4.13';
     var vEls = document.querySelectorAll('#app-version, #settings-version');
     for (var i = 0; i < vEls.length; i++) {
       if (vEls[i]) vEls[i].textContent = 'v' + ver;
@@ -2016,6 +2025,8 @@
         paintCats();
         try { renderChangelog(); } catch (eCl2) {}
   loadGames();
+  /* version-sync-boot */
+  setTimeout(function () { try { renderChangelog(); } catch (e3) {} }, 50);
       };
     }
     document.querySelectorAll('#sport-rail .sport-btn').forEach(function (btn) {

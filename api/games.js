@@ -456,10 +456,10 @@ module.exports = async function handler(req, res) {
       const es = await Promise.all(['lol', 'cs2', 'dota2', 'valorant', 'cod'].map((l) => fetchLeagueEvents(l, { limit: 18 })));
       events = es.flat();
     } else if (league && league !== 'all' && LEAGUES.includes(league)) {
-      events = await fetchLeagueEvents(league, { limit: 35 });
+      events = await fetchLeagueEvents(league, { limit: marketType === 'all' ? 28 : 35 });
     } else {
       // all sports + all markets
-      events = await fetchAllSportsEvents({ limitPerLeague: 14 });
+      events = await fetchAllSportsEvents({ limitPerLeague: marketType === 'all' ? 12 : 14 });
     }
     if (mode === 'live') events = events.filter((e) => e.live && !e.ended);
     else if (mode === 'upcoming') events = events.filter((e) => !e.live && !e.ended);
@@ -540,12 +540,35 @@ module.exports = async function handler(req, res) {
 const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1','inning_2','inning_3','inning_4','inning_5','inning_6','inning_7','inning_8','inning_9','inning_winner','inning_scorer','nrfi','yrfi','f5','f5_spread','f5_total','total','totals','spread','spreads','spread_fg','spread_1h','spread_2h','spread_q1','spread_q2','spread_q3','spread_q4','total_fg','total_1h','total_2h','total_q1','total_q2','total_q3','total_q4','team_totals','team_total_fg','team_total_1h','team_total_2h','prop','f5','nrfi','yrfi','f5_spread','f5_total','player_props','team_props','game_props','innings','player_hr','player_k','player_hits','player_tb','player_hrr','pitcher_outs','pitcher_er','pitcher_ha','pitcher_bb','inning_winner'];
 
     // Flat market cards (each Polymarket market = one card)
-    if (flattenTypes.includes(marketType)) {
+    // marketType=all → expand ML, spreads, totals, F5, NRFI, 1H, props, etc.
+    if (marketType === 'all' || flattenTypes.includes(marketType)) {
       const flat = [];
+      // Prefer a stable order of market families so board is scannable
+      const typePriority = {
+        moneyline: 1, moneyline_1h: 2,
+        spread: 3, spread_1h: 4, spread_2h: 5, spread_q1: 6, f5_spread: 7,
+        total: 10, total_1h: 11, total_2h: 12, f5_total: 13,
+        f5: 20, nrfi: 21, yrfi: 22,
+        team_total_fg: 25, team_total_1h: 26,
+        map_1: 30, map_2: 31, map_total: 32,
+      };
       for (const ev of events) {
         for (const m of ev.markets || []) {
           const type = classifyMarket(m);
-          if (!matchesType(type, marketType)) continue;
+          if (marketType !== 'all' && !matchesType(type, marketType)) continue;
+          // Skip pure noise props when All — still include core game lines + common props
+          if (marketType === 'all') {
+            const core = /^(moneyline|moneyline_1h|spread|spread_|total|total_|f5|f5_|nrfi|yrfi|team_total|map_|inning_)/.test(type)
+              || type === 'spread' || type === 'total' || type === 'f5' || type === 'f5_total' || type === 'f5_spread'
+              || type === 'player_hr' || type === 'player_k' || type === 'player_hits'
+              || type === 'player_pass_yds' || type === 'player_rush_yds' || type === 'player_rec_yds'
+              || type === 'player_atd' || type === 'player_prop';
+            // Always allow anything matchesType would allow for game_lines + listed cores
+            if (!core && !matchesType(type, 'game_lines')) {
+              // keep other classified non-unknown
+              if (type === 'unknown' || type === 'prop') continue;
+            }
+          }
           if (m.yesPrice == null) continue;
           const mu = matchupCache[ev.title || ev.name || ''] || null;
           const sd = sidesFromMarket(m, ev.title, type, mu);
@@ -614,18 +637,32 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
       // Keep top lines per game + type (PM lists many alternate numbers)
       const capped = [];
       const seen = new Map();
-      flat.sort((a, b) => (b._vol || 0) - (a._vol || 0) || (b.betScore || 0) - (a.betScore || 0));
-      for (const g of flat) {
-        const key = String(g.eventTitle || '') + '|' + String(g.marketType || '');
+      const maxPerType = marketType === 'all' ? 2 : 4;
+      flat.sort((a, b) => {
+        const pa = typePriority[String(a.marketType)] || 50;
+        const pb = typePriority[String(b.marketType)] || 50;
+        if (pa !== pb) return pa - pb;
+        return (b._vol || 0) - (a._vol || 0) || (b.betScore || 0) - (a.betScore || 0);
+      });
+      for (const row of flat) {
+        const key = String(row.eventTitle || '') + '|' + String(row.marketType || '');
         const n = seen.get(key) || 0;
-        if (n >= 4) continue;
+        if (n >= maxPerType) continue;
         seen.set(key, n + 1);
-        capped.push(g);
+        capped.push(row);
       }
+      // Prefer live, then type family order, then score
       capped.sort((a, b) => {
         if (a.live !== b.live) return a.live ? -1 : 1;
+        const pa = typePriority[String(a.marketType)] || 50;
+        const pb = typePriority[String(b.marketType)] || 50;
+        if (pa !== pb) return pa - pb;
         return (b.betScore || 0) - (a.betScore || 0);
       });
+      // Soft cap total cards so Vercel stays healthy (all sports × all markets)
+      if (marketType === 'all' && capped.length > 180) {
+        capped.length = 180;
+      }
       if (typeof attachEspnLiveBatch === 'function' && capped.length <= 60) {
         try { await attachEspnLiveBatch(capped); } catch (eLive) {}
       }
