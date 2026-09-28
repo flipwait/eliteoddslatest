@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.15</title>
+  <title>EliteOdds v3.4.17</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -657,6 +657,34 @@
       border: 1px dashed rgba(30,42,61,0.9); border-radius: 0.75rem;
     }
     .cal-empty strong { color: #e2e8f0; display: block; margin-bottom: 0.25rem; font-size: 13px; }
+    /* v3417-features */
+    .conf-hi { color: #4ade80; border-color: rgba(74,222,128,0.35); }
+    .conf-med { color: #fbbf24; border-color: rgba(251,191,36,0.35); }
+    .conf-lo { color: #94a3b8; border-color: rgba(148,163,184,0.3); }
+    .lm-up { color: #4ade80; }
+    .lm-dn { color: #f87171; }
+    .board-fresh { font-size: 10px; color: #8b9bb4; }
+    .streak-strip { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; font-size: 11px; }
+    .streak-dot { width: 14px; height: 14px; border-radius: 4px; font-size: 9px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
+    .streak-dot.w { background: rgba(74,222,128,0.2); color: #4ade80; }
+    .streak-dot.l { background: rgba(248,113,113,0.2); color: #f87171; }
+    .streak-dot.p { background: rgba(148,163,184,0.15); color: #94a3b8; }
+    .whats-new-toast {
+      position: fixed; bottom: 4.5rem; left: 50%; transform: translateX(-50%);
+      z-index: 80; max-width: 22rem; width: calc(100% - 1.5rem);
+      background: rgba(15,23,42,0.96); border: 1px solid rgba(167,139,250,0.45);
+      border-radius: 12px; padding: 0.75rem 1rem; box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+    }
+    @media (min-width: 768px) { .whats-new-toast { bottom: 1.5rem; } }
+    .live-sticky-head {
+      position: sticky; top: 0; z-index: 5;
+      background: rgba(11,16,32,0.95); backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(148,163,184,0.15);
+      padding: 0.5rem 0; margin: -0.25rem 0 0.75rem;
+    }
+    .week-report { font-size: 11px; }
+    .week-report .wr-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem; text-align: center; }
+    .week-report .wr-grid strong { display: block; font-size: 14px; color: #fff; }
 
   </style>
 </head>
@@ -671,7 +699,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.15</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.17</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -735,9 +763,36 @@
               </select>
             </label>
             <label class="hidden"><input type="checkbox" id="f-allow-mkt-good" /></label>
+            <label class="text-bb-muted flex items-center gap-1">Sort
+              <select id="f-sort">
+                <option value="edge">Edge</option>
+                <option value="model">Model %</option>
+                <option value="time" selected>Start time</option>
+                <option value="volume">Volume</option>
+              </select>
+            </label>
+            <button type="button" id="btn-tonight" class="text-[11px] px-2.5 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">Tonight</button>
             <button type="button" id="f-apply" class="apply">Apply</button>
             <button type="button" id="f-reset" class="text-bb-muted border border-bb-border rounded-lg px-2 py-1">Reset</button>
             <button type="button" id="eo-toggle-more" class="text-bb-muted text-[10px] underline">More filters</button>
+          </div>
+          <div id="weekly-report" class="glass p-3 mb-2 week-report hidden">
+            <div class="flex justify-between items-center mb-1">
+              <h3 class="text-xs font-semibold text-white m-0">Weekly Elite paper</h3>
+              <button type="button" id="wr-toggle" class="text-[10px] text-bb-muted underline">Hide</button>
+            </div>
+            <div class="wr-grid">
+              <div>Offered<strong id="wr-offered">0</strong></div>
+              <div>Settled<strong id="wr-settled">0</strong></div>
+              <div>Won<strong id="wr-won">0</strong></div>
+              <div>ROI<strong id="wr-roi">—</strong></div>
+            </div>
+            <p id="wr-detail" class="text-[10px] text-bb-muted mt-1.5 leading-snug"></p>
+          </div>
+          <div id="board-status" class="flex flex-wrap items-center gap-2 mb-2 text-[10px] text-bb-muted">
+            <span id="board-fresh" class="board-fresh">Board · —</span>
+            <span class="text-bb-muted/40">·</span>
+            <span id="elite-streak" class="streak-strip" title="Last 10 settled Elite paper">Streak · —</span>
           </div>
 
 <section id="panel-scanner">
@@ -1366,7 +1421,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.15</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.17</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1380,7 +1435,7 @@
             <div id="changelog-body" class="px-3 pb-3 space-y-4 text-[11px] text-bb-muted border-t border-bb-border pt-3">
               <div class="border-l-2 border-violet-500/40 pl-3">
                 <div class="flex flex-wrap items-baseline gap-2">
-                  <span class="text-white font-semibold font-mono">v3.4.15</span>
+                  <span class="text-white font-semibold font-mono">v3.4.17</span>
                   <span class="text-[10px] text-bb-muted">2026-09-27</span>
                 </div>
                 <p class="text-violet-200/90 font-medium mt-0.5">Version badge sync</p>
@@ -1717,199 +1772,177 @@
   };
 
   
-  var APP_VERSION = '3.4.15';
+  var APP_VERSION = '3.4.17';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.17',
+      date: '2026-09-27',
+      title: 'Tonight preset, sort, confidence, streak, weekly report',
+      items: [
+        'ADDED — Tonight preset: Today + Pregame + All ranks + min edge 3 + sort by edge.',
+        'ADDED — Sort by edge, model %, start time, or volume.',
+        'ADDED — High/Med/Low confidence tag and session line-move arrow on cards.',
+        'ADDED — Board freshness time, last-10 Elite paper streak, 7-day weekly report.',
+        'ADDED — Sticky score/clock header in Live Focus; What\'s new toast once per version.',
+        'CHANGED — Empty board explains why (Elite only, Today filter, etc.) with a Tonight shortcut.'
+      ]
+    },
+    {
+      version: '3.4.16',
+      date: '2026-09-27',
+      title: 'Changelog rewritten for clarity',
+      items: [
+        'Settings → About now lists releases in plain language: what broke or was missing, what we changed, and what you should see after deploy.',
+        'No product logic change in this build — notes only (plus version badge 3.4.16).'
+      ]
+    },
     {
       version: '3.4.15',
       date: '2026-09-27',
-      title: 'Scan day filter + Calendar Details/Trade',
+      title: 'Today / Tomorrow filter on Scan + Calendar Trade & Details',
       items: [
-        'Scan: Today / Tomorrow / All days chips (default Today) filter by local start date.',
-        'Calendar day slate and paper rows: Details opens the pick modal; Trade opens the book.',
-        'Open paper picks keep Trade; settled paper keeps Details only.'
+        'ADDED — Scan header chips: Today (default), Tomorrow, All days. Filters games by local start date so you are not mixing today’s slate with tomorrow’s.',
+        'ADDED — Calendar day rows (Day slate + Paper): Details opens the same pick modal as Scan; Trade opens Polymarket or Kalshi.',
+        'CHANGED — Settled paper rows keep Details only (Trade hidden when the bet is already won/lost).',
+        'How to check: Scan shows Today/Tomorrow/All days; Calendar → pick a day → Details / Trade on a row.'
       ]
     },
     {
       version: '3.4.14',
       date: '2026-09-27',
-      title: 'Scan loading timeout (no infinite Loading)',
+      title: 'Fixed infinite Loading on desktop dual board',
       items: [
-        'API fetches time out after ~18–20s instead of hanging forever on dual Polymarket + Kalshi.',
-        'One book failing no longer blocks the other column.',
-        'Timeout / error messages show in the column instead of Loading… for 5+ minutes.'
+        'FIXED — Polymarket + Kalshi columns could sit on Loading for minutes (especially Esports). Fetches now time out around 18–20 seconds.',
+        'FIXED — One book failing no longer blocks the other column (Promise.allSettled).',
+        'ADDED — Timeout / error text in the column instead of endless Loading.',
+        'How to check: Desktop dual board finishes or shows an error within ~20s; header v3.4.14+.'
       ]
     },
     {
       version: '3.4.13',
       date: '2026-09-27',
-      title: 'Version badge sync',
+      title: 'Version number mismatch (tab vs app)',
       items: [
-        'Header, Settings badge, tab title, and APP_VERSION all show the same number.',
-        'Fixed mismatch where tab said 3.4.12 but app still showed 3.4.10.'
+        'FIXED — Browser tab could say one version while the header still showed an older number (e.g. tab 3.4.12, app 3.4.10).',
+        'CHANGED — Header, Settings badge, tab title, and APP_VERSION are set together.',
+        'How to check: Tab title and header badge match after a hard refresh.'
       ]
     },
     {
       version: '3.4.12',
       date: '2026-09-27',
-      title: 'O/U & NRFI scan process clarity',
+      title: 'O/U, NRFI, and special markets looked empty',
       items: [
-        'Selecting O/U, NRFI, F5, innings, or props auto-sets Rank to All ranks so Pass/Good cards are visible.',
-        'Empty state explains when Elite-only hides special markets.',
-        'Meta line shows Elite / Good / Pass counts after each scan.'
+        'FIXED — Rank Elite only hid almost all Over/Under and NRFI cards (most score Pass or Good).',
+        'CHANGED — Choosing O/U, NRFI, F5, innings, or props auto-sets Rank to All ranks.',
+        'ADDED — Meta line after scan: Elite / Good / Pass counts. Empty state explains Elite-only hiding special markets.',
+        'How to check: MLB → Market NRFI or Full game O/U → cards appear with Pass/Good/Elite badges.'
       ]
     },
     {
       version: '3.4.11',
       date: '2026-09-26',
-      title: 'Clear stale LIVE on finished games',
+      title: 'Finished games still showed as LIVE Elite',
       items: [
-        'ESPN FINAL status overrides Polymarket live flags.',
-        'MLB games still marked live more than ~5.5 hours after listed start are treated as finished unless ESPN confirms in-progress.',
-        'Finished games are removed from Scan so they cannot show as Elite LIVE.'
+        'FIXED — Games that were already Final (or hours past listed start) still showed LIVE and Elite.',
+        'CHANGED — ESPN FINAL overrides Polymarket live; MLB stale live after ~5.5 hours is treated as finished unless ESPN confirms in-progress.',
+        'CHANGED — Finished games are removed from Scan so they are not actionable Elites.',
+        'How to check: Completed games no longer appear as LIVE Elite on Scan.'
       ]
     },
     {
       version: '3.4.10',
       date: '2026-09-26',
-      title: 'Fix Polymarket load (const reassignment)',
+      title: 'Polymarket Load error: Assignment to constant variable',
       items: [
-        'Fixed server error Assignment to constant variable when filtering ended games on /api/games.'
+        'FIXED — /api/games crashed when filtering out ended games because games was declared const then reassigned.',
+        'CHANGED — Server uses let games so Final filtering works.',
+        'How to check: Polymarket Scan loads without that Load error.'
       ]
     },
     {
       version: '3.4.9',
       date: '2026-09-26',
-      title: 'Changelog display fix',
+      title: 'Empty changelog panel in Settings',
       items: [
-        'Release notes always show in Settings (JS render + HTML fallback).',
-        'Version badge updates from APP_VERSION when Settings opens.',
-        'Changelog panel opens by default so notes are visible immediately.'
+        'FIXED — About → Changelog often looked blank even when notes existed in code.',
+        'ADDED — HTML fallback notes + stronger JS render when opening Settings.',
+        'How to check: Settings → About → Changelog lists version bullets.'
       ]
     },
     {
       version: '3.4.8',
       date: '2026-09-26',
-      title: 'Hide Final games · no false Tomorrow labels',
+      title: 'Final games with wrong Tomorrow label',
       items: [
-        'Completed games (Final / ended) are removed from Scan — not shown as Elite open bets.',
-        'ESPN completed status forces ended and clears live.',
-        'Date line never says Tomorrow for Finals; past listed starts show calendar date instead of future day labels.'
+        'FIXED — Cards could show Final score while the time line still said Tomorrow.',
+        'CHANGED — Completed games are dropped from Scan; Finals never use a Tomorrow day label.',
+        'How to check: No Elite open card for a game that already has a Final score.'
       ]
     },
     {
       version: '3.4.7',
       date: '2026-09-26',
-      title: 'Pregame / Live modes + Live Edge board markets',
+      title: 'Live mode tabs + Live Edge board markets',
       items: [
-        'Mode tabs are Pregame, Live, and Live + Pregame (removed Upcoming/All labels).',
-        'Live cards no longer show Tomorrow when the game is already LIVE.',
-        'Live Focus adds a Board markets panel: ML, O/U, F5, and other markets for that game from the current Scan (Good/Elite first).'
+        'CHANGED — Mode tabs are Pregame, Live, and Live + Pregame (removed confusing Upcoming/All labels).',
+        'FIXED — Live cards no longer display as Tomorrow while the game is LIVE.',
+        'ADDED — Live Focus Board markets panel: other ML / O/U / F5 markets for that game from the current Scan.'
       ]
     },
     {
       version: '3.4.6',
       date: '2026-09-26',
-      title: 'NHL markets + form',
+      title: 'NHL added',
       items: [
-        'NHL added on Polymarket US league list and Kalshi series (ML, puck line, totals, period markets when listed).',
-        'NHL form uses L10/L5, goal differential, H2H, home ice, and back-to-back rest adjustments (ESPN schedule).',
-        'Sport rail, All-sports scan, and Super Elite sport list include NHL.'
+        'ADDED — NHL on Polymarket and Kalshi (ML, puck line, totals, period markets when listed).',
+        'ADDED — NHL form (L10/L5, goal differential, H2H, home ice, rest / B2B via ESPN).',
+        'CHANGED — Sport rail, All-sports scan, and Super Elite include NHL.'
       ]
     },
     {
       version: '3.4.5',
       date: '2026-09-26',
-      title: 'All sports / all markets board fix',
+      title: 'Sport = All returned zero markets',
       items: [
-        'Sport=All loads Polymarket leagues in parallel (MLB, NFL, NBA, CFB, …) so the board is not empty after a single timed-out request.',
-        'Default rank is All ranks (not Elite only) so markets remain visible while scanning.',
-        'Clearer empty state when Elite-only filter hides every card.',
-        'Kalshi all-sports pull trimmed for reliability; league=all no longer filtered away server-side.'
+        'FIXED — All sports could time out as one big request and show an empty board.',
+        'CHANGED — Polymarket loads leagues in parallel batches; clearer empty state when Elite-only hides everything.'
       ]
     },
     {
       version: '3.4.4',
       date: '2026-09-26',
-      title: 'Card size uses your Unit $',
+      title: 'Card stake uses Unit $ (not Kelly on cards)',
       items: [
-        'Game cards no longer size with Kelly. Size and Risk use Unit $ and Max units from Settings.',
-        'Elite = max units, Good = half max units, Pass = 0. Dollar risk = units × your Unit $.',
-        'Kelly mode defaults to Off; optional Kelly remains in Settings but is not shown on cards.'
+        'CHANGED — Size / risk on cards use Unit $ and Max units from Settings.',
+        'CHANGED — Elite = max units, Good = half max units, Pass = 0. Kelly optional in Settings, not forced on cards.'
       ]
     },
     {
       version: '3.4.3',
       date: '2026-09-26',
-      title: 'Auto-settle full-game Over/Under',
+      title: 'Auto-settle full-game Over/Under from ESPN',
       items: [
-        'ESPN settle now grades full-game Over/Under using final combined score vs the line on the pick.',
-        'Moneyline settlement unchanged; F5 totals, spreads, and props remain manual.',
-        'Button renamed Settle ML + O/U from ESPN; works on Elite paper and manual journal open bets.'
+        'ADDED — Settle grades full-game O/U from final combined score vs the line on the pick.',
+        'UNCHANGED — Moneyline settle still works; F5 / spreads / props stay manual for now.'
       ]
     },
     {
       version: '3.4.2',
       date: '2026-09-26',
-      title: 'Win / CASHOUT settle upgrade',
+      title: 'Win settle posts CASHOUT-style Discord',
       items: [
-        'When a journal bet is marked Won, Discord posts a CASHOUT embed: book, stake, profit (units + $), ROI, entry, final score.',
-        'Win webhook preferred; Kalshi wins fall back to Discord 2 if Win webhook is empty.',
-        'On-screen settle message shows CASHOUT with unit and dollar profit.',
-        'Journal rows label settled wins as CASHOUT for clearer tracking.'
+        'CHANGED — Won bets can post a clearer CASHOUT-style embed (book, stake, profit, ROI, score).',
+        'ADDED — Journal labels settled wins as CASHOUT for tracking.'
       ]
     },
     {
       version: '3.4.1',
       date: '2026-09-26',
-      title: 'Win settle & cashout Discord',
+      title: 'About panel + first version badge',
       items: [
-        'Journal Win posts a clearer CASHOUT Discord embed: book, stake, PnL in units and $, entry, final score, ROI.',
-        'Dedicated Win / Loss webhooks preferred; Kalshi falls back to Discord 2 when win webhook is empty.',
-        'After settling, an on-screen summary confirms WIN/LOSS and whether Discord was notified.',
-        'Settled journal rows show WIN/LOSS badges, dollar PnL when unit size is set, and Undo to reopen a bet.'
-      ]
-    },
-    {
-      version: '3.4.0',
-      date: '2026-09-26',
-      title: 'Live Edge desk & ESPN clock',
-      items: [
-        'Added Live Edge situation ideas inside Live Focus (phase, score total, O/U pace) for MLB, NFL, CFB, NBA, and related sports.',
-        'Integrated ESPN scoreboard matching for live period, display clock, score, and elapsed/remaining time fractions.',
-        'Pace vs total line now prefers real clock elapsed % when ESPN match succeeds; falls back to period phase otherwise.',
-        'Live Focus header chips: Phase, Clock, Score Σ, O/U line, plus elapsed/remaining readout.'
-      ]
-    },
-    {
-      version: '3.3.0',
-      date: '2026-09-26',
-      title: 'Football markets, All sports, Super Elite placement',
-      items: [
-        'Expanded NFL and CFB market menus (period spreads/totals, team totals, pass/rush/rec yards, receptions, anytime TD).',
-        'Kalshi series maps widened for NFL/CFB periods and optional player-prop series; UFC and tennis series stubs added.',
-        'Sport = All now pulls multi-league boards on both Polymarket and Kalshi (no longer defaults Kalshi to MLB only).',
-        'Super Elite on mobile limited to the Desk tab; removed from Scan for a cleaner mobile scan flow.'
-      ]
-    },
-    {
-      version: '3.2.0',
-      date: '2026-09-26',
-      title: 'NRFI honesty, Kalshi Discord routing, prop filters',
-      items: [
-        'NRFI/YRFI model uses 1st-inning blank rates with optional SP ERA nudge; Details show honest limits (park, weather, true BvP not included).',
-        'Kalshi picks lock to Discord webhook 2; Polymarket remains on webhook 1.',
-        'Player prop classification fixed so HR, strikeouts, and related filters return matching markets when listed.',
-        'Expired F5 and resolved (~0%/100%) live markets forced to Pass and hidden from the actionable board.'
-      ]
-    },
-    {
-      version: '3.1.0',
-      date: '2026-09-25',
-      title: 'Journal, paper track, Super Elite form-first',
-      items: [
-        'Manual journal separated from Elite paper tracking; day tabs and book filters on paper.',
-        'Super Elite form-first gates (role L10) with configurable model floor and creative checkboxes.',
-        'Calendar desk with day badges for process review.'
+        'ADDED — Settings → About with product version and release notes panel.',
+        'NOTE — Early badge builds; later 3.4.9–3.4.13 fixed empty notes and mismatched numbers.'
       ]
     }
   ];
@@ -1949,6 +1982,177 @@
   }
 
   var sport = 'mlb', mode = 'both', dayFilter = 'today', marketType = 'all', venue = 'polymarket';
+  var boardRefreshedAt = null;
+  var sortMode = 'time';
+
+  function confidenceOf(g) {
+    var score = Number(g.betScore != null ? g.betScore : (g.score10 != null ? g.score10 * 10 : 50));
+    var edge = Math.abs(Number(g.probability_edge != null ? g.probability_edge : (g.netEdge != null ? g.netEdge : 0)));
+    var hasForm = !!(g.hasForm || (g.fairSource && String(g.fairSource).indexOf('form') >= 0));
+    var rk = String(g.rank || '').toLowerCase();
+    if (rk === 'elite' && score >= 75 && (edge >= 4 || hasForm)) return { label: 'High', cls: 'conf-hi' };
+    if (rk === 'elite' || (rk === 'good' && score >= 60)) return { label: 'Med', cls: 'conf-med' };
+    if (rk === 'good') return { label: 'Med', cls: 'conf-med' };
+    return { label: 'Low', cls: 'conf-lo' };
+  }
+
+  function lineMoveHtml(g) {
+    var cur = g.market_probability != null ? Number(g.market_probability) : null;
+    if (cur == null) return '';
+    if (cur > 1) cur = cur / 100;
+    var key = 'bb_lm_' + String(g.id || g.slug || g.eventTitle || '').slice(0, 80);
+    var prev = null;
+    try {
+      var raw = sessionStorage.getItem(key);
+      if (raw != null) prev = Number(raw);
+      else sessionStorage.setItem(key, String(cur));
+    } catch (e) {}
+    if (prev == null || isNaN(prev)) return '';
+    var dpp = Math.round((cur - prev) * 1000) / 10; // percentage points if cur is 0-1 -> *100
+    // cur stored as 0-1; display pp
+    dpp = Math.round((cur - prev) * 1000) / 10;
+    if (Math.abs(dpp) < 0.3) return '<span class="text-bb-muted text-[10px]" title="Line vs first seen this session">→</span>';
+    if (dpp > 0) return '<span class="lm-up text-[10px]" title="Market % up since first seen">↑' + dpp + 'pp</span>';
+    return '<span class="lm-dn text-[10px]" title="Market % down since first seen">↓' + Math.abs(dpp) + 'pp</span>';
+  }
+
+  function sortGamesList(list) {
+    var modeS = ($('f-sort') && $('f-sort').value) || sortMode || 'time';
+    sortMode = modeS;
+    var arr = (list || []).slice();
+    function edgeOf(g) {
+      return Number(g.probability_edge != null ? g.probability_edge : (g.netEdge != null ? g.netEdge : 0));
+    }
+    function modOf(g) {
+      var m = g.model_probability != null ? Number(g.model_probability) : 0;
+      if (m > 0 && m <= 1) m *= 100;
+      return m;
+    }
+    function tOf(g) {
+      var t = new Date(g.startTime || 0).getTime();
+      return isNaN(t) ? 1e15 : t;
+    }
+    function volOf(g) {
+      return Number(g._vol != null ? g._vol : (g.volume != null ? g.volume : (g.liquidity != null ? g.liquidity : 0)));
+    }
+    arr.sort(function (a, b) {
+      // live first always
+      if (!!a.live !== !!b.live) return a.live ? -1 : 1;
+      if (modeS === 'edge') return edgeOf(b) - edgeOf(a);
+      if (modeS === 'model') return modOf(b) - modOf(a);
+      if (modeS === 'volume') return volOf(b) - volOf(a);
+      return tOf(a) - tOf(b);
+    });
+    return arr;
+  }
+
+  function eliteStreakHtml() {
+    var list = [];
+    try { list = eliteLedger(); } catch (e) { list = []; }
+    var settled = list.filter(function (e) {
+      var r = String(e.result || '');
+      return r === 'won' || r === 'lost' || r === 'push';
+    }).sort(function (a, b) {
+      return new Date(b.settledAt || b.at || 0) - new Date(a.settledAt || a.at || 0);
+    }).slice(0, 10);
+    if (!settled.length) return 'Streak · no settled paper yet';
+    var dots = settled.map(function (e) {
+      var r = String(e.result);
+      var c = r === 'won' ? 'w' : r === 'lost' ? 'l' : 'p';
+      var ch = r === 'won' ? 'W' : r === 'lost' ? 'L' : 'P';
+      return '<span class="streak-dot ' + c + '">' + ch + '</span>';
+    }).join('');
+    var w = settled.filter(function (e) { return e.result === 'won'; }).length;
+    var l = settled.filter(function (e) { return e.result === 'lost'; }).length;
+    return 'Last 10 · ' + w + '-' + l + ' ' + dots;
+  }
+
+  function updateWeeklyReport() {
+    var box = $('weekly-report');
+    if (!box) return;
+    box.classList.remove('hidden');
+    var list = [];
+    try { list = eliteLedger(); } catch (e) { list = []; }
+    var now = new Date();
+    var weekAgo = new Date(now.getTime() - 7 * 86400000);
+    var week = list.filter(function (e) {
+      var t = new Date(e.at || e.startTime || 0);
+      return !isNaN(t.getTime()) && t >= weekAgo;
+    });
+    var settled = week.filter(function (e) {
+      var r = String(e.result || '');
+      return r === 'won' || r === 'lost' || r === 'push';
+    });
+    var won = settled.filter(function (e) { return e.result === 'won'; }).length;
+    var lost = settled.filter(function (e) { return e.result === 'lost'; }).length;
+    var pnl = 0;
+    settled.forEach(function (e) {
+      if (e.pnl != null) pnl += Number(e.pnl);
+      else if (e.result === 'won') pnl += 1;
+      else if (e.result === 'lost') pnl -= 1;
+    });
+    var risk = settled.length || 1;
+    var roi = settled.length ? Math.round((pnl / risk) * 1000) / 10 : null;
+    if ($('wr-offered')) $('wr-offered').textContent = week.length;
+    if ($('wr-settled')) $('wr-settled').textContent = settled.length;
+    if ($('wr-won')) $('wr-won').textContent = won + '-' + lost;
+    if ($('wr-roi')) {
+      $('wr-roi').textContent = roi == null ? '—' : ((roi >= 0 ? '+' : '') + roi + '%');
+      $('wr-roi').style.color = roi == null ? '' : (roi >= 0 ? '#4ade80' : '#f87171');
+    }
+    if ($('wr-detail')) {
+      $('wr-detail').textContent = settled.length
+        ? ('Last 7 days · paper Elites offered ' + week.length + ', settled ' + settled.length + ', unit PnL ' + (pnl >= 0 ? '+' : '') + Math.round(pnl * 10) / 10 + 'u')
+        : 'Last 7 days · no settled Elite paper yet. Track Elites to fill this report.';
+    }
+  }
+
+  function applyTonightPreset() {
+    dayFilter = 'today';
+    mode = 'pregame';
+    marketType = marketType || 'moneyline';
+    document.querySelectorAll('.day-btn').forEach(function (b) {
+      var on = b.getAttribute('data-day') === 'today';
+      b.classList.toggle('pill-on', on);
+      b.classList.toggle('text-bb-muted', !on);
+    });
+    document.querySelectorAll('.mode-btn').forEach(function (b) {
+      var on = b.getAttribute('data-mode') === 'pregame';
+      b.classList.toggle('pill-on', on);
+      b.classList.toggle('text-bb-muted', !on);
+    });
+    if ($('f-rank')) $('f-rank').value = '';
+    if ($('f-min-edge')) $('f-min-edge').value = '3';
+    if ($('f-sort')) $('f-sort').value = 'edge';
+    if ($('market-select') && marketType === 'all') {
+      // leave market; Tonight is about time/rank
+    }
+    loadGames();
+  }
+
+  function maybeShowWhatsNew() {
+    var toast = $('whats-new-toast');
+    if (!toast) return;
+    var ver = typeof APP_VERSION !== 'undefined' ? String(APP_VERSION) : '';
+    var key = 'bb_whats_new_seen';
+    var seen = '';
+    try { seen = localStorage.getItem(key) || ''; } catch (e) {}
+    if (!ver || seen === ver) return;
+    var top = (APP_CHANGELOG && APP_CHANGELOG[0]) ? APP_CHANGELOG[0] : null;
+    if ($('wn-ver')) $('wn-ver').textContent = 'v' + ver;
+    if ($('wn-body')) {
+      var line = top && top.title ? top.title : 'New build installed.';
+      if (top && top.items && top.items[0]) line += ' — ' + top.items[0];
+      $('wn-body').textContent = line;
+    }
+    toast.classList.remove('hidden');
+    var dis = $('wn-dismiss');
+    if (dis) dis.onclick = function () {
+      try { localStorage.setItem(key, ver); } catch (e2) {}
+      toast.classList.add('hidden');
+    };
+  }
+
   var games = [], ticket = [];
   try { ticket = JSON.parse(localStorage.getItem('bb_ticket') || '[]'); } catch (e) {}
 
@@ -2048,6 +2252,8 @@
   try { renderChangelog(); } catch (e0) {}
         paintCats();
         try { renderChangelog(); } catch (eCl2) {}
+  try { maybeShowWhatsNew(); } catch (eWn) {}
+  try { updateWeeklyReport(); if ($('elite-streak')) $('elite-streak').innerHTML = eliteStreakHtml(); } catch (eSt) {}
   loadGames();
   /* version-sync-boot */
   setTimeout(function () { try { renderChangelog(); } catch (e3) {} }, 50);
@@ -2383,7 +2589,14 @@
         (g.score ? ' · ' + String(g.score).replace(/</g,'') : '') +
         (g.startTime || g.live || g.ended ? ' · <span class="text-white/80">' + formatGameWhen(g.startTime, !!(g.live || g.isLive), !!(g.ended || /final/i.test(String(g.period||'')))) + '</span>' : '') +
         '</p></div>' +
-        '<div class="flex items-center gap-1.5 shrink-0">' +'<span class="' + rankClass(g.rank) + ' text-[10px] font-bold px-2.5 py-1 rounded-full h-fit tracking-wide">' + String(g.rank || 'PASS').toUpperCase() + '</span>' +'<span class="text-[9px] text-bb-muted">' + (g.score10 != null ? g.score10 : Math.max(1, Math.min(10, Math.round((g.betScore||50)/10)))) + '/10</span></div></div>' +
+        '<div class="flex flex-col items-end gap-0.5 shrink-0">' +
+        '<div class="flex items-center gap-1.5">' +
+        '<span class="' + rankClass(g.rank) + ' text-[10px] font-bold px-2.5 py-1 rounded-full h-fit tracking-wide">' + String(g.rank || 'PASS').toUpperCase() + '</span>' +
+        '<span class="text-[9px] text-bb-muted">' + (g.score10 != null ? g.score10 : Math.max(1, Math.min(10, Math.round((g.betScore||50)/10)))) + '/10</span></div>' +
+        '<div class="flex items-center gap-1.5">' +
+        (function(){ var c = confidenceOf(g); return '<span class="text-[9px] px-1.5 py-0.5 rounded border ' + c.cls + '">' + c.label + ' conf</span>'; })() +
+        lineMoveHtml(g) +
+        '</div></div></div>' +
       '<p class="text-sm font-semibold ' + (isKalshi ? 'text-bb-green' : 'text-violet-300') + '">Model pick · ' + (function(){
         var mt = String(g.marketType || '').toLowerCase();
         var isTot = /total|over|under|ou/.test(mt) || /\bover\b|\bunder\b/i.test(pick);
@@ -5430,12 +5643,27 @@ function renderSlate() {
         '</div>' +
       '</div>';
 
+    var stickyHead = '<div class="live-sticky-head">' +
+      '<div class="flex items-center justify-between gap-2">' +
+        '<div class="min-w-0">' +
+          '<p class="text-[10px] text-bb-muted m-0 truncate">' + String(g.eventTitle || g.title || '').replace(/</g,'') + '</p>' +
+          '<p class="text-sm font-semibold text-white m-0">' +
+            (stickyLive ? '<span class="text-bb-red">LIVE</span> · ' : '') +
+            (stickyScore ? stickyScore + ' · ' : '') +
+            (stickyPer || '—') +
+            (stickyClock ? ' · ' + stickyClock : '') +
+          '</p>' +
+        '</div>' +
+        '<span class="' + rankClass(g.rank) + ' text-[10px] font-bold px-2 py-0.5 rounded-full">' + String(g.rank || 'PASS').toUpperCase() + '</span>' +
+      '</div></div>';
+
     $('modal-body').innerHTML =
       '<div class="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-bb-border">' +
         '<button type="button" onclick="closeModal()" class="text-sm px-3 py-1.5 rounded-lg border border-bb-border text-bb-muted hover:text-white">← Back</button>' +
         '<span class="text-[10px] text-bb-muted uppercase tracking-wider">Live Focus</span>' +
         '<button type="button" onclick="closeModal()" class="text-sm px-3 py-1.5 rounded-lg bg-bb-elev text-white">Close</button>' +
       '</div>' +
+      stickyHead +
       liveTracker +
       '<div class="mt-2 flex justify-end"><button type="button" id="live-hide-card" class="text-[10px] text-bb-muted underline">Hide card detail</button></div>' +
       '<div id="live-card-wrap">' + cardHtml(g) + '</div>' + desk;
@@ -5575,6 +5803,19 @@ function renderSlate() {
       loadGames();
     };
   });
+
+  var btnTonight = $('btn-tonight');
+  if (btnTonight) btnTonight.onclick = function () { applyTonightPreset(); };
+  if ($('f-sort')) $('f-sort').onchange = function () { loadGames(); };
+  if ($('wr-toggle')) $('wr-toggle').onclick = function () {
+    var body = $('weekly-report');
+    if (!body) return;
+    var hide = body.classList.toggle('opacity-60');
+    // collapse detail
+    var d = $('wr-detail');
+    if (d) d.classList.toggle('hidden');
+  };
+
   $('btn-load').onclick = loadGames;
   $('btn-snap').onclick = async function () {
     try {
@@ -5842,5 +6083,14 @@ function renderSlate() {
 })();</script>
 
   
+<div id="whats-new-toast" class="whats-new-toast hidden" role="status">
+  <div class="flex justify-between gap-2 items-start">
+    <div>
+      <p class="text-xs font-semibold text-white m-0">What&apos;s new · <span id="wn-ver"></span></p>
+      <p id="wn-body" class="text-[11px] text-bb-muted mt-1 leading-snug m-0"></p>
+    </div>
+    <button type="button" id="wn-dismiss" class="text-[10px] text-violet-300 shrink-0">Got it</button>
+  </div>
+</div>
 </body>
 </html>
