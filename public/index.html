@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.11</title>
+  <title>EliteOdds v3.4.12</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1678,6 +1678,7 @@
     ufc: [
       { id: 'all', label: 'All' },
       { id: 'moneyline', label: 'Fight winner' },
+      { id: 'total', label: 'Totals (if listed)' },
       { id: 'prop', label: 'Fight props' }
     ],
     atp: [
@@ -1712,8 +1713,18 @@
   };
 
   
-  var APP_VERSION = '3.4.11';
+  var APP_VERSION = '3.4.12';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.12',
+      date: '2026-09-27',
+      title: 'O/U & NRFI scan process clarity',
+      items: [
+        'Selecting O/U, NRFI, F5, innings, or props auto-sets Rank to All ranks so Pass/Good cards are visible.',
+        'Empty state explains when Elite-only hides special markets.',
+        'Meta line shows Elite / Good / Pass counts after each scan.'
+      ]
+    },
     {
       version: '3.4.11',
       date: '2026-09-26',
@@ -2027,6 +2038,16 @@
       }).join('');
       sel.onchange = function () {
         marketType = sel.value || 'all';
+        // O/U, NRFI, F5, innings rarely hit Elite — show all ranks so cards appear
+        if (isSpecialMarket(marketType) && $('f-rank')) {
+          $('f-rank').value = '';
+        }
+        var tip = $('market-process-tip');
+        if (tip) {
+          var h = SPECIAL_MARKET_HINT[marketType];
+          tip.textContent = h || 'Scan loads this market type from the book, scores each market, then ranks Pass / Good / Elite.';
+          tip.classList.toggle('hidden', !h && marketType === 'all');
+        }
         loadGames();
       };
     }
@@ -3690,9 +3711,18 @@
     if (!box) return;
     if (!list.length) {
       var rk = ($('f-rank') && $('f-rank').value) || '';
-      var tip = rk === 'elite'
-        ? '<p class="text-bb-muted text-sm p-3">No games for this filter.<br><span class="text-[11px]">Elite only is on — switch <strong class="text-white">Rank</strong> to All ranks (or Good+) to see more markets across sports.</span></p>'
-        : '<p class="text-bb-muted text-sm p-3">No games for this filter.<br><span class="text-[11px]">Try Sport: MLB/NFL, Market: ML, or Mode: Pregame / Live + Pregame. Then refresh.</span></p>';
+      var mt = String(marketType || 'all');
+      var special = isSpecialMarket(mt);
+      var tip;
+      if (rk === 'elite' && special) {
+        tip = '<p class="text-bb-muted text-sm p-3">No <strong class="text-white">Elite</strong> cards for <strong class="text-white">' + mt.replace(/_/g,' ') + '</strong>.<br><span class="text-[11px]">Most O/U and NRFI score as <strong class="text-white">Pass</strong> or <strong class="text-white">Good</strong>. Set Rank to <strong class="text-white">All ranks</strong>, then Apply.</span></p>';
+      } else if (rk === 'elite') {
+        tip = '<p class="text-bb-muted text-sm p-3">No games for this filter.<br><span class="text-[11px]">Elite only is on — switch <strong class="text-white">Rank</strong> to All ranks (or Good+) to see more markets.</span></p>';
+      } else if (special) {
+        tip = '<p class="text-bb-muted text-sm p-3">No markets found for <strong class="text-white">' + mt.replace(/_/g,' ') + '</strong> on this board.<br><span class="text-[11px]">Book may not list them yet for these games, or Sport/Mode is too narrow. Try MLB · Pregame · Rank All ranks.</span></p>';
+      } else {
+        tip = '<p class="text-bb-muted text-sm p-3">No games for this filter.<br><span class="text-[11px]">Try Sport: MLB, Market: ML, Mode: Live + Pregame, Rank: All ranks.</span></p>';
+      }
       box.innerHTML = tip;
       return;
     }
@@ -3762,7 +3792,16 @@
         if (!games.length && rankF === 'elite') {
           hint = ' · try Rank: All ranks';
         }
-        if ($('meta')) $('meta').textContent = String(venue).toUpperCase() + ' · ' + games.length + ' markets' + hint;
+        if ($('meta')) {
+          var eN = 0, gN = 0, pN = 0;
+          games.forEach(function (x) {
+            var r = String(x.rank || '').toLowerCase();
+            if (r === 'elite') eN++;
+            else if (r === 'good') gN++;
+            else pN++;
+          });
+          $('meta').textContent = String(venue).toUpperCase() + ' · ' + games.length + ' markets · Elite ' + eN + ' · Good ' + gN + ' · Pass ' + pN + hint;
+        }
       }
       renderSlate();
       trackElitePicks(games);
