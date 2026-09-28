@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.19</title>
+  <title>EliteOdds v3.4.20</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -685,6 +685,15 @@
     .week-report { font-size: 11px; }
     .week-report .wr-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem; text-align: center; }
     .week-report .wr-grid strong { display: block; font-size: 14px; color: #fff; }
+    .layout-chip.on { background: rgba(139,92,246,0.28); border-color: rgba(167,139,250,0.6); color: #ede9fe; }
+    .hub-card .hub-lines { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.5rem; }
+    .hub-line {
+      display: grid; grid-template-columns: 1fr auto auto auto;
+      gap: 0.35rem 0.5rem; align-items: center;
+      padding: 0.4rem 0.5rem; border-radius: 8px;
+      border: 1px solid rgba(148,163,184,0.12); background: rgba(15,23,42,0.45);
+      font-size: 11px;
+    }
 
   </style>
 </head>
@@ -699,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.19</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.20</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -771,6 +780,9 @@
                 <option value="volume">Volume</option>
               </select>
             </label>
+            <span class="text-[10px] text-bb-muted hidden sm:inline">Layout</span>
+            <button type="button" data-layout="classic" id="layout-classic" class="layout-chip on text-[11px] px-2.5 py-1 rounded-lg border border-bb-border text-bb-muted">Classic</button>
+            <button type="button" data-layout="hub" id="layout-hub" class="layout-chip text-[11px] px-2.5 py-1 rounded-lg border border-bb-border text-bb-muted">By game</button>
             <button type="button" id="btn-tonight" class="text-[11px] px-2.5 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">Tonight</button>
             <button type="button" id="f-apply" class="apply">Apply</button>
             <button type="button" id="f-reset" class="text-bb-muted border border-bb-border rounded-lg px-2 py-1">Reset</button>
@@ -1421,7 +1433,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.19</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.20</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1433,17 +1445,7 @@
               <span class="text-bb-muted font-normal hidden group-open:inline">Hide</span>
             </summary>
             <div id="changelog-body" class="px-3 pb-3 space-y-4 text-[11px] text-bb-muted border-t border-bb-border pt-3">
-              <div class="border-l-2 border-violet-500/40 pl-3">
-                <div class="flex flex-wrap items-baseline gap-2">
-                  <span class="text-white font-semibold font-mono">v3.4.19</span>
-                  <span class="text-[10px] text-bb-muted">2026-09-27</span>
-                </div>
-                <p class="text-violet-200/90 font-medium mt-0.5">Version badge sync</p>
-                <ul class="mt-1.5 space-y-1 list-disc pl-4">
-                  <li class="leading-snug">Release notes always populate in Settings (static fallback + JS render).</li>
-                  <li class="leading-snug">Version badge stays in sync with APP_VERSION.</li>
-                </ul>
-              </div>
+              <p class="text-bb-muted">Loading release notes…</p>
             </div>
           </details>
           <p class="text-[10px] text-bb-muted">Tip: after each deploy, confirm this version matches the zip you uploaded (Settings → About).</p>
@@ -1772,8 +1774,18 @@
   };
 
   
-  var APP_VERSION = '3.4.19';
+  var APP_VERSION = '3.4.20';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.20',
+      date: '2026-09-27',
+      title: 'Changelog shows real build changes',
+      items: [
+        'FIXED — Settings → About only showed a short static “Version badge sync” note instead of the full release history.',
+        'CHANGED — Changelog now always renders from APP_CHANGELOG (ADDED / FIXED / CHANGED for each version).',
+        'How to check: Settings → About → you should see v3.4.20, then 3.4.19 Classic/By game, 3.4.18 isSpecialMarket, 3.4.17 Tonight preset, etc.'
+      ]
+    },
     {
       version: '3.4.19',
       date: '2026-09-27',
@@ -1968,7 +1980,7 @@
   ];
 
   function renderChangelog() {
-    var ver = (typeof APP_VERSION !== 'undefined' && APP_VERSION) ? String(APP_VERSION) : '3.4.13';
+    var ver = (typeof APP_VERSION !== 'undefined' && APP_VERSION) ? String(APP_VERSION) : '3.4.20';
     var vEls = document.querySelectorAll('#app-version, #settings-version');
     for (var i = 0; i < vEls.length; i++) {
       if (vEls[i]) vEls[i].textContent = 'v' + ver;
@@ -1977,7 +1989,7 @@
     if (!el) return;
     var list = (typeof APP_CHANGELOG !== 'undefined' && APP_CHANGELOG && APP_CHANGELOG.length) ? APP_CHANGELOG : [];
     if (!list.length) {
-      el.innerHTML = '<p class="text-bb-muted">No release notes loaded. Hard-refresh after deploy.</p>';
+      el.innerHTML = '<p class="text-bb-muted">No release notes in this build. Hard-refresh after deploy.</p>';
       return;
     }
     var htmlOut = '';
@@ -1989,35 +2001,18 @@
         lis += '<li class="leading-snug">' + String(items[j]).replace(/</g, '') + '</li>';
       }
       htmlOut +=
-        '<div class="border-l-2 border-violet-500/40 pl-3 mb-3">' +
+        '<div class="border-l-2 border-violet-500/40 pl-3 mb-4">' +
           '<div class="flex flex-wrap items-baseline gap-2">' +
             '<span class="text-white font-semibold font-mono">v' + String(rel.version || '').replace(/</g,'') + '</span>' +
             '<span class="text-[10px] text-bb-muted">' + String(rel.date || '').replace(/</g,'') + '</span>' +
           '</div>' +
           '<p class="text-violet-200/90 font-medium mt-0.5">' + String(rel.title || '').replace(/</g,'') + '</p>' +
-          '<ul class="mt-1.5 space-y-1 list-disc pl-4">' + lis + '</ul>' +
+          '<ul class="mt-1.5 space-y-1 list-disc pl-4 text-bb-muted">' + lis + '</ul>' +
         '</div>';
     }
     el.innerHTML = htmlOut;
   }
 
-
-  var SPECIAL_MARKET_HINT = {
-    nrfi: 'NRFI = no run in the 1st · YRFI = at least one run. Often Pass until 1st-inning form is rich.',
-    yrfi: 'YRFI = yes run first inning (same board as NRFI).',
-    total: 'Full-game Over/Under. Each card is one O/U side from the model.',
-    f5_total: 'First 5 innings total runs Over/Under.',
-    f5: 'First 5 innings winner.',
-    f5_spread: 'First 5 innings run line / spread.',
-    innings: 'Inning winners + NRFI/YRFI when listed.',
-    spread: 'Full-game spread / run line / puck line.',
-    player_props: 'Player props — use Rank: All ranks to browse.',
-    map_1: 'Esports Map 1 winner.',
-    map_2: 'Esports Map 2 winner.',
-    map_3: 'Esports Map 3 winner.',
-    map_total: 'Esports total maps.',
-    map_winner: 'All map winner markets.'
-  };
   function isSpecialMarket(mt) {
     mt = String(mt || '').toLowerCase();
     if (!mt || mt === 'all' || mt === 'moneyline' || mt === 'ml') return false;
@@ -5990,6 +5985,33 @@ function renderSlate() {
     };
   });
 
+  document.querySelectorAll('.layout-chip').forEach(function (btn) {
+    var on = btn.getAttribute('data-layout') === boardLayout;
+    btn.classList.toggle('on', on);
+    btn.classList.toggle('text-bb-muted', !on);
+    btn.onclick = function () {
+      boardLayout = btn.getAttribute('data-layout') || 'classic';
+      try { localStorage.setItem('bb_board_layout', boardLayout); } catch (e) {}
+      document.querySelectorAll('.layout-chip').forEach(function (b) {
+        var o = b.getAttribute('data-layout') === boardLayout;
+        b.classList.toggle('on', o);
+        b.classList.toggle('text-bb-muted', !o);
+      });
+      if (typeof games !== 'undefined' && games && games.length) {
+        var dual = typeof window.matchMedia === 'function' && window.matchMedia('(min-width: 1100px)').matches;
+        if (dual) {
+          var polyG = games.filter(function (g) { return String(g.venue||g.source||'') !== 'kalshi'; });
+          var kalG = games.filter(function (g) { return String(g.venue||g.source||'') === 'kalshi'; });
+          if ($('games-poly')) renderGameList($('games-poly'), polyG);
+          if ($('games-kal')) renderGameList($('games-kal'), kalG);
+        } else if ($('games')) {
+          renderGameList($('games'), games);
+        }
+      } else {
+        loadGames();
+      }
+    };
+  });
   var btnTonight = $('btn-tonight');
   if (btnTonight) btnTonight.onclick = function () { applyTonightPreset(); };
   if ($('f-sort')) $('f-sort').onchange = function () { loadGames(); };
