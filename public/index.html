@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.13</title>
+  <title>EliteOdds v3.4.15</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -671,11 +671,15 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.13</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.15</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
           <button type="button" data-mode="both" class="mode-btn pill-on px-3 py-1.5 rounded-full border border-bb-border text-[11px]">Live + Pregame</button>
+          <span class="hidden sm:inline text-bb-muted/40 mx-0.5">|</span>
+          <button type="button" data-day="today" class="day-btn pill-on px-3 py-1.5 rounded-full border border-bb-border text-[11px]">Today</button>
+          <button type="button" data-day="tomorrow" class="day-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Tomorrow</button>
+          <button type="button" data-day="all" class="day-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">All days</button>
         </div>
         <div id="venue-toggle" class="eo-mobile-only-venue flex gap-1 items-center ml-auto sm:ml-2">
           <button type="button" data-venue="polymarket" class="venue-btn pill-on px-3 py-1.5 rounded-full border border-bb-border text-[11px]">Polymarket</button>
@@ -1362,7 +1366,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.13</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.15</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1376,7 +1380,7 @@
             <div id="changelog-body" class="px-3 pb-3 space-y-4 text-[11px] text-bb-muted border-t border-bb-border pt-3">
               <div class="border-l-2 border-violet-500/40 pl-3">
                 <div class="flex flex-wrap items-baseline gap-2">
-                  <span class="text-white font-semibold font-mono">v3.4.13</span>
+                  <span class="text-white font-semibold font-mono">v3.4.15</span>
                   <span class="text-[10px] text-bb-muted">2026-09-27</span>
                 </div>
                 <p class="text-violet-200/90 font-medium mt-0.5">Version badge sync</p>
@@ -1713,8 +1717,28 @@
   };
 
   
-  var APP_VERSION = '3.4.13';
+  var APP_VERSION = '3.4.15';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.15',
+      date: '2026-09-27',
+      title: 'Scan day filter + Calendar Details/Trade',
+      items: [
+        'Scan: Today / Tomorrow / All days chips (default Today) filter by local start date.',
+        'Calendar day slate and paper rows: Details opens the pick modal; Trade opens the book.',
+        'Open paper picks keep Trade; settled paper keeps Details only.'
+      ]
+    },
+    {
+      version: '3.4.14',
+      date: '2026-09-27',
+      title: 'Scan loading timeout (no infinite Loading)',
+      items: [
+        'API fetches time out after ~18–20s instead of hanging forever on dual Polymarket + Kalshi.',
+        'One book failing no longer blocks the other column.',
+        'Timeout / error messages show in the column instead of Loading… for 5+ minutes.'
+      ]
+    },
     {
       version: '3.4.13',
       date: '2026-09-27',
@@ -1924,7 +1948,7 @@
     el.innerHTML = htmlOut;
   }
 
-  var sport = 'mlb', mode = 'both', marketType = 'all', venue = 'polymarket';
+  var sport = 'mlb', mode = 'both', dayFilter = 'today', marketType = 'all', venue = 'polymarket';
   var games = [], ticket = [];
   try { ticket = JSON.parse(localStorage.getItem('bb_ticket') || '[]'); } catch (e) {}
 
@@ -3637,6 +3661,24 @@
     } else if (rankF === 'pass') {
       list = list.filter(function (g) { return String(g.rank||'').toLowerCase() === 'pass'; });
     }
+    // Day filter: Today / Tomorrow / All (local timezone)
+    var df = typeof dayFilter !== 'undefined' ? dayFilter : 'all';
+    if (df && df !== 'all') {
+      var nowD = new Date();
+      var todayKey = nowD.getFullYear() + '-' + (nowD.getMonth() + 1 < 10 ? '0' : '') + (nowD.getMonth() + 1) + '-' + (nowD.getDate() < 10 ? '0' : '') + nowD.getDate();
+      var tomD = new Date(nowD.getFullYear(), nowD.getMonth(), nowD.getDate() + 1);
+      var tomKey = tomD.getFullYear() + '-' + (tomD.getMonth() + 1 < 10 ? '0' : '') + (tomD.getMonth() + 1) + '-' + (tomD.getDate() < 10 ? '0' : '') + tomD.getDate();
+      list = list.filter(function (g) {
+        var iso = g.startTime || g.commenceTime || g.start;
+        if (!iso) return false;
+        var d = new Date(iso);
+        if (isNaN(d.getTime())) return false;
+        var k = d.getFullYear() + '-' + (d.getMonth() + 1 < 10 ? '0' : '') + (d.getMonth() + 1) + '-' + (d.getDate() < 10 ? '0' : '') + d.getDate();
+        if (df === 'today') return k === todayKey;
+        if (df === 'tomorrow') return k === tomKey;
+        return true;
+      });
+    }
     return list;
   }
   function apiMode() {
@@ -3645,6 +3687,26 @@
     if (mode === 'live') return 'live';
     return 'all'; // both / all
   }
+  function fetchJsonTimeout(url, ms) {
+    ms = ms || 18000;
+    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var t = null;
+    var p = fetch(url, ctrl ? { signal: ctrl.signal } : {}).then(function (r) {
+      return r.json().then(function (d) {
+        if (!r.ok && !(d && d.ok === false)) throw new Error((d && d.error) || ('HTTP ' + r.status));
+        return d;
+      });
+    });
+    if (ctrl) {
+      t = setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, ms);
+      return p.finally(function () { if (t) clearTimeout(t); }).catch(function (e) {
+        var msg = (e && e.name === 'AbortError') ? ('timeout ' + ms + 'ms') : String(e.message || e);
+        return { ok: false, games: [], error: msg };
+      });
+    }
+    return p.catch(function (e) { return { ok: false, games: [], error: String(e.message || e) }; });
+  }
+
   function polyQuery(mt, rankF, minEv, minEdge, minSc, strict, allowMkt, leagueOverride) {
     var q = '/api/games?mode=' + encodeURIComponent(apiMode()) +
       '&marketType=' + encodeURIComponent(mt || 'all') +
@@ -3684,14 +3746,8 @@
     // Prefer server rank filter when Elite-only so each league returns less data faster
     var rf = rankF || '';
     async function oneLeague(lg) {
-      try {
-        var r = await fetch(polyQuery(mt || 'all', rf, minEv, minEdge, minSc, strict, allowMkt, lg));
-        var d = await r.json();
-        if (d && d.ok && d.games) return d.games;
-        return [];
-      } catch (e) {
-        return [];
-      }
+      var d = await fetchJsonTimeout(polyQuery(mt || 'all', rf, minEv, minEdge, minSc, strict, allowMkt, lg), 15000);
+      return (d && d.ok && d.games) ? d.games : [];
     }
     // Batch of 3 to avoid 9 cold starts dying together
     for (var i = 0; i < leagues.length; i += 3) {
@@ -3759,36 +3815,50 @@
       var dual = typeof window.matchMedia === 'function' && window.matchMedia('(min-width: 1100px)').matches;
 
       if (dual) {
+        // Timeouts so one slow book cannot leave both columns on Loading forever
+        var tMs = sport === 'esports' || sport === 'all' ? 20000 : 18000;
         var polyPromise = sport === 'all'
           ? fetchPolyAllLeagues(mt, rankF, minEv, minEdge, minSc, strict, allowMkt).then(function (g) { return { ok: true, games: g }; })
-          : fetch(polyQuery(mt, rankF, minEv, minEdge, minSc, strict, allowMkt)).then(function (r) { return r.json(); });
-        var results = await Promise.all([
-          polyPromise,
-          fetch(kalQuery(mt, strict, allowMkt)).then(function (r) { return r.json(); })
-        ]);
-        var polyG = filterGamesClient(dedupeGameCards((results[0] && results[0].ok ? results[0].games : []) || []));
-        var kalG = filterGamesClient(dedupeGameCards((results[1] && results[1].ok ? results[1].games : []) || []));
+          : fetchJsonTimeout(polyQuery(mt, rankF, minEv, minEdge, minSc, strict, allowMkt), tMs);
+        var kalPromise = fetchJsonTimeout(kalQuery(mt, strict, allowMkt), tMs);
+        var settled = await Promise.allSettled([polyPromise, kalPromise]);
+        var polyRaw = settled[0].status === 'fulfilled' ? settled[0].value : { ok: false, games: [], error: 'poly failed' };
+        var kalRaw = settled[1].status === 'fulfilled' ? settled[1].value : { ok: false, games: [], error: 'kalshi failed' };
+        var polyG = filterGamesClient(dedupeGameCards((polyRaw && polyRaw.games) ? polyRaw.games : []));
+        var kalG = filterGamesClient(dedupeGameCards((kalRaw && kalRaw.games) ? kalRaw.games : []));
         polyG.forEach(function (g) { g.venue = 'polymarket'; g.source = 'polymarket'; });
         kalG.forEach(function (g) { g.venue = 'kalshi'; g.source = 'kalshi'; });
         games = polyG.concat(kalG);
-        renderGameList(boxP, polyG);
-        renderGameList(boxK, kalG);
+        if (boxP) {
+          if (!(polyRaw && (polyRaw.ok || polyRaw.games)) && polyG.length === 0)
+            boxP.innerHTML = '<p class="text-bb-red text-sm p-3">Polymarket: ' + String((polyRaw && polyRaw.error) || 'no data / timeout').replace(/</g,'') + '<br><span class="text-[11px] text-bb-muted">Try MLB + Rank All ranks, or refresh.</span></p>';
+          else renderGameList(boxP, polyG);
+        }
+        if (boxK) {
+          if (!(kalRaw && (kalRaw.ok || (kalRaw.games && kalRaw.games.length))) && kalG.length === 0)
+            boxK.innerHTML = '<p class="text-bb-red text-sm p-3">Kalshi: ' + String((kalRaw && kalRaw.error) || 'no data / timeout').replace(/</g,'') + '</p>';
+          else renderGameList(boxK, kalG);
+        }
         if (box) box.innerHTML = '';
-        if ($('meta')) $('meta').textContent = 'Desktop dual · PM ' + polyG.length + ' · Kalshi ' + kalG.length;
+        if ($('meta')) {
+          var errBits = [];
+          if (polyRaw && polyRaw.error) errBits.push('PM ' + polyRaw.error);
+          if (kalRaw && kalRaw.error) errBits.push('Kal ' + kalRaw.error);
+          $('meta').textContent = 'Desktop dual · PM ' + polyG.length + ' · Kalshi ' + kalG.length +
+            (errBits.length ? (' · ' + errBits.join(' · ')) : '');
+        }
       } else {
         var list = [];
+        var tMs2 = sport === 'esports' || sport === 'all' ? 20000 : 18000;
         if (venue === 'kalshi') {
-          var rK = await fetch(kalQuery(mt, strict, allowMkt));
-          var dataK = await rK.json();
-          if (!dataK.ok) throw new Error(dataK.error || ('HTTP ' + rK.status));
+          var dataK = await fetchJsonTimeout(kalQuery(mt, strict, allowMkt), tMs2);
+          if (!dataK.ok && !(dataK.games && dataK.games.length)) throw new Error(dataK.error || 'Kalshi failed');
           list = dataK.games || [];
         } else if (sport === 'all') {
-          // Parallel by league — avoids one timed-out all-sports call
           list = await fetchPolyAllLeagues(mt, rankF, minEv, minEdge, minSc, strict, allowMkt);
         } else {
-          var r = await fetch(polyQuery(mt, rankF, minEv, minEdge, minSc, strict, allowMkt));
-          var data = await r.json();
-          if (!data.ok) throw new Error(data.error || ('HTTP ' + r.status));
+          var data = await fetchJsonTimeout(polyQuery(mt, rankF, minEv, minEdge, minSc, strict, allowMkt), tMs2);
+          if (!data.ok && !(data.games && data.games.length)) throw new Error(data.error || 'Polymarket failed');
           list = data.games || [];
         }
         games = filterGamesClient(dedupeGameCards(list));
@@ -4556,20 +4626,27 @@
       if (!slateRows.length) {
         slate.innerHTML = '<div class="cal-empty"><strong>No Elite · no Super — sit</strong>Nothing on the board for this day & filter.</div>';
       } else {
-        slate.innerHTML = slateRows.slice(0, 40).map(function (g) {
+        slate.innerHTML = slateRows.slice(0, 40).map(function (g, idx) {
           var isK = String(g.venue || g.source || '').toLowerCase() === 'kalshi';
           var mp = g.model_probability != null ? g.model_probability : g.modelPct;
           if (mp != null && mp <= 1) mp = Math.round(mp * 1000) / 10;
           var mkt = g.market_probability != null ? g.market_probability : g.impliedPct;
           if (mkt != null && mkt <= 1) mkt = Math.round(mkt * 1000) / 10;
           var px = mkt != null ? (isK ? Math.round(mkt) + '¢' : mkt + '%') : '—';
+          var tradeHref = g.url || (isK ? 'https://kalshi.com' : 'https://polymarket.us');
+          var gid = 'cal-slate-' + idx;
+          try { window.__calGameCache = window.__calGameCache || {}; window.__calGameCache[gid] = g; } catch (eC) {}
           return '<div class="cal-row">' +
             '<div class="flex justify-between gap-2">' +
             '<div class="min-w-0"><div class="text-white text-xs font-medium truncate">' + String(g.modelPick || '—').replace(/</g,'') + '</div>' +
             '<div class="text-[10px] text-bb-muted truncate">' + String(g.eventTitle || g.title || '').replace(/</g,'') + '</div></div>' +
             '<div class="text-right shrink-0 text-[10px]">' +
             '<div class="' + (isK ? 'text-bb-green' : 'text-violet-300') + '">' + (isK ? 'Kalshi' : 'PM') + ' · ' + String(g.rank || 'elite').toUpperCase() + '</div>' +
-            '<div class="text-bb-muted">model ' + (mp != null ? mp + '%' : '—') + ' · ' + px + '</div></div></div></div>';
+            '<div class="text-bb-muted">model ' + (mp != null ? mp + '%' : '—') + ' · ' + px + '</div></div></div>' +
+            '<div class="flex gap-1.5 mt-1.5">' +
+            '<button type="button" class="cal-act-details text-[10px] px-2 py-1 rounded-md border border-bb-border text-bb-muted hover:text-white" data-cal-gid="' + gid + '">Details</button>' +
+            '<a class="text-[10px] px-2 py-1 rounded-md border border-violet-400/40 text-violet-200 hover:bg-violet-500/15" href="' + String(tradeHref).replace(/"/g, '') + '" target="_blank" rel="noopener">Trade</a>' +
+            '</div></div>';
         }).join('');
       }
     }
@@ -4578,14 +4655,29 @@
       if (!rows.length) {
         paper.innerHTML = '<p class="text-[11px] text-bb-muted p-1">No paper Elites tagged to this day.</p>';
       } else {
-        paper.innerHTML = rows.map(function (e) {
+        paper.innerHTML = rows.map(function (e, ri) {
           var res = String(e.result || 'open');
+          var isK2 = String(e.venue || e.source || '').toLowerCase() === 'kalshi';
+          var tradeHref2 = e.url || (isK2 ? 'https://kalshi.com' : 'https://polymarket.us');
+          var gid2 = 'cal-paper-' + ri;
+          var gPaper = {
+            modelPick: e.pick, eventTitle: e.title, title: e.title, rank: 'Elite',
+            venue: e.venue || e.source, source: e.venue || e.source,
+            model_probability: e.modelPct, market_probability: e.marketPct,
+            marketType: e.marketType, url: e.url, league: e.league,
+            startTime: e.startTime, result: e.result, finalScore: e.finalScore
+          };
+          try { window.__calGameCache = window.__calGameCache || {}; window.__calGameCache[gid2] = gPaper; } catch (eC2) {}
           return '<div class="cal-row text-[11px]">' +
             '<div class="text-white font-medium">' + String(e.pick || '—').replace(/</g,'') +
             ' <span class="' + (res === 'won' ? 'text-bb-green' : res === 'lost' ? 'text-bb-red' : 'text-bb-muted') + '">' + res.toUpperCase() + '</span></div>' +
             '<div class="text-bb-muted">' + String(e.title || '').replace(/</g,'') +
             (e.finalScore ? ' · ' + String(e.finalScore).replace(/</g,'') : '') +
             (e.pnl != null && res !== 'open' ? ' · ' + (e.pnl >= 0 ? '+' : '') + e.pnl + 'u' : '') +
+            '</div>' +
+            '<div class="flex gap-1.5 mt-1.5">' +
+            '<button type="button" class="cal-act-details text-[10px] px-2 py-1 rounded-md border border-bb-border text-bb-muted hover:text-white" data-cal-gid="' + gid2 + '">Details</button>' +
+            (res === 'open' ? ('<a class="text-[10px] px-2 py-1 rounded-md border border-violet-400/40 text-violet-200" href="' + String(tradeHref2).replace(/"/g,'') + '" target="_blank" rel="noopener">Trade</a>') : '') +
             '</div></div>';
         }).join('');
       }
@@ -5429,6 +5521,38 @@ function renderSlate() {
     btn.onclick = function () {
       mode = btn.getAttribute('data-mode') || 'both';
       document.querySelectorAll('.mode-btn').forEach(function (b) {
+        b.classList.remove('pill-on');
+        b.classList.add('text-bb-muted');
+      });
+      btn.classList.add('pill-on');
+      btn.classList.remove('text-bb-muted');
+      loadGames();
+    };
+  });
+
+
+  // Calendar Details → open same Focus/details modal as Scan cards
+  document.addEventListener('click', function calActDetailsClick(ev) {
+    var t = ev.target;
+    if (!t || !t.classList || !t.classList.contains('cal-act-details')) return;
+    var gid = t.getAttribute('data-cal-gid');
+    var g = window.__calGameCache && window.__calGameCache[gid];
+    if (!g) return;
+    // Prefer live board copy if same event still loaded
+    var boardHit = null;
+    (games || []).forEach(function (x) {
+      if (boardHit) return;
+      if (g.url && x.url && g.url === x.url) boardHit = x;
+      else if (String(g.eventTitle || '') && String(g.eventTitle) === String(x.eventTitle || x.title || '') &&
+               String(g.modelPick || '') === String(x.modelPick || '')) boardHit = x;
+    });
+    try { openModal(boardHit || g); } catch (err) { console.warn(err); }
+  });
+
+  document.querySelectorAll('.day-btn').forEach(function (btn) {
+    btn.onclick = function () {
+      dayFilter = btn.getAttribute('data-day') || 'all';
+      document.querySelectorAll('.day-btn').forEach(function (b) {
         b.classList.remove('pill-on');
         b.classList.add('text-bb-muted');
       });
