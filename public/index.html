@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.18</title>
+  <title>EliteOdds v3.4.19</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -699,7 +699,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.18</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.19</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1421,7 +1421,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.18</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.19</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1435,7 +1435,7 @@
             <div id="changelog-body" class="px-3 pb-3 space-y-4 text-[11px] text-bb-muted border-t border-bb-border pt-3">
               <div class="border-l-2 border-violet-500/40 pl-3">
                 <div class="flex flex-wrap items-baseline gap-2">
-                  <span class="text-white font-semibold font-mono">v3.4.18</span>
+                  <span class="text-white font-semibold font-mono">v3.4.19</span>
                   <span class="text-[10px] text-bb-muted">2026-09-27</span>
                 </div>
                 <p class="text-violet-200/90 font-medium mt-0.5">Version badge sync</p>
@@ -1772,8 +1772,18 @@
   };
 
   
-  var APP_VERSION = '3.4.18';
+  var APP_VERSION = '3.4.19';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.19',
+      date: '2026-09-27',
+      title: 'Classic vs By game board + accurate Trade links',
+      items: [
+        'ADDED — Board layout toggle: Classic (one market per card) or By game (hub with ML/spread/total/props rows).',
+        'CHANGED — Auto-send Elite still fires per market line, not per game card.',
+        'FIXED — Trade links prefer the market slug/ticker for that line (Polymarket event slug, Kalshi market ticker).'
+      ]
+    },
     {
       version: '3.4.18',
       date: '2026-09-27',
@@ -2017,6 +2027,123 @@
   var sport = 'mlb', mode = 'both', dayFilter = 'today', marketType = 'all', venue = 'polymarket';
   var boardRefreshedAt = null;
   var sortMode = 'time';
+
+  var boardLayout = (function () {
+    try { return localStorage.getItem('bb_board_layout') || 'classic'; } catch (e) { return 'classic'; }
+  })();
+
+  function tradeHrefFor(g) {
+    if (!g) return 'https://polymarket.us';
+    var isK = g.venue === 'kalshi' || g.source === 'kalshi';
+    if (isK) {
+      if (g.marketUrl) return g.marketUrl;
+      var tick = g.marketTicker || g.marketSlug || g.slug || '';
+      if (tick && !/^https?:/i.test(String(tick))) return 'https://kalshi.com/markets/' + encodeURIComponent(tick);
+      if (g.url && /kalshi\.com/i.test(String(g.url))) return g.url;
+      return g.url || 'https://kalshi.com/browse/sports';
+    }
+    if (g.url && /polymarket\.(us|com)\//i.test(String(g.url)) && !/polymarket\.(us|com)\/?$/i.test(String(g.url).replace(/\/$/, ''))) {
+      return g.url;
+    }
+    var slug = g.marketSlug || g.slug || '';
+    if (slug && !/^https?:/i.test(String(slug))) {
+      return 'https://polymarket.us/event/' + String(slug).replace(/^\//, '');
+    }
+    if (g.url) return g.url;
+    return 'https://polymarket.us';
+  }
+
+  function gameGroupKey(g) {
+    var v = String(g.venue || g.source || 'polymarket').toLowerCase();
+    var title = String(g.eventTitle || g.title || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    var start = g.startTime ? String(g.startTime).slice(0, 16) : '';
+    var lg = String(g.league || '').toLowerCase();
+    return v + '|' + lg + '|' + title + '|' + start;
+  }
+
+  function groupGamesByEvent(list) {
+    var map = {};
+    var order = [];
+    (list || []).forEach(function (g) {
+      var k = gameGroupKey(g);
+      if (!map[k]) {
+        map[k] = { key: k, lines: [], primary: g };
+        order.push(k);
+      }
+      map[k].lines.push(g);
+      var rankScore = function (x) {
+        var r = String(x.rank || '').toLowerCase();
+        return r === 'elite' ? 3 : r === 'good' ? 2 : 1;
+      };
+      if (rankScore(g) > rankScore(map[k].primary)) map[k].primary = g;
+    });
+    var typeOrder = function (t) {
+      t = String(t || '').toLowerCase();
+      if (t === 'moneyline' || t === 'ml') return 1;
+      if (t.indexOf('spread') === 0) return 2;
+      if (t.indexOf('total') === 0 || t === 'f5_total') return 3;
+      if (t.indexOf('f5') === 0) return 4;
+      if (t === 'nrfi' || t === 'yrfi') return 5;
+      return 10;
+    };
+    order.forEach(function (k) {
+      map[k].lines.sort(function (a, b) {
+        var ra = String(a.rank||'').toLowerCase() === 'elite' ? 0 : String(a.rank||'').toLowerCase() === 'good' ? 1 : 2;
+        var rb = String(b.rank||'').toLowerCase() === 'elite' ? 0 : String(b.rank||'').toLowerCase() === 'good' ? 1 : 2;
+        if (ra !== rb) return ra - rb;
+        return typeOrder(a.marketType) - typeOrder(b.marketType);
+      });
+    });
+    return order.map(function (k) { return map[k]; });
+  }
+
+  function hubCardHtml(group) {
+    var g = group.primary;
+    var isKalshi = g.venue === 'kalshi' || g.source === 'kalshi';
+    var title = String(g.eventTitle || g.title || '').replace(/</g, '');
+    var lines = group.lines || [];
+    var show = lines.slice(0, 6);
+    var more = lines.length - show.length;
+    var bestRank = String(g.rank || 'Pass');
+    var linesHtml = show.map(function (line) {
+      var mt = String(line.marketType || 'ml').replace(/_/g, ' ');
+      var pick = String(line.modelPick || '—').replace(/</g, '');
+      var rk = String(line.rank || 'Pass');
+      var rkCls = rankClass(rk);
+      var mkt = line.market_probability;
+      if (mkt != null && Number(mkt) <= 1) mkt = Math.round(Number(mkt) * 1000) / 10;
+      else if (mkt != null) mkt = Math.round(Number(mkt) * 10) / 10;
+      var href = tradeHrefFor(line);
+      return '<div class="hub-line">' +
+        '<div class="min-w-0"><div class="hub-mt">' + mt + '</div><div class="hub-pick truncate">' + pick + '</div></div>' +
+        '<span class="' + rkCls + ' text-[9px] font-bold px-1.5 py-0.5 rounded-full">' + rk.toUpperCase() + '</span>' +
+        '<span class="hub-meta text-bb-muted text-[10px]">' + (mkt != null ? mkt + '%' : '—') + '</span>' +
+        '<a class="text-[10px] px-2 py-0.5 rounded border border-violet-400/40 text-violet-200" href="' + String(href).replace(/"/g, '') + '" target="_blank" rel="noopener">Trade</a>' +
+        '</div>';
+    }).join('');
+    if (more > 0) {
+      linesHtml += '<p class="text-[10px] text-bb-muted mt-0.5">+' + more + ' more · set Market to All or use Classic for every line</p>';
+    }
+    return '<article class="glass p-3 space-y-2 hub-card min-w-0 overflow-hidden' + (isKalshi ? ' kalshi-card' : '') + '" data-hub="1">' +
+      '<div class="flex justify-between gap-2">' +
+        '<div class="min-w-0"><p class="text-[9px] uppercase tracking-wide mb-0.5 ' + (isKalshi ? 'text-bb-green' : 'text-violet-300') + '">' +
+          (isKalshi ? 'Kalshi' : 'Polymarket') + ' · By game</p>' +
+          '<p class="font-medium text-sm leading-snug">' + title + '</p>' +
+          '<p class="text-[10px] text-bb-muted mt-0.5">' + String(g.league || '').toUpperCase() +
+          (g.live ? ' · <span class="text-bb-red">LIVE</span>' : '') +
+          (g.startTime ? ' · ' + formatGameWhen(g.startTime, !!(g.live || g.isLive), !!g.ended) : '') +
+          '</p></div>' +
+        '<span class="' + rankClass(bestRank) + ' text-[10px] font-bold px-2.5 py-1 rounded-full h-fit">' + bestRank.toUpperCase() + '</span>' +
+      '</div>' +
+      '<p class="text-xs text-bb-muted">Best lean · <span class="text-white font-medium">' + String(g.modelPick || '—').replace(/</g,'') + '</span> · ' + lines.length + ' markets</p>' +
+      '<div class="hub-lines">' + linesHtml + '</div>' +
+      '<div class="flex flex-wrap gap-1.5 pt-1">' +
+        '<button type="button" class="btn-focus text-[11px] px-2.5 py-1 rounded-lg border border-bb-border text-bb-muted" data-id="' + String(g.id || '').replace(/"/g,'') + '">Focus</button>' +
+        '<button type="button" class="btn-verdict text-[11px] px-2.5 py-1 rounded-lg border border-bb-border text-bb-muted" data-id="' + String(g.id || '').replace(/"/g,'') + '">Verdict</button>' +
+        '<a class="text-[11px] px-2.5 py-1 rounded-lg border border-violet-400/40 text-violet-200" href="' + String(tradeHrefFor(g)).replace(/"/g,'') + '" target="_blank" rel="noopener">Trade best</a>' +
+      '</div></article>';
+  }
+
 
   function confidenceOf(g) {
     var score = Number(g.betScore != null ? g.betScore : (g.score10 != null ? g.score10 * 10 : 50));
@@ -2703,7 +2830,7 @@
         '<button type="button" class="btn-focus">Focus</button>' +
         '<button type="button" class="btn-verdict">Verdict</button>' +
         '<button type="button" class="btn-log">Log</button>' +
-        '<a class="btn-trade" href="' + (g.url || (isKalshi ? 'https://kalshi.com' : 'https://polymarket.us')) + '" target="_blank" rel="noopener">Trade</a>' +
+        '<a class="btn-trade" href="' + tradeHrefFor(g) + '" target="_blank" rel="noopener">Trade</a>' +
       '</div>' +
       '<div class="v3-actions mt-1.5" style="grid-template-columns:repeat(4,minmax(0,1fr))">' +
         '<button type="button" class="btn-books">Books</button>' +
@@ -4042,7 +4169,30 @@
       box.innerHTML = tip;
       return;
     }
-    box.innerHTML = list.map(cardHtml).join('');
+    if (boardLayout === 'hub') {
+        var groups = groupGamesByEvent(list);
+        box.innerHTML = groups.map(hubCardHtml).join('');
+        // bind focus/verdict on hub using primary game id — map from flat list
+        var byId = {};
+        list.forEach(function (g) { byId[String(g.id)] = g; });
+        box.querySelectorAll('.btn-focus').forEach(function (btn) {
+          btn.onclick = function () {
+            var id = btn.getAttribute('data-id');
+            var g = byId[id] || list[0];
+            if (g) openModal(g);
+          };
+        });
+        box.querySelectorAll('.btn-verdict').forEach(function (btn) {
+          btn.onclick = function () {
+            var id = btn.getAttribute('data-id');
+            var g = byId[id];
+            if (g && typeof openVerdict === 'function') openVerdict(g);
+            else if (g) openModal(g);
+          };
+        });
+      } else {
+        box.innerHTML = list.map(cardHtml).join('');
+      }
     bindCards(box, list);
   }
   async function loadGames() {

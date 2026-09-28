@@ -593,8 +593,16 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
             startTime: ev.startTime || (mu && mu.espnGameStart) || null,
             marketCount: 1,
             marketType: type,
-            url: m.url || ev.url,
-            slug: m.slug || m.marketSlug || (m.url && String(m.url).split('/').filter(Boolean).pop()) || null,
+            url: (function () {
+              const slug = m.slug || m.marketSlug || null;
+              if (m.url && /polymarket\.(us|com)/i.test(String(m.url))) return m.url;
+              if (slug) return 'https://polymarket.us/event/' + slug;
+              if (ev.url) return ev.url;
+              if (ev.slug) return 'https://polymarket.us/event/' + ev.slug;
+              return 'https://polymarket.us';
+            })(),
+            slug: m.slug || m.marketSlug || (m.url && String(m.url).split('/').filter(Boolean).pop()) || ev.slug || null,
+            marketSlug: m.slug || m.marketSlug || null,
             sides,
             modelPick: pickSide ? pickSide.name : sc ? sc.side : null,
             rank: sc ? sc.rank : 'Pass',
