@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.17</title>
+  <title>EliteOdds v3.4.18</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -699,7 +699,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.17</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.18</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1421,7 +1421,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.17</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.18</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1435,7 +1435,7 @@
             <div id="changelog-body" class="px-3 pb-3 space-y-4 text-[11px] text-bb-muted border-t border-bb-border pt-3">
               <div class="border-l-2 border-violet-500/40 pl-3">
                 <div class="flex flex-wrap items-baseline gap-2">
-                  <span class="text-white font-semibold font-mono">v3.4.17</span>
+                  <span class="text-white font-semibold font-mono">v3.4.18</span>
                   <span class="text-[10px] text-bb-muted">2026-09-27</span>
                 </div>
                 <p class="text-violet-200/90 font-medium mt-0.5">Version badge sync</p>
@@ -1772,8 +1772,18 @@
   };
 
   
-  var APP_VERSION = '3.4.17';
+  var APP_VERSION = '3.4.18';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.18',
+      date: '2026-09-27',
+      title: 'Fix isSpecialMarket load error + sport market menus',
+      items: [
+        'FIXED — Load error: Can\'t find variable isSpecialMarket (broke Scan empty states and market change).',
+        'ADDED — Explicit NBA, WNBA, CBB market menus (ML, spreads, totals, team totals, props).',
+        'CHANGED — Switching sport resets Market to All if the previous market is not valid for that sport.'
+      ]
+    },
     {
       version: '3.4.17',
       date: '2026-09-27',
@@ -1979,6 +1989,29 @@
         '</div>';
     }
     el.innerHTML = htmlOut;
+  }
+
+
+  var SPECIAL_MARKET_HINT = {
+    nrfi: 'NRFI = no run in the 1st · YRFI = at least one run. Often Pass until 1st-inning form is rich.',
+    yrfi: 'YRFI = yes run first inning (same board as NRFI).',
+    total: 'Full-game Over/Under. Each card is one O/U side from the model.',
+    f5_total: 'First 5 innings total runs Over/Under.',
+    f5: 'First 5 innings winner.',
+    f5_spread: 'First 5 innings run line / spread.',
+    innings: 'Inning winners + NRFI/YRFI when listed.',
+    spread: 'Full-game spread / run line / puck line.',
+    player_props: 'Player props — use Rank: All ranks to browse.',
+    map_1: 'Esports Map 1 winner.',
+    map_2: 'Esports Map 2 winner.',
+    map_3: 'Esports Map 3 winner.',
+    map_total: 'Esports total maps.',
+    map_winner: 'All map winner markets.'
+  };
+  function isSpecialMarket(mt) {
+    mt = String(mt || '').toLowerCase();
+    if (!mt || mt === 'all' || mt === 'moneyline' || mt === 'ml') return false;
+    return /nrfi|yrfi|total|f5|spread|inning|prop|player_|pitcher_|map_/.test(mt);
   }
 
   var sport = 'mlb', mode = 'both', dayFilter = 'today', marketType = 'all', venue = 'polymarket';
@@ -2272,6 +2305,9 @@
 
   function paintCats() {
     var cats = CATS[sport] || CATS._default;
+    var ids = {};
+    cats.forEach(function (c) { ids[c.id] = true; });
+    if (!ids[marketType]) marketType = 'all';
     var sel = $('market-select');
     if (sel) {
       sel.innerHTML = cats.map(function (c) {
@@ -2280,12 +2316,12 @@
       sel.onchange = function () {
         marketType = sel.value || 'all';
         // O/U, NRFI, F5, innings rarely hit Elite — show all ranks so cards appear
-        if (isSpecialMarket(marketType) && $('f-rank')) {
+        if (typeof isSpecialMarket === 'function' && isSpecialMarket(marketType) && $('f-rank')) {
           $('f-rank').value = '';
         }
         var tip = $('market-process-tip');
         if (tip) {
-          var h = SPECIAL_MARKET_HINT[marketType];
+          var h = (typeof SPECIAL_MARKET_HINT !== 'undefined' && SPECIAL_MARKET_HINT[marketType]) ? SPECIAL_MARKET_HINT[marketType] : '';
           tip.textContent = h || 'Scan loads this market type from the book, scores each market, then ranks Pass / Good / Elite.';
           tip.classList.toggle('hidden', !h && marketType === 'all');
         }
@@ -3992,7 +4028,7 @@
     if (!list.length) {
       var rk = ($('f-rank') && $('f-rank').value) || '';
       var mt = String(marketType || 'all');
-      var special = isSpecialMarket(mt);
+      var special = (typeof isSpecialMarket === 'function') ? isSpecialMarket(mt) : /nrfi|total|f5|spread|inning|prop|player_|map_/.test(mt);
       var tip;
       if (rk === 'elite' && special) {
         tip = '<p class="text-bb-muted text-sm p-3">No <strong class="text-white">Elite</strong> cards for <strong class="text-white">' + mt.replace(/_/g,' ') + '</strong>.<br><span class="text-[11px]">Most O/U and NRFI score as <strong class="text-white">Pass</strong> or <strong class="text-white">Good</strong>. Set Rank to <strong class="text-white">All ranks</strong>, then Apply.</span></p>';
