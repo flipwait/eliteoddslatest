@@ -349,7 +349,74 @@ function sidesFromMarket(m, evTitle, type, matchup) {
     side1 = pack(noLabel || 'No', no, 'no');
   }
 
-  return { sides: [side0, side1], yesIsHome, homeName, awayName };
+  // Spread / run line: always show Team ±line (API line field is authoritative)
+  if (type === 'spread' || String(type).startsWith('spread_') || type === 'f5_spread') {
+    const q = String(m.question || '');
+    const slug = String(m.slug || m.marketSlug || '');
+    // All sports (NFL/CFB/NBA/CBB/NHL/MLB/WNBA): API `line` is source of truth
+    let rawLine = m.line != null && !isNaN(Number(m.line)) ? Number(m.line) : null;
+    let mag = rawLine != null ? Math.abs(rawLine) : null;
+    if (mag == null) {
+      let lm = q.match(/cover\s*([+-]?[0-9]+\.?[0-9]*)/i) || q.match(/wins by over\s*([0-9]+\.?[0-9]*)/i);
+      if (lm) mag = Math.abs(Number(lm[1]));
+      if (lm && String(lm[1]).trim().startsWith('-')) rawLine = -mag;
+    }
+    if (mag == null) {
+      let lm = slug.match(/(?:neg|pos)[-_]?(\d+)(?:pt(\d+))?/i);
+      if (lm) {
+        mag = Number(lm[1] + '.' + (lm[2] || '0'));
+        if (/neg/i.test(lm[0])) rawLine = -mag;
+        else rawLine = mag;
+      }
+    }
+    // Sign for YES team (the team named in "Will X cover …")
+    let yesSign = 1;
+    if (rawLine != null && rawLine < 0) yesSign = -1;
+    else if (rawLine != null && rawLine > 0) yesSign = 1;
+    else if (/neg[-_]?\d/i.test(slug)) yesSign = -1;
+    else if (/pos[-_]?\d/i.test(slug)) yesSign = 1;
+    else if (/wins by over/i.test(q)) yesSign = -1;
+    else if (/cover\s*[0-9]/i.test(q)) yesSign = 1;
+
+    // Named team in "Will the TEAM cover"
+    let yesTeam = yesLabel;
+    const coverTeam = q.match(/will\s+(?:the\s+)?(.+?)\s+cover/i);
+    if (coverTeam) yesTeam = coverTeam[1].trim();
+    if (!yesTeam && yesIsHome === true) yesTeam = homeName;
+    if (!yesTeam && yesIsHome === false) yesTeam = awayName;
+
+    if (mag != null) {
+      const fmt = (v) => (v > 0 ? '+' : '') + (Number.isInteger(v) ? v : Math.round(v * 10) / 10);
+      const yesLine = yesSign * mag;
+      const noLine = -yesSign * mag;
+      const short = (n) => {
+        n = String(n || '').trim();
+        const p = n.split(/\s+/);
+        return p[p.length - 1] || n;
+      };
+      // Resolve NO team as the other side
+      let noTeam = noLabel;
+      if (homeName && awayName) {
+        if (yesTeam && nameHit(yesTeam, homeName)) noTeam = awayName;
+        else if (yesTeam && nameHit(yesTeam, awayName)) noTeam = homeName;
+      }
+      const yName = (yesTeam || side0.name || 'YES') + ' ' + fmt(yesLine);
+      const nName = (noTeam || side1.name || 'NO') + ' ' + fmt(noLine);
+      // Keep price mapping: side0/side1 may be home-first ordered
+      if (homeName && awayName && yesIsHome === true) {
+        side0 = pack(short(homeName) + ' ' + fmt(yesLine), side0.price, 'home');
+        side1 = pack(short(awayName) + ' ' + fmt(noLine), side1.price, 'away');
+      } else if (homeName && awayName && yesIsHome === false) {
+        side0 = pack(short(homeName) + ' ' + fmt(noLine), side0.price, 'home');
+        side1 = pack(short(awayName) + ' ' + fmt(yesLine), side1.price, 'away');
+      } else {
+        side0 = pack(yName, side0.price, side0.role || 'yes');
+        side1 = pack(nName, side1.price, side1.role || 'no');
+      }
+    }
+  }
+
+  return { sides: [side0, side1], yesIsHome, homeName, awayName, line: m.line != null ? Number(m.line) : null };
 }
 
 function sanitizePick(pick, sides, eventTitle) {
@@ -593,18 +660,61 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
             startTime: ev.startTime || (mu && mu.espnGameStart) || null,
             marketCount: 1,
             marketType: type,
+            // Always prefer EVENT (game) URL for Trade — market slugs like
+            // asc-nfl-ari-nyg-2026-10-04-1h-neg-3pt5 are not event pages
+            eventSlug: ev.slug || null,
+            marketSlug: m.slug || m.marketSlug || null,
+            marketUrl: (m.slug || m.marketSlug)
+              ? ('https://polymarket.us/market/' + (m.slug || m.marketSlug))
+              : (m.marketUrl || null),
             url: (function () {
-              const slug = m.slug || m.marketSlug || null;
-              if (m.url && /polymarket\.(us|com)/i.test(String(m.url))) return m.url;
-              if (slug) return 'https://polymarket.us/event/' + slug;
-              if (ev.url) return ev.url;
               if (ev.slug) return 'https://polymarket.us/event/' + ev.slug;
+              if (ev.url && /\/event\//i.test(String(ev.url))) return ev.url;
+              // Derive event slug from market slug (strip suffixes after YYYY-MM-DD)
+              const ms = m.slug || m.marketSlug || '';
+              const dm = String(ms).match(/^(.*?\d{4}-\d{2}-\d{2})/);
+              if (dm) return 'https://polymarket.us/event/' + dm[1];
+              if (m.url && /\/event\//i.test(String(m.url))) return m.url;
+              if (ms) return 'https://polymarket.us/market/' + ms;
               return 'https://polymarket.us';
             })(),
-            slug: m.slug || m.marketSlug || (m.url && String(m.url).split('/').filter(Boolean).pop()) || ev.slug || null,
-            marketSlug: m.slug || m.marketSlug || null,
+            slug: ev.slug || m.slug || m.marketSlug || null,
             sides,
-            modelPick: pickSide ? pickSide.name : sc ? sc.side : null,
+            modelPick: (function () {
+              if (sc && sc.pickName && !/^YES|NO/i.test(String(sc.pickName))) return sc.pickName;
+              // Attach spread line to side name if missing
+              const nm = pickSide && pickSide.name;
+              if (nm && (type === 'spread' || String(type).startsWith('spread_') || type === 'f5_spread')) {
+                const q = String(m.question || m.slug || '');
+                let line = null;
+                let lm = q.match(/wins by over\s*([0-9]+\.?[0-9]*)/i);
+                if (lm) line = Number(lm[1]);
+                if (line == null) {
+                  lm = q.match(/([+-]\d+\.?\d*)/);
+                  if (lm) line = Number(lm[1]);
+                }
+                if (line == null) {
+                  lm = String(m.slug || '').match(/neg[-_]?(\d+)(?:pt(\d+))?/i);
+                  if (lm) line = -Number(lm[1] + '.' + (lm[2] || '0'));
+                }
+                if (line != null && !/[+-]\d/.test(String(nm))) {
+                  const last = String(nm).split(/\s+/).pop();
+                  // side covering as favorite vs dog: if question is "wins by over X" YES is favorite -line
+                  const isYesPick = pickSide === sides[0] || (sc && sc.side === 'YES');
+                  let disp = line;
+                  if (/wins by over/i.test(q) && isYesPick) disp = -Math.abs(line);
+                  else if (/wins by over/i.test(q) && !isYesPick) disp = Math.abs(line);
+                  const ls = (disp > 0 ? '+' : '') + disp;
+                  return last + ' ' + ls;
+                }
+              }
+              if (nm) return nm;
+              if (sc && sc.pickName) return sc.pickName;
+              if (sc && sc.side) return sc.side;
+              return null;
+            })(),
+            spreadLine: (sc && sc.spreadLine != null) ? sc.spreadLine : (m.line != null ? Number(m.line) : null),
+            line: m.line != null ? Number(m.line) : null,
             rank: sc ? sc.rank : 'Pass',
             netEdge: sc ? sc.netEdge : 0,
             probability_edge: sc ? sc.probability_edge : null,
@@ -762,6 +872,7 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
       return {
         id: ev.id,
         title: ev.title,
+        eventSlug: ev.slug || null,
         marketSlug: primary && (primary.slug || primary.marketSlug) || null,
         marketSlugs: markets.map((m) => m.slug).filter(Boolean),
         league: ev.league,

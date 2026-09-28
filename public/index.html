@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.20</title>
+  <title>EliteOdds v3.4.24</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.20</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.24</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1433,7 +1433,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.20</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.24</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1774,8 +1774,47 @@
   };
 
   
-  var APP_VERSION = '3.4.20';
+  var APP_VERSION = '3.4.24';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.24',
+      date: '2026-09-28',
+      title: 'Spread lines for every sport (NFL, CFB, NBA, CBB, NHL, MLB, WNBA)',
+      items: [
+        'CHANGED — Same spread labeling for all leagues: uses Polymarket market.line (signed or absolute).',
+        'FIXED — NHL/MLB signed lines (e.g. -1.5 puck/run line) display correctly as Team -1.5 / Team +1.5.',
+        'Covers FG, 1H, 2H, quarter, and F5 spreads wherever the book lists them.'
+      ]
+    },
+    {
+      version: '3.4.23',
+      date: '2026-09-28',
+      title: 'Spreads use Polymarket line field (FG / 1H / 2H / Q)',
+      items: [
+        'FIXED — Spread rows showed team only (e.g. Bengals) with no number.',
+        'CHANGED — Reads market.line from Polymarket US (e.g. 17.5) plus cover/slug text.',
+        'How to check: spread / spread 1h / 2h / q1 should show e.g. Bengals -3.5 or Jaguars +3.5.'
+      ]
+    },
+    {
+      version: '3.4.22',
+      date: '2026-09-28',
+      title: 'Spread cards show the line (e.g. Cardinals -3.5)',
+      items: [
+        'FIXED — Spread model pick often showed only a team (or YES/NO) with no spread number.',
+        'CHANGED — Picks and side labels use Team ±line from the market question/slug (wins by over 3.5, neg-3pt5, etc.).'
+      ]
+    },
+    {
+      version: '3.4.21',
+      date: '2026-09-28',
+      title: 'Trade opens the game (event), not a random market slug',
+      items: [
+        'FIXED — NFL/football Trade used market slugs like …-1h-neg-3pt5 under /market/ or /event/, which did not open the game.',
+        'CHANGED — Trade prefers https://polymarket.us/event/{game-slug} (event slug ends at the game date).',
+        'How to check: Trade on an NFL spread/total card opens ARI vs NYG (or that matchup), not a blank/wrong page.'
+      ]
+    },
     {
       version: '3.4.20',
       date: '2026-09-27',
@@ -2037,14 +2076,30 @@
       if (g.url && /kalshi\.com/i.test(String(g.url))) return g.url;
       return g.url || 'https://kalshi.com/browse/sports';
     }
-    if (g.url && /polymarket\.(us|com)\//i.test(String(g.url)) && !/polymarket\.(us|com)\/?$/i.test(String(g.url).replace(/\/$/, ''))) {
-      return g.url;
+    // Polymarket US — open the GAME (event) page, not a market-only path that 404s / redirects randomly
+    function eventSlugFromAny(s) {
+      s = String(s || '');
+      if (!s) return '';
+      // strip path if full URL
+      var path = s.replace(/^https?:\/\/[^/]+/i, '').replace(/^\//, '');
+      if (path.indexOf('event/') === 0) path = path.slice(6);
+      if (path.indexOf('market/') === 0) path = path.slice(7);
+      path = path.split('?')[0].split('/')[0];
+      // Market slugs often append after date: ...-2026-10-04-1h-neg-3pt5 → event ends at date
+      var dm = path.match(/^(.*?\d{4}-\d{2}-\d{2})/);
+      return dm ? dm[1] : path;
     }
-    var slug = g.marketSlug || g.slug || '';
-    if (slug && !/^https?:/i.test(String(slug))) {
-      return 'https://polymarket.us/event/' + String(slug).replace(/^\//, '');
+    var es = g.eventSlug || '';
+    if (!es && g.url) {
+      var u = String(g.url);
+      if (/\/event\//i.test(u)) {
+        var m1 = u.match(/\/event\/([^/?#]+)/i);
+        if (m1) es = m1[1];
+      }
     }
-    if (g.url) return g.url;
+    if (!es) es = eventSlugFromAny(g.eventSlug || g.slug || g.marketSlug || g.url || '');
+    if (es) return 'https://polymarket.us/event/' + es.replace(/^\//, '');
+    if (g.url && /polymarket\.(us|com)/i.test(String(g.url))) return g.url;
     return 'https://polymarket.us';
   }
 
@@ -2690,6 +2745,20 @@
     var edge = g.netEdge != null ? ((g.netEdge >= 0 ? '+' : '') + g.netEdge + '%') : '—';
     var title = String(g.eventTitle || g.title || '').replace(/</g, '');
     var pick = String(g.modelPick || '—').replace(/</g, '');
+    // If spread pick lacks a number, try sides / spreadLine
+    if ((String(g.marketType || '').indexOf('spread') >= 0 || String(g.marketType || '') === 'f5_spread')
+        && !/[+-]?\d/.test(pick)) {
+      if (g.spreadLine != null) {
+        var sn = pick.replace(/\s*\(spread\)/i, '').replace(/^YES\s*|NO\s*/i, '').trim();
+        var sl = Number(g.spreadLine);
+        pick = (sn || pick) + ' ' + (sl > 0 ? '+' : '') + sl;
+      } else if (g.sides && g.sides.length) {
+        var prefer = g.sides.find(function (s) {
+          return s && s.name && /[+-]\d/.test(String(s.name));
+        });
+        if (prefer) pick = String(prefer.name);
+      }
+    }
     var s0 = (g.sides && g.sides[0]) || {};
     var s1 = (g.sides && g.sides[1]) || {};
     var pct0 = s0.pct != null ? s0.pct : 50;
