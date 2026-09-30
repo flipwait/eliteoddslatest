@@ -273,12 +273,29 @@ function sidesFromMarket(m, evTitle, type, matchup) {
     display: formatCents(price),
   });
 
-  if (type === 'total' || type === 'f5_total') {
-    const line = (m.question || '').match(/more than\s*([\d.]+)/i) || (m.question || '').match(/([\d.]+)\s*(?:runs|points|goals)/i);
-    const lineStr = line ? line[1] : '';
+  if (type === 'total' || type === 'f5_total' || String(type).startsWith('total_')) {
+    // Prefer API line (all sports), then question "more than X", then slug 6pt5
+    let lineVal = m.line != null && !isNaN(Number(m.line)) ? Number(m.line) : null;
+    if (lineVal == null) {
+      const qm = String(m.question || '').match(/more than\s*([0-9]+\.?[0-9]*)/i)
+        || String(m.question || '').match(/(?:o\/u|total)\s*([0-9]+\.?[0-9]*)/i)
+        || String(m.question || '').match(/([0-9]+\.?[0-9]*)\s*(?:runs|points|goals)/i);
+      if (qm) lineVal = Number(qm[1]);
+    }
+    if (lineVal == null) {
+      const sm = String(m.slug || m.marketSlug || '').match(/(\d+)pt(\d+)/i);
+      if (sm) lineVal = Number(sm[1] + '.' + sm[2]);
+    }
+    const lineStr = lineVal != null
+      ? (Number.isInteger(lineVal) ? String(lineVal) : String(Math.round(lineVal * 10) / 10))
+      : '';
     return {
-      sides: [pack(lineStr ? 'Over ' + lineStr : 'Over', p, 'over'), pack(lineStr ? 'Under ' + lineStr : 'Under', no, 'under')],
+      sides: [
+        pack(lineStr ? 'Over ' + lineStr : 'Over', p, 'over'),
+        pack(lineStr ? 'Under ' + lineStr : 'Under', no, 'under'),
+      ],
       yesIsHome: null,
+      line: lineVal,
     };
   }
   if (type === 'nrfi' || type === 'yrfi') {
@@ -713,7 +730,8 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
               if (sc && sc.side) return sc.side;
               return null;
             })(),
-            spreadLine: (sc && sc.spreadLine != null) ? sc.spreadLine : (m.line != null ? Number(m.line) : null),
+            spreadLine: (sc && sc.spreadLine != null) ? sc.spreadLine : ((type === 'spread' || String(type).startsWith('spread_') || type === 'f5_spread') && m.line != null ? Number(m.line) : null),
+            totalLine: (sc && sc.totalLine != null) ? sc.totalLine : ((type === 'total' || type === 'f5_total' || String(type).startsWith('total_')) && m.line != null ? Number(m.line) : null),
             line: m.line != null ? Number(m.line) : null,
             rank: sc ? sc.rank : 'Pass',
             netEdge: sc ? sc.netEdge : 0,

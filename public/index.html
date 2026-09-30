@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.24</title>
+  <title>EliteOdds v3.4.26</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.24</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.26</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1292,7 +1292,8 @@
               <input id="webhook" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="Main picks / Elite alerts" />
             </label>
             <label class="block text-xs">Discord · <span class="text-violet-300">Discord 2 (Kalshi) · Picks</span>
-              <input id="webhook-2" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="Kalshi channel only" />
+              <input id="webhook-2" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="Kalshi channel only — required for Kalshi Elite auto" />
+              <p class="text-[10px] text-bb-green mt-0.5">Kalshi Elite auto-send uses this webhook only (never Discord 1).</p>
             </label>
             <label class="block text-xs">Discord · <span class="text-amber-300">Super Elite</span>
               <input id="webhook-super" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="Super Elite picks only (optional)" />
@@ -1433,7 +1434,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.24</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.26</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1774,8 +1775,26 @@
   };
 
   
-  var APP_VERSION = '3.4.24';
+  var APP_VERSION = '3.4.26';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.26',
+      date: '2026-09-29',
+      title: 'Kalshi Elite always posts to Discord 2',
+      items: [
+        'FIXED — Kalshi Elite auto-send could land in Discord 1 (POLY). Routing is locked: Kalshi → webhook 2 only.',
+        'CHANGED — Auto-Elite stamps venue and passes channel explicitly; missing Discord 2 skips send instead of falling back to Discord 1.'
+      ]
+    },
+    {
+      version: '3.4.25',
+      date: '2026-09-29',
+      title: 'Totals & F5 totals show the number (Over 8.5)',
+      items: [
+        'FIXED — total / f5 total rows showed only Over or Under with no line.',
+        'CHANGED — Uses Polymarket market.line + more than X + slug (6pt5) for FG and F5 totals on all sports.'
+      ]
+    },
     {
       version: '3.4.24',
       date: '2026-09-28',
@@ -2745,12 +2764,12 @@
     var edge = g.netEdge != null ? ((g.netEdge >= 0 ? '+' : '') + g.netEdge + '%') : '—';
     var title = String(g.eventTitle || g.title || '').replace(/</g, '');
     var pick = String(g.modelPick || '—').replace(/</g, '');
-    // If spread pick lacks a number, try sides / spreadLine
+    // Spread: ensure ±line on pick
     if ((String(g.marketType || '').indexOf('spread') >= 0 || String(g.marketType || '') === 'f5_spread')
         && !/[+-]?\d/.test(pick)) {
-      if (g.spreadLine != null) {
+      if (g.spreadLine != null || g.line != null) {
         var sn = pick.replace(/\s*\(spread\)/i, '').replace(/^YES\s*|NO\s*/i, '').trim();
-        var sl = Number(g.spreadLine);
+        var sl = Number(g.spreadLine != null ? g.spreadLine : g.line);
         pick = (sn || pick) + ' ' + (sl > 0 ? '+' : '') + sl;
       } else if (g.sides && g.sides.length) {
         var prefer = g.sides.find(function (s) {
@@ -2758,6 +2777,17 @@
         });
         if (prefer) pick = String(prefer.name);
       }
+    }
+    // Totals / F5: Over → Over 8.5
+    if ((String(g.marketType || '') === 'total' || String(g.marketType || '') === 'f5_total' || String(g.marketType || '').indexOf('total_') === 0)
+        && /^\s*(Over|Under)\s*$/i.test(pick)) {
+      var tl = g.totalLine != null ? g.totalLine : g.line;
+      if (tl == null && g.sides && g.sides[0] && g.sides[0].name) {
+        var nm = String(g.sides[0].name);
+        var tm = nm.match(/([0-9]+\.?[0-9]*)/);
+        if (tm) tl = tm[1];
+      }
+      if (tl != null) pick = pick.trim() + ' ' + tl;
     }
     var s0 = (g.sides && g.sides[0]) || {};
     var s1 = (g.sides && g.sides[1]) || {};
@@ -4381,10 +4411,18 @@
     Object.keys(sent).forEach(function (k) { if (sent[k] < week) delete sent[k]; });
     localStorage.setItem('bb_elite_sent', JSON.stringify(sent));
     if (!queue.length) return;
-    // Stagger sends to avoid Discord rate limits
+    // Stagger sends; Kalshi ALWAYS channel 2, Polymarket channel 1
     queue.forEach(function (g, i) {
       setTimeout(function () {
-        sendDiscord(g, { silent: true, fromEliteAuto: true });
+        var v = resolveVenue(g);
+        // Re-stamp so sendDiscord cannot mis-route
+        if (v === 'kalshi') { g.venue = 'kalshi'; g.source = 'kalshi'; }
+        else { g.venue = g.venue || 'polymarket'; g.source = g.source || 'polymarket'; }
+        sendDiscord(g, {
+          silent: true,
+          fromEliteAuto: true,
+          channel: v === 'kalshi' ? 2 : 1
+        });
       }, i * gapMs);
     });
   }
@@ -5554,12 +5592,15 @@ function renderSlate() {
 
   function resolveVenue(g) {
     if (!g) return 'polymarket';
-    var v = String(g.venue || g.source || '').toLowerCase().trim();
-    if (v === 'kalshi' || v === 'kal') return 'kalshi';
+    var v = String(g.venue || g.source || g.book || '').toLowerCase().trim();
+    if (v === 'kalshi' || v === 'kal' || v.indexOf('kalshi') >= 0) return 'kalshi';
     if (v === 'polymarket' || v === 'poly' || v === 'pm') return 'polymarket';
-    var url = String(g.url || g.tradeUrl || '').toLowerCase();
+    var url = String(g.url || g.tradeUrl || g.marketUrl || '').toLowerCase();
     if (url.indexOf('kalshi.com') >= 0) return 'kalshi';
     if (url.indexOf('polymarket') >= 0) return 'polymarket';
+    // Kalshi tickers / event ids often start with KX or contain series codes
+    var tick = String(g.marketTicker || g.ticker || g.marketSlug || g.slug || g.id || '').toUpperCase();
+    if (/^KX|KALSHI|SERIES_/.test(tick) || /KX[A-Z]/.test(tick)) return 'kalshi';
     return 'polymarket';
   }
   function liveSettings() {
@@ -5579,24 +5620,39 @@ function renderSlate() {
     opts = opts || {};
     var st = liveSettings();
     var venue = resolveVenue(g);
-    g.venue = venue; // stamp for logging
-    // Kalshi ALWAYS → Discord 2; Polymarket → Discord 1 (Disc 2 button still forces 2)
-    var channel = opts.channel;
+    g.venue = venue;
+    g.source = venue;
+    // Kalshi ALWAYS → Discord 2 only (never Discord 1, even if webhook2 empty)
+    var channel;
     if (venue === 'kalshi') {
-      channel = 2; // lock Kalshi to webhook 2
-    } else if (channel == null) {
+      channel = 2;
+    } else if (opts.channel != null && Number(opts.channel) === 2) {
+      channel = 2; // Disc 2 button for poly still allowed
+    } else {
       channel = 1;
     }
-    channel = Number(channel) === 2 ? 2 : 1;
-    var useWh = channel === 2 ? st.webhook2 : st.webhook;
+    var useWh = channel === 2 ? (st.webhook2 || '') : (st.webhook || '');
+    useWh = String(useWh || '').trim();
+    // Safety: if somehow same URL configured for both, still post — but Kalshi only uses webhook2 field
     if (!useWh) {
       if (opts.silent) {
-        console.warn('[EliteOdds] Discord skip: no webhook for channel', channel, 'venue', venue);
+        console.warn('[EliteOdds] Discord skip: no webhook for channel', channel, 'venue', venue,
+          channel === 2 ? '(set Discord 2 / Kalshi webhook in Settings)' : '(set Discord 1 webhook)');
         return false;
       }
       return alert(channel === 2
-        ? 'Kalshi needs Discord 2 webhook in Settings (save after pasting).'
+        ? 'Kalshi picks go to Discord 2 only. Paste the Kalshi channel webhook under Settings → Discord 2, then Save.'
         : 'Polymarket needs Discord 1 webhook in Settings (save after pasting).');
+    }
+    // Extra guard: Kalshi must not use Discord 1 URL
+    if (venue === 'kalshi' && channel !== 2) {
+      console.warn('[EliteOdds] blocked Kalshi → Discord 1');
+      channel = 2;
+      useWh = String(st.webhook2 || '').trim();
+      if (!useWh) {
+        if (opts.silent) return false;
+        return alert('Kalshi blocked from Discord 1. Set Discord 2 webhook.');
+      }
     }
     var rank = String(g.rank || 'Pass').toUpperCase();
     var title = String(g.eventTitle || g.title || 'Pick');
@@ -5617,7 +5673,7 @@ function renderSlate() {
     var matchScore = (g.evaluate && g.evaluate.matchup && g.evaluate.matchup.score) || g.matchupScore || null;
     var matchLabel = (g.evaluate && g.evaluate.matchup && g.evaluate.matchup.label) || '';
     var b = g.breakdown || {};
-    var tradeUrl = g.url || 'https://polymarket.us';
+    var tradeUrl = (typeof tradeHrefFor === 'function') ? tradeHrefFor(g) : (g.url || (isKalshi ? 'https://kalshi.com' : 'https://polymarket.us'));
     var league = String(g.league || 'MLB').toUpperCase();
     var alertId = String(g.id || g.marketSlug || (title + '-' + pick)).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 48);
 
@@ -5631,7 +5687,7 @@ function renderSlate() {
 
     var rankBadge = rank === 'ELITE' ? 'ELITE' : rank === 'GOOD' ? 'GOOD' : 'PASS';
     var rankEmoji = rank === 'ELITE' ? '🎯' : rank === 'GOOD' ? '✅' : '📋';
-    var isKalshi = g.venue === 'kalshi' || g.source === 'kalshi';
+    var isKalshi = venue === 'kalshi' || resolveVenue(g) === 'kalshi';
     var color = isKalshi ? 0x22c55e : 0x3b82f6;
     var venueLabel = isKalshi ? 'Kalshi' : 'Polymarket';
     var venueEmoji = isKalshi ? '🟢' : '🔵';
