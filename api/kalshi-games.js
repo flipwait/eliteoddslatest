@@ -1,5 +1,12 @@
 const { listSportGames } = require('../lib/kalshi');
 const { matchupForEvent } = require('../lib/espn');
+let matchupForEsports = async () => null;
+let isEsportsLeague = () => false;
+try {
+  const es = require('../lib/esports');
+  matchupForEsports = es.matchupForEsports;
+  isEsportsLeague = es.isEsportsLeague;
+} catch (e) {}
 const { buildSignal } = require('../lib/score');
 const { buildLiveAnalysis } = require('../lib/live');
 let attachEspnLiveBatch = null;
@@ -119,7 +126,13 @@ module.exports = async function handler(req, res) {
     await Promise.all(
       uniqueTitles.map(async (title) => {
         try {
-          let m = await matchupForEvent(league, title);
+          const pandascoreToken = String(q.pandascore || q.pandascoreToken || process.env.PANDASCORE_TOKEN || '').trim();
+          let m = null;
+          if (isEsportsLeague(league) || league === 'esports') {
+            m = await matchupForEsports(league === 'esports' ? 'cs2' : league, title, { pandascoreToken });
+          } else {
+            m = await matchupForEvent(league, title);
+          }
           if (m && league === 'mlb') {
             try {
               m = await enrichMlbMatchup(m);

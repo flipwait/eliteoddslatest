@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.26</title>
+  <title>EliteOdds v3.4.28</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.26</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.28</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -832,6 +832,7 @@
                     <option value="nhl">NHL</option>
                     <option value="cfb">CFB</option>
                     <option value="cbb">CBB</option>
+                    <option value="mls">MLS / Soccer</option>
                     <option value="esports">Esports</option>
                   </select>
                 </label>
@@ -1371,6 +1372,10 @@
 
             <label class="block text-xs">OpenAI key
               <input id="openai" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" />
+            <label class="block text-xs text-bb-muted mt-3">PandaScore API token (esports form — free tier OK)
+              <input id="pandascore" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="Bearer token from pandascore.co dashboard" />
+            </label>
+            <p class="text-[10px] text-bb-muted mt-0.5">Unlocks CS2 / LoL / Valorant map L10 + H2H. Dota2 still uses free OpenDota. Optional env: PANDASCORE_TOKEN.</p>
             </label>
             <label class="block text-xs">The Odds API key <span class="text-bb-muted">(shortlist only · 20m cache)</span>
               <input id="odds-key" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" />
@@ -1398,6 +1403,19 @@
             <label class="block text-xs">Smart$ worker URL <span class="text-bb-muted">(optional Railway)</span>
               <input id="worker-url" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="https://your-worker.up.railway.app" />
             </label>
+            <div class="border border-bb-border rounded-lg p-2.5 space-y-2">
+              <p class="text-[11px] font-medium text-violet-200">Esports &amp; soccer ranks</p>
+              <p class="text-[10px] text-bb-muted">These sports usually have no L10/H2H form. Without the toggles below they stay <strong class="text-white">Pass</strong>.</p>
+              <label class="flex items-center gap-2 text-xs cursor-pointer">
+                <input type="checkbox" id="allow-thin-form-good" class="rounded" checked />
+                Allow <strong class="text-white">Good</strong> from market edge (esports / soccer / MLS)
+              </label>
+              <label class="flex items-center gap-2 text-xs cursor-pointer">
+                <input type="checkbox" id="allow-thin-form-elite" class="rounded" />
+                Allow rare <strong class="text-white">Elite</strong> on very strong market edge only (still no form)
+              </label>
+              <p class="text-[10px] text-bb-muted">Does not change MLB/NFL/NBA strict form rules. Elite thin-form needs ~5pp+ edge.</p>
+            </div>
             <label class="flex items-center gap-2 text-xs cursor-pointer">
               <input type="checkbox" id="auto-discord-elite" class="rounded" />
               Auto-send Elite picks to Discord (once per game id)
@@ -1434,7 +1452,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.26</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.28</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1623,6 +1641,7 @@
     { id: 'ufc', label: 'UFC' },
     { id: 'atp', label: 'ATP' },
     { id: 'wta', label: 'WTA' },
+    { id: 'mls', label: 'MLS' },
     { id: 'esports', label: 'Esports' },
     { id: 'all', label: 'All' }
   ];
@@ -1755,6 +1774,18 @@
       { id: 'total', label: 'Total sets/games' },
       { id: 'spread', label: 'Handicap' }
     ],
+    mls: [
+      { id: 'moneyline', label: 'Moneyline' },
+      { id: 'spread', label: 'Spread / Handicap' },
+      { id: 'total', label: 'Total' },
+      { id: 'all', label: 'All markets' }
+    ],
+    epl: [
+      { id: 'moneyline', label: 'Moneyline' },
+      { id: 'spread', label: 'Spread / Handicap' },
+      { id: 'total', label: 'Total' },
+      { id: 'all', label: 'All markets' }
+    ],
     esports: [
       { id: 'all', label: 'All' },
       { id: 'moneyline', label: 'Series / match' },
@@ -1775,8 +1806,28 @@
   };
 
   
-  var APP_VERSION = '3.4.26';
+  var APP_VERSION = '3.4.28';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.28',
+      date: '2026-09-30',
+      title: 'PandaScore esports form (CS2 / LoL / Val)',
+      items: [
+        'ADDED — Settings → PandaScore API token (free tier works). Passed to /api/games and /api/kalshi-games.',
+        'ADDED — CS2, LoL, Valorant, CoD: last ~10 series W/L + H2H via PandaScore when token is set.',
+        'KEPT — Dota2 still uses free OpenDota first; PandaScore is fallback if needed.'
+      ]
+    },
+    {
+      version: '3.4.27',
+      date: '2026-09-30',
+      title: 'Esports & soccer can rank Good (market edge)',
+      items: [
+        'ADDED — Settings: allow Good from market edge for esports/soccer/MLS (on by default). Optional rare Elite on very strong edge.',
+        'ADDED — MLS in sport list; thin-form leagues use slightly looser Good floors without changing MLB/NFL form rules.',
+        'CHANGED — Fair line shows “no team form” when market-only so Pass vs Good is clearer.'
+      ]
+    },
     {
       version: '3.4.26',
       date: '2026-09-29',
@@ -4183,7 +4234,25 @@
       '&minEdge=' + encodeURIComponent(minEdge || '0') +
       '&minScore=' + encodeURIComponent(minSc || '0') +
       '&strictTruth=' + encodeURIComponent(strict || '1') +
-      '&allowMarketGood=' + (allowMkt || '0');
+      '&allowMarketGood=' + (allowMkt || '0') +
+      '&allowThinFormGood=' + (function () {
+        try {
+          var st = settings();
+          if (st.allowThinFormGood === false || st.allowThinFormGood === 0) return '0';
+        } catch (e) {}
+        var el = $('allow-thin-form-good');
+        if (el && !el.checked) return '0';
+        return '1';
+      })() +
+      '&allowThinFormElite=' + (function () {
+        try {
+          var st = settings();
+          if (st.allowThinFormElite === true || st.allowThinFormElite === 1) return '1';
+        } catch (e) {}
+        var el = $('allow-thin-form-elite');
+        if (el && el.checked) return '1';
+        return '0';
+      })();
     // Rank filter applied client-side too — still pass for server summary
     if (rankF && rankF !== 'all') q += '&rank=' + encodeURIComponent(rankF);
     if (Number(minEv) > 0) q += '&minGoodEv=' + encodeURIComponent(minEv);
@@ -4201,7 +4270,7 @@
   /** Per-league fetch when Sport=All — batched so Vercel does not time out empty */
   async function fetchPolyAllLeagues(mt, rankF, minEv, minEdge, minSc, strict, allowMkt) {
     // Active books first; esports last (heavier / thinner)
-    var leagues = ['mlb', 'nfl', 'nba', 'nhl', 'cfb', 'cbb', 'wnba', 'ufc', 'esports'];
+    var leagues = ['mlb', 'nfl', 'nba', 'nhl', 'cfb', 'cbb', 'wnba', 'ufc', 'mls', 'esports'];
     var merged = [];
     var seen = {};
     function addAll(arr) {
@@ -4237,12 +4306,19 @@
   }
   function kalQuery(mt, strict, allowMkt) {
     var lim = (sport === 'all' || mt === 'all') ? 60 : 35;
-    return '/api/kalshi-games?mode=' + encodeURIComponent(apiMode()) +
+    var kq = '/api/kalshi-games?mode=' + encodeURIComponent(apiMode()) +
       '&league=' + encodeURIComponent(sport && sport !== 'all' ? sport : 'all') +
       '&marketType=' + encodeURIComponent(mt || 'all') +
       '&strict=' + encodeURIComponent(strict) +
       '&allowMarketGood=' + allowMkt +
+      '&allowThinFormGood=' + (($('allow-thin-form-good') && !$('allow-thin-form-good').checked) ? '0' : '1') +
+      '&allowThinFormElite=' + (($('allow-thin-form-elite') && $('allow-thin-form-elite').checked) ? '1' : '0') +
       '&limit=' + lim;
+    try {
+      var pst = (settings().pandascore || ($('pandascore') && $('pandascore').value) || '').trim();
+      if (pst) kq += '&pandascore=' + encodeURIComponent(pst);
+    } catch (e) {}
+    return kq;
   }
   function renderGameList(box, list) {
     if (!box) return;
@@ -6176,8 +6252,11 @@ function renderSlate() {
 
       webhookLost: ($('webhook-lost') && $('webhook-lost').value) || '',
       openai: $('openai').value || '',
+      pandascore: ($('pandascore') && $('pandascore').value) || '',
       oddsKey: ($('odds-key') && $('odds-key').value) || '',
       workerUrl: ($('worker-url') && $('worker-url').value) || '',
+      allowThinFormGood: !($('allow-thin-form-good') && !$('allow-thin-form-good').checked),
+      allowThinFormElite: !!($('allow-thin-form-elite') && $('allow-thin-form-elite').checked),
       autoDiscordElite: !!($('auto-discord-elite') && $('auto-discord-elite').checked),
       autoDiscordGapSec: ($('auto-discord-gap') && $('auto-discord-gap').value) || '5',
       autoLogOnDiscord: false,
@@ -6224,8 +6303,11 @@ function renderSlate() {
 
   if ($('webhook-lost')) $('webhook-lost').value = st.webhookLost || '';
   if ($('openai')) $('openai').value = st.openai || '';
+  if ($('pandascore')) $('pandascore').value = st.pandascore || '';
   if ($('odds-key')) $('odds-key').value = st.oddsKey || '';
   if ($('worker-url')) $('worker-url').value = st.workerUrl || '';
+  if ($('allow-thin-form-good')) $('allow-thin-form-good').checked = st.allowThinFormGood !== false && st.allowThinFormGood !== 0;
+  if ($('allow-thin-form-elite')) $('allow-thin-form-elite').checked = !!st.allowThinFormElite;
   if ($('auto-discord-elite')) $('auto-discord-elite').checked = !!st.autoDiscordElite;
   if ($('auto-discord-gap')) $('auto-discord-gap').value = st.autoDiscordGapSec != null ? st.autoDiscordGapSec : '5';
   if ($('auto-log-on-discord')) $('auto-log-on-discord').checked = !!st.autoLogOnDiscord;

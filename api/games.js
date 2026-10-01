@@ -524,9 +524,12 @@ module.exports = async function handler(req, res) {
     const minLiq = parseFloat(req.query.minLiq || '0');
     const rankFilter = (req.query.rank || '').toLowerCase();
     const minScore = parseFloat(req.query.minScore || '0');
+    const pandascoreToken = String(req.query.pandascore || req.query.pandascoreToken || process.env.PANDASCORE_TOKEN || '').trim();
     const rankOpts = {
       strictTruth: req.query.strictTruth !== '0',
       allowMarketGood: req.query.allowMarketGood === '1',
+      allowThinFormGood: req.query.allowThinFormGood !== '0',
+      allowThinFormElite: req.query.allowThinFormElite === '1',
       minGoodEv: req.query.minGoodEv != null ? parseFloat(req.query.minGoodEv) : undefined,
       minEliteEv: req.query.minEliteEv != null ? parseFloat(req.query.minEliteEv) : undefined,
       minGoodEdge: req.query.minGoodEdge != null ? parseFloat(req.query.minGoodEdge) : undefined,
@@ -595,7 +598,15 @@ module.exports = async function handler(req, res) {
         seen.add(title);
         if (jobs.length >= (league && league !== "all" ? 12 : 8)) break;
         jobs.push(
-          matchupForEvent(lg, title)
+          (async () => {
+            let m = null;
+            if (typeof isEsportsLeague === 'function' && isEsportsLeague(lg)) {
+              try { m = await matchupForEsports(lg, title, { pandascoreToken: pandascoreToken }); } catch (e) { m = null; }
+            } else {
+              try { m = await matchupForEvent(lg, title); } catch (e) { m = null; }
+            }
+            return m;
+          })()
             .then(async (m) => {
               if (!m || m.error) return;
               m.league = lg;
