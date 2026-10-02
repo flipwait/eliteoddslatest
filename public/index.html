@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.30</title>
+  <title>EliteOdds v3.4.31</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.30</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.31</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -832,12 +832,7 @@
                     <option value="nhl">NHL</option>
                     <option value="cfb">CFB</option>
                     <option value="cbb">CBB</option>
-                    <option value="soccer">Soccer (all)</option>
-                    <option value="epl">EPL</option>
-                    <option value="mls">MLS</option>
-                    <option value="lal">La Liga</option>
-                    <option value="bun">Bundesliga</option>
-                    <option value="sea">Serie A</option>
+                    <option value="soccer">Soccer (all leagues)</option>
                     <option value="esports">Esports</option>
                   </select>
                 </label>
@@ -1457,7 +1452,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.30</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.31</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1647,9 +1642,6 @@
     { id: 'atp', label: 'ATP' },
     { id: 'wta', label: 'WTA' },
     { id: 'soccer', label: 'Soccer' },
-    { id: 'epl', label: 'EPL' },
-    { id: 'mls', label: 'MLS' },
-    { id: 'lal', label: 'La Liga' },
     { id: 'esports', label: 'Esports' },
     { id: 'all', label: 'All' }
   ];
@@ -1844,8 +1836,17 @@
   };
 
   
-  var APP_VERSION = '3.4.30';
+  var APP_VERSION = '3.4.31';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.31',
+      date: '2026-10-02',
+      title: 'Soccer fix: fetchSoccerEvents + one category',
+      items: [
+        'FIXED — Polymarket error “fetchSoccerEvents is not defined” (missing import in /api/games).',
+        'CHANGED — Single Soccer category pulls EPL, MLS, La Liga, Bundesliga, Serie A, UCL and related leagues together.'
+      ]
+    },
     {
       version: '3.4.30',
       date: '2026-10-02',
@@ -4287,6 +4288,11 @@
     return p.catch(function (e) { return { ok: false, games: [], error: String(e.message || e) }; });
   }
 
+  function resolveSportLeague(sp) {
+    var s = String(sp || '').toLowerCase();
+    if (s === 'mls' || s === 'epl' || s === 'lal' || s === 'bun' || s === 'sea' || s === 'ucl' || s === 'uefa' || s === 'fwc' || s === 'football') return 'soccer';
+    return s;
+  }
   function polyQuery(mt, rankF, minEv, minEdge, minSc, strict, allowMkt, leagueOverride) {
     var q = '/api/games?mode=' + encodeURIComponent(apiMode()) +
       '&marketType=' + encodeURIComponent(mt || 'all') +
@@ -4317,6 +4323,7 @@
     if (Number(minEv) > 0) q += '&minGoodEv=' + encodeURIComponent(minEv);
     if (Number(minEdge) > 0) q += '&minGoodEdge=' + encodeURIComponent(minEdge);
     var lg = leagueOverride != null ? leagueOverride : sport;
+    lg = resolveSportLeague(lg);
     if (lg && lg !== 'all') q += '&league=' + encodeURIComponent(lg);
     else if (lg === 'all') q += '&league=all';
     // Keep payloads smaller for multi-league scans
@@ -4366,7 +4373,7 @@
   function kalQuery(mt, strict, allowMkt) {
     var lim = (sport === 'all' || mt === 'all') ? 60 : 35;
     var kq = '/api/kalshi-games?mode=' + encodeURIComponent(apiMode()) +
-      '&league=' + encodeURIComponent(sport && sport !== 'all' ? sport : 'all') +
+      '&league=' + encodeURIComponent(sport && sport !== 'all' ? resolveSportLeague(sport) : 'all') +
       '&marketType=' + encodeURIComponent(mt || 'all') +
       '&strict=' + encodeURIComponent(strict) +
       '&allowMarketGood=' + allowMkt +
