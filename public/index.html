@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.37</title>
+  <title>EliteOdds v3.4.40</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.37</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.40</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1265,7 +1265,7 @@
                 <div class="rounded-xl bg-black/25 border border-bb-border p-2"><div class="text-bb-muted">ROI %</div><div id="elite-week-roi" class="text-lg font-semibold text-white">—</div></div>
               </div>
               <p id="elite-book-statline" class="text-[10px] text-bb-muted">Filter: All books</p>
-              <p id="elite-week-blurb" class="text-[11px] text-bb-muted">Paper Elites from Scan · not logged bets · Discord 1 = PM · Discord 2 = Kalshi</p>
+              <p id="elite-week-blurb" class="text-[11px] text-bb-muted">Paper Elites from Scan · Open includes future games (not wrong) · past start → run ESPN settle · Discord 1 = PM · Discord 2 = Kalshi</p>
                             <div class="flex flex-wrap gap-1.5 text-xs mb-1" id="elite-day-filters">
                 <button type="button" class="elite-day-chip on" data-eday="today">Today</button>
                 <button type="button" class="elite-day-chip" data-eday="yesterday">Yesterday</button>
@@ -1469,13 +1469,57 @@
             <p class="text-[10px] text-bb-muted">Discord 1 = Polymarket · Discord 2 = Kalshi only</p>
           </div>
         
+        <div class="mt-6 rounded-xl border border-cyan-500/25 bg-cyan-500/5 p-4 space-y-3" id="retooler-section">
+          <div class="flex items-center justify-between gap-2 flex-wrap">
+            <div>
+              <h3 class="text-sm font-semibold text-white">Retooler · Auto Coach</h3>
+              <p class="text-[11px] text-bb-muted mt-0.5">Learns from <strong class="text-white">Elite paper</strong> by sport · suggests rank/edge tweaks · optional AI notes</p>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded border border-cyan-400/30 text-cyan-200">coach</span>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-2 text-[11px]">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="coach-auto" class="rounded" checked />
+              Show coach summary when opening Journal
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="coach-ai" class="rounded" />
+              Optional AI summary (needs OpenAI key)
+            </label>
+            <label class="block">Min sample before suggestion
+              <select id="coach-min-n" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs">
+                <option value="5">5 settled</option>
+                <option value="10" selected>10 settled</option>
+                <option value="15">15 settled</option>
+                <option value="20">20 settled</option>
+              </select>
+            </label>
+            <label class="block">Window
+              <select id="coach-window" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs">
+                <option value="10">Last 10 settled</option>
+                <option value="20" selected>Last 20 settled</option>
+                <option value="50">Last 50 settled</option>
+                <option value="0">All settled</option>
+              </select>
+            </label>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" id="btn-run-coach" class="px-3 py-1.5 rounded-lg border border-cyan-400/40 text-cyan-200 text-xs bg-cyan-500/10">Run coach now</button>
+            <button type="button" id="btn-coach-apply" class="px-3 py-1.5 rounded-lg border border-bb-green/40 text-bb-green text-xs hidden">Apply suggested filters</button>
+          </div>
+          <div id="coach-out" class="text-[11px] text-bb-muted space-y-2 max-h-72 overflow-y-auto leading-snug">
+            <p class="text-bb-muted">Run coach after settled Elite paper (Journal → ESPN settle). Future games stay Open on purpose.</p>
+          </div>
+          <div id="open-breakdown" class="rounded-lg border border-bb-border bg-black/20 p-2 text-[10px] text-bb-muted"></div>
+        </div>
+
         <div class="mt-6 rounded-xl border border-bb-border bg-bb-elev/40 p-4 space-y-3">
           <div class="flex items-center justify-between gap-2">
             <div>
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.37</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.40</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1859,8 +1903,37 @@
   };
 
   
-  var APP_VERSION = '3.4.37';
+  var APP_VERSION = '3.4.40';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.40',
+      date: '2026-10-02',
+      title: 'NRFI/YRFI always scores + form visible',
+      items: [
+        'FIXED — NRFI/YRFI returned null when sample was thin, so cards looked empty / never ranked.',
+        'CHANGED — Always returns a pick (NRFI or YRFI) with Pass at minimum; Good/Elite only with real 1st-inning sample.',
+        'ADDED — Card form shows 1st-inning NRFI% even when thin (labeled thin/prior vs form live).'
+      ]
+    },
+    {
+      version: '3.4.39',
+      date: '2026-10-02',
+      title: 'Retooler Auto Coach + open Elite breakdown',
+      items: [
+        'ADDED — Settings → Retooler · Auto Coach: sport/market report from Elite paper, optional AI notes, Apply suggested min-edge.',
+        'ADDED — Open breakdown: future vs live vs past-start (need ESPN settle) so 100+ open is not a bug.',
+        'CHANGED — ESPN settle skips games that have not started yet; only past-start ML + full-game O/U.'
+      ]
+    },
+    {
+      version: '3.4.38',
+      date: '2026-10-02',
+      title: 'Totals honesty: no ML form on Under/Over',
+      items: [
+        'FIXED — NHL/etc totals could show Model 65% on a 19¢ Under using moneyline form (wrong). Without a real totals projection, model tracks market and rank stays Pass.',
+        'CHANGED — Totals with projection still capped (~18pp max model vs market); sub-18¢ totals cannot be Good/Elite.'
+      ]
+    },
     {
       version: '3.4.37',
       date: '2026-10-02',
@@ -2869,10 +2942,11 @@
       }
     }
     var nr = b.nrfi;
-    if (nr && !nr.thin && nr.nrfiProxy != null) {
+    if (nr && nr.nrfiProxy != null) {
       lines += '<div><strong class="text-white">1st inning</strong> NRFI ' + Math.round(nr.nrfiProxy * 1000) / 10 +
-        '% · YRFI ' + (nr.yrfiProxy != null ? Math.round(nr.yrfiProxy * 1000) / 10 : Math.round((1 - nr.nrfiProxy) * 1000) / 10) + '%</div>';
-      lines += '<div class="text-bb-muted">NRFI = no run scores in the 1st · YRFI = at least one run in the 1st</div>';
+        '% · YRFI ' + (nr.yrfiProxy != null ? Math.round(nr.yrfiProxy * 1000) / 10 : Math.round((1 - nr.nrfiProxy) * 1000) / 10) + '%' +
+        (nr.thin ? ' <span class="text-amber-200">· thin / prior</span>' : ' <span class="text-bb-green">· form live</span>') + '</div>';
+      lines += '<div class="text-bb-muted">NRFI = no run in the 1st · YRFI = at least one run in the 1st · rank uses this model (not ML form)</div>';
       if (nr.home && nr.away) {
         lines += '<div class="text-bb-muted">Team 1st-inning NRFI (blank 1sts): H ' +
           (nr.home.nrfiPct != null ? Math.round(nr.home.nrfiPct * 1000) / 10 + '%' : '—') +
@@ -4105,6 +4179,7 @@
     if ($('elite-week-record')) $('elite-week-record').textContent = st.won + '-' + st.lost + (st.push ? '-' + st.push : '');
     if ($('elite-week-hit')) $('elite-week-hit').textContent = st.hit != null ? (st.hit + '%') : '—';
     if ($('elite-week-open')) $('elite-week-open').textContent = st.open;
+    try { updateOpenBreakdownUI(); } catch (eOb) {}
     if ($('elite-week-pnl')) {
       $('elite-week-pnl').textContent = (st.pnl >= 0 ? '+' : '') + st.pnl;
       $('elite-week-pnl').className = 'text-lg font-semibold ' + (st.pnl > 0 ? 'text-bb-green' : st.pnl < 0 ? 'text-bb-red' : 'text-white');
@@ -4294,11 +4369,19 @@
         loggedAt: b.at || null
       });
     });
+    var nowMs = Date.now();
+    var past = picks.filter(function (p) {
+      if (!p.startTime) return true;
+      var t = new Date(p.startTime).getTime();
+      return isNaN(t) || t <= nowMs;
+    });
+    var futureN = picks.length - past.length;
+    picks = past;
     if (!picks.length) {
-      if (!opts.quiet) alert('No open ML or full-game O/U paper Elites / journal bets to settle.');
+      if (!opts.quiet) alert('No settleable open picks.\n\n' + futureN + ' open games have not started yet (stay Open on purpose).\nOnly moneyline + full-game O/U after kickoff can auto-settle.');
       return;
     }
-    if (!opts.quiet && !confirm('Settle up to ' + picks.length + ' open ML + full-game Over/Under picks from ESPN finals?\n\n(F5, spreads, and props stay manual.)')) return;
+    if (!opts.quiet && !confirm('Settle up to ' + Math.min(40, picks.length) + ' open ML + full-game O/U from ESPN finals?\n\n' + (futureN ? (futureN + ' future games skipped (not started).\n') : '') + '(F5, spreads, props stay manual.)')) return;
     try {
       var r = await fetch('/api/settle-ml', {
         method: 'POST',
@@ -4371,6 +4454,140 @@
     }
   }
 
+
+
+  function eliteOpenBreakdown() {
+    var list = eliteLedger().filter(function (e) { return String(e.result || 'open') === 'open'; });
+    var now = Date.now();
+    var future = 0, due = 0, unknown = 0, pastNoSettle = 0;
+    list.forEach(function (e) {
+      if (!e.startTime) { unknown++; return; }
+      var t = new Date(e.startTime).getTime();
+      if (isNaN(t)) { unknown++; return; }
+      if (t > now + 15 * 60000) future++;
+      else if (t < now - 3 * 3600000) pastNoSettle++;
+      else due++;
+    });
+    return { total: list.length, future: future, due: due, pastNoSettle: pastNoSettle, unknown: unknown };
+  }
+  function updateOpenBreakdownUI() {
+    var el = $('open-breakdown');
+    if (!el) return;
+    var b = eliteOpenBreakdown();
+    el.innerHTML = '<strong class="text-white">Open Elite paper: ' + b.total + '</strong>' +
+      ' · <span class="text-violet-200">' + b.future + ' not started yet</span>' +
+      ' · <span class="text-amber-200">' + b.due + ' live / just started</span>' +
+      ' · <span class="text-bb-orange">' + b.pastNoSettle + ' past start (run ESPN settle)</span>' +
+      (b.unknown ? ' · ' + b.unknown + ' no start time' : '') +
+      '<div class="mt-1 text-bb-muted">Far-out games stay Open on purpose. ESPN settle only handles moneyline + full-game O/U after finals. Spreads / F5 / props stay manual.</div>';
+  }
+  function coachBucketStats(list, windowN) {
+    var settled = list.filter(function (e) {
+      var r = String(e.result || '');
+      return r === 'won' || r === 'lost' || r === 'push';
+    }).sort(function (a, b) {
+      return new Date(b.settledAt || b.at || 0) - new Date(a.settledAt || a.at || 0);
+    });
+    if (windowN > 0) settled = settled.slice(0, windowN);
+    var by = {};
+    settled.forEach(function (e) {
+      var lg = String(e.league || 'unk').toLowerCase();
+      var mt = String(e.marketType || 'moneyline').toLowerCase();
+      if (/total|over|under/.test(mt) || /\bover\b|\bunder\b/i.test(String(e.pick || ''))) mt = 'total';
+      else if (/spread/.test(mt)) mt = 'spread';
+      else if (/nrfi|yrfi/.test(mt)) mt = 'nrfi';
+      else mt = 'moneyline';
+      var k = lg + '|' + mt;
+      if (!by[k]) by[k] = { league: lg, market: mt, w: 0, l: 0, p: 0, n: 0 };
+      by[k].n++;
+      if (e.result === 'won') by[k].w++;
+      else if (e.result === 'lost') by[k].l++;
+      else by[k].p++;
+    });
+    return Object.keys(by).map(function (k) { return by[k]; }).sort(function (a, b) { return b.n - a.n; });
+  }
+  function coachSuggest(buckets, minN) {
+    var tips = [];
+    buckets.forEach(function (b) {
+      var decided = b.w + b.l;
+      if (decided < minN) {
+        tips.push({ level: 'info', text: (b.league + ' ' + b.market).toUpperCase() + ': only ' + decided + ' settled (need ' + minN + ') — keep filters.' });
+        return;
+      }
+      var hit = b.w / decided;
+      var label = (b.league + ' · ' + b.market).toUpperCase();
+      if (hit >= 0.58) {
+        tips.push({ level: 'good', text: label + ': ' + b.w + '-' + b.l + ' (' + Math.round(hit * 100) + '%) — working. Optional: loosen min edge −0.5pp.', sport: b.league, action: 'loosen' });
+      } else if (hit <= 0.42) {
+        tips.push({ level: 'warn', text: label + ': ' + b.w + '-' + b.l + ' (' + Math.round(hit * 100) + '%) — cold. Tighten +1pp min edge or Elite-only.', sport: b.league, action: 'tighten' });
+      } else {
+        tips.push({ level: 'ok', text: label + ': ' + b.w + '-' + b.l + ' (' + Math.round(hit * 100) + '%) — neutral. Hold filters.' });
+      }
+    });
+    if (!tips.length) tips.push({ level: 'info', text: 'No settled Elite paper yet. Scan → track Elites → after games end: Journal → ESPN settle.' });
+    return tips;
+  }
+  async function runCoach(opts) {
+    opts = opts || {};
+    var out = $('coach-out');
+    if (!out) return;
+    var minN = parseInt(($('coach-min-n') && $('coach-min-n').value) || '10', 10) || 10;
+    var win = parseInt(($('coach-window') && $('coach-window').value) || '20', 10);
+    if (isNaN(win)) win = 20;
+    var buckets = coachBucketStats(eliteLedger(), win);
+    var tips = coachSuggest(buckets, minN);
+    var openB = eliteOpenBreakdown();
+    var bits = [];
+    bits.push('<div class="text-white font-medium">Coach report · Elite paper</div>');
+    bits.push('<div>Open: <strong class="text-white">' + openB.total + '</strong> (' + openB.future + ' future · ' + openB.pastNoSettle + ' past start → ESPN settle · ' + openB.due + ' live)</div>');
+    tips.forEach(function (t) {
+      var col = t.level === 'good' ? 'text-bb-green' : (t.level === 'warn' ? 'text-bb-orange' : 'text-bb-muted');
+      bits.push('<div class="' + col + '">• ' + t.text + '</div>');
+    });
+    window.__coachTips = tips;
+    var applyBtn = $('btn-coach-apply');
+    if (applyBtn) applyBtn.classList.toggle('hidden', !tips.some(function (t) { return t.action === 'tighten' || t.action === 'loosen'; }));
+    out.innerHTML = bits.join('');
+    updateOpenBreakdownUI();
+    if ($('coach-ai') && $('coach-ai').checked) {
+      var st = settings();
+      if (!st.openaiKey) {
+        out.innerHTML += '<div class="text-bb-orange mt-1">AI coach: add OpenAI key in Settings.</div>';
+        return;
+      }
+      out.innerHTML += '<div class="text-bb-muted mt-1">AI coach thinking…</div>';
+      try {
+        var prompt = 'Sports betting model coach. 4 short bullets from this Elite paper data only. Do not invent stats.\n' + tips.map(function (t) { return t.text; }).join('\n') + '\nOpen: ' + JSON.stringify(openB);
+        var r = await fetch('/api/tools', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'openai', openaiKey: st.openaiKey, prompt: prompt, max_tokens: 350 })
+        });
+        var d = await r.json();
+        var text = (d && (d.text || d.reply || d.content)) || (d.error ? ('AI error: ' + d.error) : 'No AI reply');
+        out.innerHTML += '<div class="mt-2 p-2 rounded-lg border border-cyan-500/20 bg-black/30 text-cyan-100/90 whitespace-pre-wrap">' + String(text).replace(/</g, '') + '</div>';
+      } catch (e) {
+        out.innerHTML += '<div class="text-bb-orange mt-1">AI coach failed: ' + (e.message || e) + '</div>';
+      }
+    }
+  }
+  function applyCoachFilters() {
+    var tips = window.__coachTips || [];
+    var tighten = tips.filter(function (t) { return t.action === 'tighten'; }).length;
+    var loosen = tips.filter(function (t) { return t.action === 'loosen'; }).length;
+    var edgeEl = $('f-min-edge');
+    if (!edgeEl) return alert('Open Scan to apply edge changes.');
+    var cur = parseFloat(edgeEl.value || '3') || 3;
+    if (tighten > loosen) {
+      edgeEl.value = String(Math.min(12, cur + 1));
+      alert('Coach: min edge raised to ' + edgeEl.value + 'pp. Hit Apply on Scan.');
+    } else if (loosen > tighten) {
+      edgeEl.value = String(Math.max(1, Math.round((cur - 0.5) * 10) / 10));
+      alert('Coach: min edge eased to ' + edgeEl.value + 'pp. Hit Apply on Scan.');
+    } else {
+      alert('No clear majority — filters unchanged.');
+    }
+  }
 
   async function sendEliteWeekDiscord() {
     var st = settings();
@@ -6702,6 +6919,11 @@ function renderSlate() {
   if (wrw) wrw.onclick = resetWeeklyElite;
   var wra = document.getElementById('wr-reset-all-elite');
   if (wra) wra.onclick = resetAllElitePaper;
+  var bc = document.getElementById('btn-run-coach');
+  if (bc) bc.onclick = function () { runCoach({}); };
+  var bca = document.getElementById('btn-coach-apply');
+  if (bca) bca.onclick = applyCoachFilters;
+  try { updateOpenBreakdownUI(); } catch (eOpen) {}
   var bim = document.getElementById('btn-import-settings');
   if (bim) bim.onchange = function () { importSettingsFile(bim.files && bim.files[0]); };
 
