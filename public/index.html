@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.31</title>
+  <title>EliteOdds v3.4.33</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.31</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.33</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1452,7 +1452,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.31</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.33</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1836,8 +1836,28 @@
   };
 
   
-  var APP_VERSION = '3.4.31';
+  var APP_VERSION = '3.4.33';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.33',
+      date: '2026-10-02',
+      title: 'CFB form uses NFL winner formula',
+      items: [
+        'CHANGED — CFB form win probability now uses the same weights as NFL: L10/L5, point margin, H2H, rest, ~+2pp home.',
+        'CHANGED — Short-week rest adjustment applies to CFB the same way as NFL.',
+        'CHANGED — Fair blend form weight for CFB matches NFL (0.58).'
+      ]
+    },
+    {
+      version: '3.4.32',
+      date: '2026-10-02',
+      title: 'CFB form: correct team matching',
+      items: [
+        'FIXED — CFB form was empty or wrong: “Virginia Tech” matched Virginia, “Northwestern” matched D-III Northwestern (MN).',
+        'FIXED — Prefer FBS teams, full multi-word name match, larger ESPN team list + search fallback (Liberty, Charlotte, etc.).',
+        'FIXED — Matchup cache no longer drops form when ESPN nickname (Lions/Hokies) is not in the Polymarket title.'
+      ]
+    },
     {
       version: '3.4.31',
       date: '2026-10-02',

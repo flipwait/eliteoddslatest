@@ -622,9 +622,21 @@ module.exports = async function handler(req, res) {
               const blob = String(title).toLowerCase();
               function okName(name) {
                 if (!name) return false;
-                const parts = String(name).toLowerCase().replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter((w) => w.length > 3);
-                const nick = parts[parts.length - 1] || '';
-                return nick && blob.includes(nick);
+                const parts = String(name).toLowerCase().replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter((w) => w.length > 2);
+                // Any strong token of ESPN team name appears in Polymarket title
+                // (CFB: "Penn State Nittany Lions" must match title "Penn State", not require "Lions")
+                const stop = new Set(['university', 'state', 'college', 'the', 'and', 'tech']);
+                for (const w of parts) {
+                  if (w.length < 4 && w !== 'tech') continue;
+                  if (stop.has(w) && w !== 'tech') continue;
+                  if (blob.includes(w)) return true;
+                }
+                // Fallback: 2 consecutive tokens
+                for (let i = 0; i < parts.length - 1; i++) {
+                  const pair = parts[i] + ' ' + parts[i + 1];
+                  if (pair.length >= 6 && blob.includes(pair)) return true;
+                }
+                return false;
               }
               if (m.homeName && m.awayName && !(okName(m.homeName) && okName(m.awayName))) {
                 return; // do not cache wrong game form
