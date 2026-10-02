@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.40</title>
+  <title>EliteOdds v3.4.42</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.40</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.42</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -721,6 +721,7 @@
         <div id="venue-toggle" class="eo-mobile-only-venue flex gap-1 items-center ml-auto sm:ml-2">
           <button type="button" data-venue="polymarket" class="venue-btn pill-on px-3 py-1.5 rounded-full border border-bb-border text-[11px]">Polymarket</button>
           <button type="button" data-venue="kalshi" class="venue-btn px-3 py-1.5 rounded-full border border-bb-green/50 text-[11px] text-bb-green">Kalshi</button>
+          <button type="button" data-venue="both" class="venue-btn px-3 py-1.5 rounded-full border border-violet-400/40 text-[11px] text-violet-200">Both</button>
         </div>
         <button type="button" id="btn-load" class="px-2.5 py-1.5 rounded-full border border-bb-border text-bb-muted text-[11px]" title="Refresh">↻</button>
         <button type="button" id="btn-snap" class="hidden">LM</button>
@@ -1285,7 +1286,7 @@
                 <button type="button" id="elite-week-discord" class="px-2.5 py-1.5 rounded-lg border border-[#5865F2]/40 text-[#5865F2]">Send week → Discord</button>
                 <button type="button" id="elite-refresh" class="px-2.5 py-1.5 rounded-lg border border-bb-border text-bb-muted">Refresh</button>
               </div>
-              <p class="text-[10px] text-bb-muted">ESPN settle: <strong class="text-white">moneyline + full-game Over/Under</strong>. F5, spreads, props stay manual.</p>
+              <p class="text-[10px] text-bb-muted">Auto-settle: <strong class="text-white">ML + full-game O/U</strong> (ESPN) · <strong class="text-white">NRFI/YRFI + F5</strong> (MLB linescore). Spreads/props manual.</p>
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 <div class="rounded-xl border border-sky-500/30 bg-sky-500/5 p-2.5 space-y-2">
                   <div class="flex justify-between items-center">
@@ -1519,7 +1520,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.40</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.42</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1903,8 +1904,26 @@
   };
 
   
-  var APP_VERSION = '3.4.40';
+  var APP_VERSION = '3.4.42';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.42',
+      date: '2026-10-02',
+      title: 'NRFI/F5 auto-settle + Both books',
+      items: [
+        'ADDED — Auto-settle MLB NRFI/YRFI and F5 from MLB Stats API linescore (1st inning / through 5).',
+        'ADDED — Venue Both: pulls Polymarket + Kalshi into one board so auto-Elite covers both (Discord 1 = PM, Discord 2 = Kalshi).',
+        'CHANGED — Settle button includes ML, full-game O/U, NRFI/YRFI, F5. Spreads/props stay manual.'
+      ]
+    },
+    {
+      version: '3.4.41',
+      date: '2026-10-02',
+      title: 'Default board: All sports + All markets',
+      items: [
+        'CHANGED — App load defaults to sport = All and market = All (was MLB).'
+      ]
+    },
     {
       version: '3.4.40',
       date: '2026-10-02',
@@ -2344,7 +2363,7 @@
     return /nrfi|yrfi|total|f5|spread|inning|prop|player_|pitcher_|map_/.test(mt);
   }
 
-  var sport = 'mlb', mode = 'both', dayFilter = 'today', marketType = 'all', venue = 'polymarket';
+  var sport = 'all', mode = 'both', dayFilter = 'today', marketType = 'all', venue = 'polymarket';
   var boardRefreshedAt = null;
   var sortMode = 'time';
 
@@ -4324,9 +4343,11 @@
   function isAutoSettleableBet(mt, pick) {
     var t = String(mt || '').toLowerCase();
     var p = String(pick || '').toLowerCase();
-    // F5 / props / spreads: manual for now
-    if (/f5|spread|prop|nrfi|yrfi|inning|player_/.test(t)) return false;
-    if (/f5|first\s*5/.test(p) && /over|under|total/.test(p)) return false;
+    // MLB NRFI/YRFI + F5: auto via MLB linescore
+    if (/nrfi|yrfi/.test(t) || /\bnrfi\b|\byrfi\b|no run first|yes run first/.test(p)) return true;
+    if (/f5/.test(t) || /\bf5\b|first\s*5|first five/.test(p)) return true;
+    // Spreads / props / other innings: manual
+    if (/spread|prop|inning|player_/.test(t)) return false;
     if (!t || t === 'all' || /moneyline|^ml$|winner/.test(t)) return true;
     if (/total|totals/.test(t)) return true;
     if (/\bover\b|\bunder\b|o\/u/.test(p)) return true;
@@ -4378,10 +4399,10 @@
     var futureN = picks.length - past.length;
     picks = past;
     if (!picks.length) {
-      if (!opts.quiet) alert('No settleable open picks.\n\n' + futureN + ' open games have not started yet (stay Open on purpose).\nOnly moneyline + full-game O/U after kickoff can auto-settle.');
+      if (!opts.quiet) alert('No settleable open picks.\n\n' + futureN + ' open games have not started yet (stay Open on purpose).\nML + full-game O/U + MLB NRFI/YRFI + F5 can auto-settle after the relevant innings finish.');
       return;
     }
-    if (!opts.quiet && !confirm('Settle up to ' + Math.min(40, picks.length) + ' open ML + full-game O/U from ESPN finals?\n\n' + (futureN ? (futureN + ' future games skipped (not started).\n') : '') + '(F5, spreads, props stay manual.)')) return;
+    if (!opts.quiet && !confirm('Settle up to ' + Math.min(40, picks.length) + ' open ML / O/U / NRFI / F5 picks?\n\n' + (futureN ? (futureN + ' future games skipped (not started).\n') : '') + '(Spreads / props stay manual. NRFI/F5 use MLB linescore.)')) return;
     try {
       var r = await fetch('/api/settle-ml', {
         method: 'POST',
@@ -4910,8 +4931,9 @@
       var strict = ($('f-strict') && $('f-strict').value) || '1';
       var allowMkt = ($('f-allow-mkt-good') && $('f-allow-mkt-good').checked) ? '1' : '0';
       var dual = typeof window.matchMedia === 'function' && window.matchMedia('(min-width: 1100px)').matches;
+      var forceBoth = venue === 'both';
 
-      if (dual) {
+      if (dual && !forceBoth) {
         // Timeouts so one slow book cannot leave both columns on Loading forever
         var tMs = sport === 'esports' || sport === 'all' ? 20000 : 18000;
         var polyPromise = sport === 'all'
@@ -4947,38 +4969,94 @@
       } else {
         var list = [];
         var tMs2 = sport === 'esports' || sport === 'all' ? 20000 : 18000;
-        if (venue === 'kalshi') {
+        if (forceBoth || venue === 'both') {
+          var polyPromise2 = sport === 'all'
+            ? fetchPolyAllLeagues(mt, rankF, minEv, minEdge, minSc, strict, allowMkt).then(function (g) { return { ok: true, games: g }; })
+            : fetchJsonTimeout(polyQuery(mt, rankF, minEv, minEdge, minSc, strict, allowMkt), tMs2);
+          var kalPromise2 = fetchJsonTimeout(kalQuery(mt, strict, allowMkt), tMs2);
+          var settled2 = await Promise.allSettled([polyPromise2, kalPromise2]);
+          var polyRaw2 = settled2[0].status === 'fulfilled' ? settled2[0].value : { games: [] };
+          var kalRaw2 = settled2[1].status === 'fulfilled' ? settled2[1].value : { games: [] };
+          var polyG2 = filterGamesClient(dedupeGameCards((polyRaw2 && polyRaw2.games) ? polyRaw2.games : []));
+          var kalG2 = filterGamesClient(dedupeGameCards((kalRaw2 && kalRaw2.games) ? kalRaw2.games : []));
+          polyG2.forEach(function (g) { g.venue = 'polymarket'; g.source = 'polymarket'; });
+          kalG2.forEach(function (g) { g.venue = 'kalshi'; g.source = 'kalshi'; });
+          list = polyG2.concat(kalG2);
+          games = list;
+          if (boxP) boxP.innerHTML = '';
+          if (boxK) boxK.innerHTML = '';
+          renderGameList(box, games);
+          var eN2 = 0, gN2 = 0, pN2 = 0;
+          games.forEach(function (x) {
+            var r = String(x.rank || '').toLowerCase();
+            if (r === 'elite') eN2++;
+            else if (r === 'good') gN2++;
+            else pN2++;
+          });
+          if ($('meta')) {
+            $('meta').textContent = 'BOTH · PM ' + polyG2.length + ' + Kal ' + kalG2.length + ' · Elite ' + eN2 + ' · Good ' + gN2 + ' · Pass ' + pN2;
+          }
+        } else if (venue === 'kalshi') {
           var dataK = await fetchJsonTimeout(kalQuery(mt, strict, allowMkt), tMs2);
           if (!dataK.ok && !(dataK.games && dataK.games.length)) throw new Error(dataK.error || 'Kalshi failed');
           list = dataK.games || [];
+          games = filterGamesClient(dedupeGameCards(list));
+          games.forEach(function (g) { g.venue = 'kalshi'; g.source = 'kalshi'; });
+          renderGameList(box, games);
+          if (boxP) boxP.innerHTML = '';
+          if (boxK) boxK.innerHTML = '';
+          var hint = '';
+          if (!games.length && rankF === 'elite') hint = ' · try Rank: All ranks';
+          if ($('meta')) {
+            var eN = 0, gN = 0, pN = 0;
+            games.forEach(function (x) {
+              var r = String(x.rank || '').toLowerCase();
+              if (r === 'elite') eN++;
+              else if (r === 'good') gN++;
+              else pN++;
+            });
+            $('meta').textContent = 'KALSHI · ' + games.length + ' markets · Elite ' + eN + ' · Good ' + gN + ' · Pass ' + pN + hint;
+          }
         } else if (sport === 'all') {
           list = await fetchPolyAllLeagues(mt, rankF, minEv, minEdge, minSc, strict, allowMkt);
+          games = filterGamesClient(dedupeGameCards(list));
+          games.forEach(function (g) { g.venue = g.venue || 'polymarket'; g.source = g.source || 'polymarket'; });
+          renderGameList(box, games);
+          if (boxP) boxP.innerHTML = '';
+          if (boxK) boxK.innerHTML = '';
+          var hint = '';
+          if (!games.length && rankF === 'elite') hint = ' · try Rank: All ranks';
+          if ($('meta')) {
+            var eN = 0, gN = 0, pN = 0;
+            games.forEach(function (x) {
+              var r = String(x.rank || '').toLowerCase();
+              if (r === 'elite') eN++;
+              else if (r === 'good') gN++;
+              else pN++;
+            });
+            $('meta').textContent = 'POLYMARKET · ' + games.length + ' markets · Elite ' + eN + ' · Good ' + gN + ' · Pass ' + pN + hint;
+          }
         } else {
           var data = await fetchJsonTimeout(polyQuery(mt, rankF, minEv, minEdge, minSc, strict, allowMkt), tMs2);
           if (!data.ok && !(data.games && data.games.length)) throw new Error(data.error || 'Polymarket failed');
           list = data.games || [];
-        }
-        games = filterGamesClient(dedupeGameCards(list));
-        games.forEach(function (g) {
-          if (venue === 'kalshi') { g.venue = 'kalshi'; g.source = 'kalshi'; }
-          else { g.venue = g.venue || 'polymarket'; g.source = g.source || 'polymarket'; }
-        });
-        renderGameList(box, games);
-        if (boxP) boxP.innerHTML = '';
-        if (boxK) boxK.innerHTML = '';
-        var hint = '';
-        if (!games.length && rankF === 'elite') {
-          hint = ' · try Rank: All ranks';
-        }
-        if ($('meta')) {
-          var eN = 0, gN = 0, pN = 0;
-          games.forEach(function (x) {
-            var r = String(x.rank || '').toLowerCase();
-            if (r === 'elite') eN++;
-            else if (r === 'good') gN++;
-            else pN++;
-          });
-          $('meta').textContent = String(venue).toUpperCase() + ' · ' + games.length + ' markets · Elite ' + eN + ' · Good ' + gN + ' · Pass ' + pN + hint;
+          games = filterGamesClient(dedupeGameCards(list));
+          games.forEach(function (g) { g.venue = g.venue || 'polymarket'; g.source = g.source || 'polymarket'; });
+          renderGameList(box, games);
+          if (boxP) boxP.innerHTML = '';
+          if (boxK) boxK.innerHTML = '';
+          var hint = '';
+          if (!games.length && rankF === 'elite') hint = ' · try Rank: All ranks';
+          if ($('meta')) {
+            var eN = 0, gN = 0, pN = 0;
+            games.forEach(function (x) {
+              var r = String(x.rank || '').toLowerCase();
+              if (r === 'elite') eN++;
+              else if (r === 'good') gN++;
+              else pN++;
+            });
+            $('meta').textContent = 'POLYMARKET · ' + games.length + ' markets · Elite ' + eN + ' · Good ' + gN + ' · Pass ' + pN + hint;
+          }
         }
       }
       renderSlate();
@@ -6706,10 +6784,11 @@ function renderSlate() {
       document.querySelectorAll('.venue-btn').forEach(function (b) {
         var on = b.getAttribute('data-venue') === venue;
         b.classList.toggle('pill-on', on);
-        b.classList.toggle('text-bb-muted', !on && b.getAttribute('data-venue') !== 'kalshi');
+        b.classList.toggle('text-bb-muted', !on);
       });
       document.body.classList.toggle('theme-kalshi', venue === 'kalshi');
-      document.body.classList.toggle('theme-polymarket', venue !== 'kalshi');
+      document.body.classList.toggle('theme-polymarket', venue === 'polymarket');
+      document.body.classList.toggle('theme-both', venue === 'both');
       loadGames();
     };
   });
