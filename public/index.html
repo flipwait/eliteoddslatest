@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.28</title>
+  <title>EliteOdds v3.4.29</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.28</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.29</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1411,8 +1411,8 @@
                 Allow <strong class="text-white">Good</strong> from market edge (esports / soccer / MLS)
               </label>
               <label class="flex items-center gap-2 text-xs cursor-pointer">
-                <input type="checkbox" id="allow-thin-form-elite" class="rounded" />
-                Allow rare <strong class="text-white">Elite</strong> on very strong market edge only (still no form)
+                <input type="checkbox" id="allow-thin-form-elite" class="rounded" disabled title="Elite always requires form as of v3.4.29" />
+                <span class="text-bb-muted">Elite without form disabled (v3.4.29) — needs team form data</span>
               </label>
               <p class="text-[10px] text-bb-muted">Does not change MLB/NFL/NBA strict form rules. Elite thin-form needs ~5pp+ edge.</p>
             </div>
@@ -1452,7 +1452,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.28</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.29</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1806,8 +1806,19 @@
   };
 
   
-  var APP_VERSION = '3.4.28';
+  var APP_VERSION = '3.4.29';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.29',
+      date: '2026-10-01',
+      title: 'No fake Elite on market-only longshots',
+      items: [
+        'FIXED — Market-only cards can no longer show Model 90%+ on a 12¢ dog. Model tracks market when there is no form.',
+        'FIXED — Elite is blocked without form (esports/soccer included). Thin-form Elite toggle cannot mint Elite from price alone.',
+        'FIXED — Fantasy EV/edge on no-form dogs hard-capped; longshots without form stay Pass.',
+        'IMPROVED — Dota2/PandaScore team name matching (token overlap) so names like Yangon Galacticos resolve more often.'
+      ]
+    },
     {
       version: '3.4.28',
       date: '2026-09-30',
