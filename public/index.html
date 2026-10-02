@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.33</title>
+  <title>EliteOdds v3.4.37</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.33</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.37</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -789,9 +789,13 @@
             <button type="button" id="eo-toggle-more" class="text-bb-muted text-[10px] underline">More filters</button>
           </div>
           <div id="weekly-report" class="glass p-3 mb-2 week-report hidden">
-            <div class="flex justify-between items-center mb-1">
+            <div class="flex justify-between items-center mb-1 gap-2 flex-wrap">
               <h3 class="text-xs font-semibold text-white m-0">Weekly Elite paper</h3>
-              <button type="button" id="wr-toggle" class="text-[10px] text-bb-muted underline">Hide</button>
+              <div class="flex items-center gap-2">
+                <button type="button" id="wr-reset-week" class="text-[10px] text-amber-300/90 underline" title="Clear last 7 days Elite paper only">Reset week</button>
+                <button type="button" id="wr-reset-all-elite" class="text-[10px] text-red-300/90 underline" title="Erase ALL Elite paper history (Poly + Kalshi)">Clear all Elite</button>
+                <button type="button" id="wr-toggle" class="text-[10px] text-bb-muted underline">Hide</button>
+              </div>
             </div>
             <div class="wr-grid">
               <div>Offered<strong id="wr-offered">0</strong></div>
@@ -799,12 +803,28 @@
               <div>Won<strong id="wr-won">0</strong></div>
               <div>ROI<strong id="wr-roi">—</strong></div>
             </div>
+            <div class="grid grid-cols-2 gap-2 mt-2 text-[10px]">
+              <div class="rounded-lg border border-blue-500/30 bg-blue-500/5 p-2">
+                <div class="text-blue-300 font-semibold mb-0.5">🔵 Polymarket</div>
+                <div class="text-white">Week <strong id="wr-pm-rec">0-0</strong> · ROI <strong id="wr-pm-roi">—</strong></div>
+                <div class="text-bb-muted mt-0.5">L10 <span id="wr-pm-l10">—</span></div>
+              </div>
+              <div class="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-2">
+                <div class="text-emerald-300 font-semibold mb-0.5">🟢 Kalshi</div>
+                <div class="text-white">Week <strong id="wr-kal-rec">0-0</strong> · ROI <strong id="wr-kal-roi">—</strong></div>
+                <div class="text-bb-muted mt-0.5">L10 <span id="wr-kal-l10">—</span></div>
+              </div>
+            </div>
             <p id="wr-detail" class="text-[10px] text-bb-muted mt-1.5 leading-snug"></p>
           </div>
           <div id="board-status" class="flex flex-wrap items-center gap-2 mb-2 text-[10px] text-bb-muted">
             <span id="board-fresh" class="board-fresh">Board · —</span>
             <span class="text-bb-muted/40">·</span>
-            <span id="elite-streak" class="streak-strip" title="Last 10 settled Elite paper">Streak · —</span>
+            <span id="elite-streak" class="streak-strip" title="Last 10 settled Elite paper (all books)">Streak · —</span>
+            <span class="text-bb-muted/40">·</span>
+            <span id="elite-streak-pm" class="streak-strip text-blue-300/90" title="Last 10 Polymarket Elite">PM L10 · —</span>
+            <span class="text-bb-muted/40">·</span>
+            <span id="elite-streak-kal" class="streak-strip text-emerald-300/90" title="Last 10 Kalshi Elite">Kal L10 · —</span>
           </div>
 
 <section id="panel-scanner">
@@ -1436,6 +1456,9 @@
             <div class="flex flex-wrap gap-2 pt-1">
               <button type="button" id="btn-export-settings" class="px-3 py-1.5 rounded-lg border border-bb-border text-bb-muted text-xs">Export settings</button>
               <button type="button" id="btn-share-settings" class="px-3 py-1.5 rounded-lg border border-bb-border text-bb-muted text-xs">Share / Save to phone</button>
+              <button type="button" id="btn-reset-weekly" class="px-3 py-1.5 rounded-lg border border-amber-500/40 text-amber-200 text-xs">Reset Elite week</button>
+              <button type="button" id="btn-reset-all-elite" class="px-3 py-1.5 rounded-lg border border-red-500/40 text-red-300 text-xs">Clear all Elite paper</button>
+              <button type="button" id="btn-reset-settings" class="px-3 py-1.5 rounded-lg border border-bb-border text-bb-muted text-xs">Reset settings only</button>
               <label class="px-3 py-1.5 rounded-lg border border-bb-border text-bb-muted text-xs cursor-pointer">
                 Import settings
                 <input type="file" id="btn-import-settings" accept="application/json,.json" class="hidden" />
@@ -1452,7 +1475,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.33</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.37</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1836,8 +1859,48 @@
   };
 
   
-  var APP_VERSION = '3.4.33';
+  var APP_VERSION = '3.4.37';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.37',
+      date: '2026-10-02',
+      title: 'Share pick (no Discord required)',
+      items: [
+        'ADDED — Share button on every game card. Opens the phone share sheet (Messages, WhatsApp, etc.) when available.',
+        'FALLBACK — Copies a clean pick summary + Trade link to the clipboard if share is unavailable.',
+        'Share text includes book, rank, pick, model/market/edge, time, and trade URL — works for friends without Discord.'
+      ]
+    },
+    {
+      version: '3.4.36',
+      date: '2026-10-02',
+      title: 'Clear all Elite paper (Sunday fresh start)',
+      items: [
+        'ADDED — Clear all Elite paper: wipes entire Elite ledger + weekly/L10 stats for Poly and Kalshi. Keys and Discord webhooks stay.',
+        'ADDED — Reset Elite week still clears only the last 7 days.',
+        'KEPT — Reset settings only (optional) for a full settings wipe without touching Elite history.'
+      ]
+    },
+    {
+      version: '3.4.35',
+      date: '2026-10-02',
+      title: 'CFB form legend · weekly Poly vs Kalshi · reset controls',
+      items: [
+        'ADDED — CFB/NFL cards label form source: ESPN L10/L5, PF/PA, H2H, rest (same winner recipe as NFL).',
+        'ADDED — Weekly Elite paper splits Polymarket vs Kalshi + last-10 streak for each book.',
+        'ADDED — Reset week (Elite paper last 7 days) and Reset settings (keys/filters only; journal kept).'
+      ]
+    },
+    {
+      version: '3.4.34',
+      date: '2026-10-02',
+      title: 'Spread pick labels + 1H/2H spreads',
+      items: [
+        'FIXED — Model pick no longer shows full “Will X cover …” question text; shows Team ±line (e.g. Liberty -4.5).',
+        'FIXED — 1H / 2H / quarter spreads use the same spread model and get a (1H)/(2H) tag on the pick.',
+        'UI — CFB/NFL filters already include FG spread, 1H spread, 2H spread — labels cleaned on cards.'
+      ]
+    },
     {
       version: '3.4.33',
       date: '2026-10-02',
@@ -2427,19 +2490,11 @@
     return 'Last 10 · ' + w + '-' + l + ' ' + dots;
   }
 
-  function updateWeeklyReport() {
-    var box = $('weekly-report');
-    if (!box) return;
-    box.classList.remove('hidden');
-    var list = [];
-    try { list = eliteLedger(); } catch (e) { list = []; }
-    var now = new Date();
-    var weekAgo = new Date(now.getTime() - 7 * 86400000);
-    var week = list.filter(function (e) {
-      var t = new Date(e.at || e.startTime || 0);
-      return !isNaN(t.getTime()) && t >= weekAgo;
-    });
-    var settled = week.filter(function (e) {
+  function venueOfElite(e) {
+    return String(e.venue || e.source || e.book || 'polymarket').toLowerCase() === 'kalshi' ? 'kalshi' : 'polymarket';
+  }
+  function eliteStatsSlice(rows) {
+    var settled = rows.filter(function (e) {
       var r = String(e.result || '');
       return r === 'won' || r === 'lost' || r === 'push';
     });
@@ -2451,20 +2506,109 @@
       else if (e.result === 'won') pnl += 1;
       else if (e.result === 'lost') pnl -= 1;
     });
-    var risk = settled.length || 1;
-    var roi = settled.length ? Math.round((pnl / risk) * 1000) / 10 : null;
-    if ($('wr-offered')) $('wr-offered').textContent = week.length;
-    if ($('wr-settled')) $('wr-settled').textContent = settled.length;
-    if ($('wr-won')) $('wr-won').textContent = won + '-' + lost;
+    var roi = settled.length ? Math.round((pnl / settled.length) * 1000) / 10 : null;
+    return { settled: settled, won: won, lost: lost, pnl: pnl, roi: roi, offered: rows.length };
+  }
+  function last10Rec(list, venue) {
+    var settled = list.filter(function (e) {
+      var r = String(e.result || '');
+      if (!(r === 'won' || r === 'lost' || r === 'push')) return false;
+      if (venue && venueOfElite(e) !== venue) return false;
+      return true;
+    }).sort(function (a, b) {
+      return new Date(b.settledAt || b.at || 0) - new Date(a.settledAt || a.at || 0);
+    }).slice(0, 10);
+    var marks = settled.map(function (e) {
+      if (e.result === 'won') return 'W';
+      if (e.result === 'lost') return 'L';
+      return 'P';
+    });
+    var w = settled.filter(function (e) { return e.result === 'won'; }).length;
+    var l = settled.filter(function (e) { return e.result === 'lost'; }).length;
+    return { text: marks.length ? (marks.join('') + ' · ' + w + '-' + l) : '—', w: w, l: l, n: settled.length };
+  }
+  function updateWeeklyReport() {
+    var box = $('weekly-report');
+    if (!box) return;
+    box.classList.remove('hidden');
+    var list = [];
+    try { list = eliteLedger(); } catch (e) { list = []; }
+    var weekAgo = new Date(Date.now() - 7 * 86400000);
+    var week = list.filter(function (e) {
+      var t = new Date(e.at || e.startTime || 0);
+      return !isNaN(t.getTime()) && t >= weekAgo;
+    });
+    var all = eliteStatsSlice(week);
+    var pmWeek = eliteStatsSlice(week.filter(function (e) { return venueOfElite(e) === 'polymarket'; }));
+    var kalWeek = eliteStatsSlice(week.filter(function (e) { return venueOfElite(e) === 'kalshi'; }));
+    if ($('wr-offered')) $('wr-offered').textContent = all.offered;
+    if ($('wr-settled')) $('wr-settled').textContent = all.settled.length;
+    if ($('wr-won')) $('wr-won').textContent = all.won + '-' + all.lost;
     if ($('wr-roi')) {
-      $('wr-roi').textContent = roi == null ? '—' : ((roi >= 0 ? '+' : '') + roi + '%');
-      $('wr-roi').style.color = roi == null ? '' : (roi >= 0 ? '#4ade80' : '#f87171');
+      $('wr-roi').textContent = all.roi == null ? '—' : ((all.roi >= 0 ? '+' : '') + all.roi + '%');
+      $('wr-roi').style.color = all.roi == null ? '' : (all.roi >= 0 ? '#4ade80' : '#f87171');
     }
+    if ($('wr-pm-rec')) $('wr-pm-rec').textContent = pmWeek.won + '-' + pmWeek.lost;
+    if ($('wr-pm-roi')) $('wr-pm-roi').textContent = pmWeek.roi == null ? '—' : ((pmWeek.roi >= 0 ? '+' : '') + pmWeek.roi + '%');
+    if ($('wr-kal-rec')) $('wr-kal-rec').textContent = kalWeek.won + '-' + kalWeek.lost;
+    if ($('wr-kal-roi')) $('wr-kal-roi').textContent = kalWeek.roi == null ? '—' : ((kalWeek.roi >= 0 ? '+' : '') + kalWeek.roi + '%');
+    var pmL10 = last10Rec(list, 'polymarket');
+    var kalL10 = last10Rec(list, 'kalshi');
+    if ($('wr-pm-l10')) $('wr-pm-l10').textContent = pmL10.text;
+    if ($('wr-kal-l10')) $('wr-kal-l10').textContent = kalL10.text;
+    if ($('elite-streak-pm')) $('elite-streak-pm').textContent = 'PM L10 · ' + pmL10.text;
+    if ($('elite-streak-kal')) $('elite-streak-kal').textContent = 'Kal L10 · ' + kalL10.text;
     if ($('wr-detail')) {
-      $('wr-detail').textContent = settled.length
-        ? ('Last 7 days · paper Elites offered ' + week.length + ', settled ' + settled.length + ', unit PnL ' + (pnl >= 0 ? '+' : '') + Math.round(pnl * 10) / 10 + 'u')
-        : 'Last 7 days · no settled Elite paper yet. Track Elites to fill this report.';
+      $('wr-detail').textContent = all.settled.length
+        ? ('Last 7d · Poly ' + pmWeek.won + '-' + pmWeek.lost + ' · Kalshi ' + kalWeek.won + '-' + kalWeek.lost + ' · PnL ' + (all.pnl >= 0 ? '+' : '') + Math.round(all.pnl * 10) / 10 + 'u')
+        : 'Last 7 days · no settled Elite paper yet. Auto-tracked Elites fill Polymarket vs Kalshi here.';
     }
+  }
+  function refreshEliteUI() {
+    try { updateWeeklyReport(); } catch (e) {}
+    try { if ($('elite-streak')) $('elite-streak').innerHTML = eliteStreakHtml(); } catch (e2) {}
+    try { renderJournal(); } catch (e3) {}
+  }
+  function resetWeeklyElite() {
+    if (!confirm('Clear Elite paper from the LAST 7 DAYS only?\n(Poly + Kalshi)\nOlder Elite history stays. Keys/webhooks untouched.')) return;
+    var list = [];
+    try { list = eliteLedger(); } catch (e) { list = []; }
+    var weekAgo = Date.now() - 7 * 86400000;
+    var kept = list.filter(function (e) {
+      var t = new Date(e.at || e.startTime || 0).getTime();
+      return isNaN(t) || t < weekAgo;
+    });
+    try { localStorage.setItem('bb_elite_ledger', JSON.stringify(kept.slice(0, 500))); } catch (e2) {}
+    // Only strip sent-markers for cleared week rows (full clear of sent map is safer for week reset)
+    try { localStorage.removeItem('bb_elite_sent'); } catch (e3) {}
+    refreshEliteUI();
+    alert('Last 7 days of Elite paper cleared (' + (list.length - kept.length) + ' rows). Settings kept.');
+  }
+  /** Sunday fresh start: wipe entire Elite paper store (all books), not keys/webhooks */
+  function resetAllElitePaper() {
+    if (!confirm('Erase ALL Elite paper history?\n\n• Polymarket + Kalshi Elite ledger\n• Weekly stats + L10 streaks\n• Auto-send “already sent” markers\n\nDoes NOT touch API keys, Discord webhooks, or manual Journal bets.')) return;
+    if (!confirm('Final confirm: clear every stored Elite pick?')) return;
+    var n = 0;
+    try {
+      var list = eliteLedger();
+      n = list.length;
+    } catch (e) { n = 0; }
+    try { localStorage.setItem('bb_elite_ledger', '[]'); } catch (e2) {}
+    try { localStorage.removeItem('bb_elite_sent'); } catch (e3) {}
+    try { localStorage.removeItem('bb_super_elite_log'); } catch (e4) {}
+    // Optional elite pool caches if present
+    try { localStorage.removeItem('bb_elite_pool'); } catch (e5) {}
+    try { localStorage.removeItem('bb_elite_week'); } catch (e6) {}
+    refreshEliteUI();
+    alert('All Elite paper cleared (' + n + ' rows). Keys & webhooks kept. Fresh board for the new week.');
+  }
+  function resetAllSettings() {
+    if (!confirm('Reset SETTINGS only to defaults?\n(API keys, webhooks, filters, bankroll)\n\nElite paper and Journal are NOT deleted.')) return;
+    if (!confirm('Final confirm: wipe settings only?')) return;
+    try { localStorage.removeItem('bb_settings'); } catch (e) {}
+    try { localStorage.removeItem('bb_board_layout'); } catch (e2) {}
+    alert('Settings cleared. Reloading…');
+    location.reload();
   }
 
   function applyTonightPreset() {
@@ -2776,15 +2920,24 @@
     // Prefer explicit names from breakdown.sp / winProb context — pass homeName on breakdown in score
     if (b.homeName) hName = b.homeName;
     if (b.awayName) aName = b.awayName;
-    lines += l10Line('Home L10 (' + String(hName).replace(/</g,'').split(' ').pop() + ')', b.homeL10, g.league);
-    lines += l10Line('Away L10 (' + String(aName).replace(/</g,'').split(' ').pop() + ')', b.awayL10, g.league);
+    var lgLow = String(g.league || '').toLowerCase();
+    if (lgLow === 'cfb' || lgLow === 'nfl') {
+      lines += '<div class="text-violet-300/90"><strong class="text-white">Football form (ESPN)</strong> · NFL recipe: L10/L5 W-L, PF/PA, H2H, rest, ~+2pp home · 58% form / 42% market</div>';
+    }
+    lines += l10Line('Home L10 (' + String(hName).replace(/</g,'').split(' ').slice(0,2).join(' ') + ')', b.homeL10, g.league);
+    lines += l10Line('Away L10 (' + String(aName).replace(/</g,'').split(' ').slice(0,2).join(' ') + ')', b.awayL10, g.league);
+    if (b.homeL5 || b.awayL5) {
+      lines += l10Line('Home L5', b.homeL5, g.league);
+      lines += l10Line('Away L5', b.awayL5, g.league);
+    }
     if (b.h2h && b.h2h.n) {
       lines += '<div><strong class="text-white">H2H</strong> ' + (b.h2h.homeWins != null ? b.h2h.homeWins + '-' + b.h2h.awayWins : '') +
         ' (n=' + b.h2h.n + ')' + (b.h2h.avgTotal != null ? ' · avg tot ' + b.h2h.avgTotal : '') + '</div>';
     }
     if (b.homeRestDays != null || b.awayRestDays != null) {
       lines += '<div><strong class="text-white">Rest</strong> H ' + (b.homeRestDays != null ? b.homeRestDays + 'd' : '?') +
-        ' · A ' + (b.awayRestDays != null ? b.awayRestDays + 'd' : '?') + '</div>';
+        ' · A ' + (b.awayRestDays != null ? b.awayRestDays + 'd' : '?') +
+        ((lgLow === 'nfl' || lgLow === 'cfb') ? ' <span class="text-bb-muted">· short week ≤6d</span>' : '') + '</div>';
     }
     if (b.power) {
       lines += '<div><strong class="text-white">Power</strong> H ' + b.power.home +
@@ -3057,9 +3210,10 @@
         '<button type="button" class="btn-log">Log</button>' +
         '<a class="btn-trade" href="' + tradeHrefFor(g) + '" target="_blank" rel="noopener">Trade</a>' +
       '</div>' +
-      '<div class="v3-actions mt-1.5" style="grid-template-columns:repeat(4,minmax(0,1fr))">' +
+      '<div class="v3-actions mt-1.5" style="grid-template-columns:repeat(5,minmax(0,1fr))">' +
         '<button type="button" class="btn-books">Books</button>' +
         '<button type="button" class="btn-ticket">Ticket</button>' +
+        '<button type="button" class="btn-share" title="Share pick (text / Messages / copy — no Discord needed)">Share</button>' +
         '<button type="button" class="btn-discord">Discord</button>' +
         '<button type="button" class="btn-discord2">Disc 2</button>' +
       '</div>' +
@@ -3069,6 +3223,75 @@
       '<div class="verdict-panel hidden text-[11px] text-bb-muted bg-cyan-500/5 border border-cyan-500/20 rounded-lg p-2.5 mt-1 whitespace-pre-wrap max-h-72 overflow-y-auto"></div></article>';
   }
 
+  function buildShareText(g) {
+    var venue = (typeof resolveVenue === 'function' ? resolveVenue(g) : '') || String(g.venue || g.source || 'polymarket');
+    var isK = String(venue).toLowerCase() === 'kalshi';
+    var book = isK ? 'Kalshi' : 'Polymarket';
+    var rank = String(g.rank || 'Pass').toUpperCase();
+    var pick = String(g.modelPick || g.pickName || g.pick || '—');
+    var title = String(g.eventTitle || g.title || 'Game');
+    var league = String(g.league || '').toUpperCase();
+    var mt = String(g.marketType || 'moneyline').replace(/_/g, ' ');
+    var model = g.model_probability != null ? g.model_probability : g.modelPct;
+    var market = g.market_probability != null ? g.market_probability : g.marketPct;
+    if (model != null && model <= 1) model = Math.round(model * 1000) / 10;
+    if (market != null && market <= 1) market = Math.round(market * 1000) / 10;
+    var edge = g.probability_edge != null ? g.probability_edge : g.edgePp;
+    var url = (typeof tradeHrefFor === 'function') ? tradeHrefFor(g) : (g.url || (isK ? 'https://kalshi.com' : 'https://polymarket.us'));
+    var when = '';
+    if (g.startTime) {
+      try {
+        when = new Date(g.startTime).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+      } catch (e) { when = ''; }
+    }
+    var lines = [
+      '🎯 ' + book + ' · ' + rank,
+      title + (league ? ' (' + league + ')' : ''),
+      'Pick: ' + pick + (mt ? ' · ' + mt : ''),
+      (model != null ? 'Model ' + model + '%' : '') + (market != null ? ' · Mkt ' + market + '%' : '') + (edge != null ? ' · Edge ' + (edge >= 0 ? '+' : '') + edge + 'pp' : ''),
+      when ? ('When: ' + when) : '',
+      'Trade: ' + url
+    ].filter(Boolean);
+    return lines.join('\n');
+  }
+  async function sharePick(g, btn) {
+    var text = buildShareText(g);
+    var url = (typeof tradeHrefFor === 'function') ? tradeHrefFor(g) : (g.url || '');
+    var title = String(g.eventTitle || g.title || 'EliteOdds pick');
+    function flash(msg) {
+      if (!btn) return;
+      var prev = btn.textContent;
+      btn.textContent = msg;
+      setTimeout(function () { btn.textContent = prev; }, 1600);
+    }
+    try {
+      if (navigator.share) {
+        var payload = { title: title, text: text };
+        // Some platforms want URL separate
+        if (url && !/android/i.test(navigator.userAgent)) payload.url = url;
+        await navigator.share(payload);
+        flash('Sent');
+        return;
+      }
+    } catch (e) {
+      // user cancelled share sheet — don't fall through as error if AbortError
+      if (e && (e.name === 'AbortError' || String(e.message || '').toLowerCase().indexOf('abort') >= 0)) return;
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        flash('Copied');
+        return;
+      }
+    } catch (e2) {}
+    // Last resort
+    try {
+      prompt('Copy this pick for your friend:', text);
+      flash('Copy');
+    } catch (e3) {
+      alert(text);
+    }
+  }
   function bindCards(root, list) {
     if (!root) return;
     var arts = root.querySelectorAll('article');
@@ -3087,6 +3310,8 @@
       if (d) d.onclick = function () { sendDiscord(g, {}); }; // auto: Kalshi→2, Poly→1
       var d2 = art.querySelector('.btn-discord2');
       if (d2) d2.onclick = function () { sendDiscord(g, { channel: 2 }); };
+      var sh = art.querySelector('.btn-share');
+      if (sh) sh.onclick = function () { sharePick(g, sh); };
       var sm = art.querySelector('.btn-smart');
       var dp = art.querySelector('.btn-deep');
       var lg = art.querySelector('.btn-log');
@@ -6467,6 +6692,16 @@ function renderSlate() {
   if (bex) bex.onclick = downloadSettingsFile;
   var bsh = document.getElementById('btn-share-settings');
   if (bsh) bsh.onclick = function () { shareSettingsFile(); };
+  var brw = document.getElementById('btn-reset-weekly');
+  if (brw) brw.onclick = resetWeeklyElite;
+  var bra = document.getElementById('btn-reset-all-elite');
+  if (bra) bra.onclick = resetAllElitePaper;
+  var brs = document.getElementById('btn-reset-settings');
+  if (brs) brs.onclick = resetAllSettings;
+  var wrw = document.getElementById('wr-reset-week');
+  if (wrw) wrw.onclick = resetWeeklyElite;
+  var wra = document.getElementById('wr-reset-all-elite');
+  if (wra) wra.onclick = resetAllElitePaper;
   var bim = document.getElementById('btn-import-settings');
   if (bim) bim.onchange = function () { importSettingsFile(bim.files && bim.files[0]); };
 

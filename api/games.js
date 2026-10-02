@@ -438,13 +438,24 @@ function sidesFromMarket(m, evTitle, type, matchup) {
 
 function sanitizePick(pick, sides, eventTitle) {
   if (!pick) return pick;
+  // Never show full Polymarket spread questions as the pick label
+  if (/will\s+.+(cover|win)|wins by over/i.test(String(pick))) {
+    const sidesWithLine = (sides || []).filter((s) => s && s.name && /[+-]\d/.test(String(s.name)));
+    if (sidesWithLine.length) return sidesWithLine[0].name;
+    // Try to compress "Will the Liberty cover -4.5..." → "Liberty -4.5"
+    const m = String(pick).match(/will\s+(?:the\s+)?(.+?)\s+cover\s*([-+]?[0-9]+\.?[0-9]*)/i);
+    if (m) {
+      const team = m[1].replace(/\s+vs\.?\s+.*$/i, '').trim().split(/\s+/).slice(0, 2).join(' ');
+      const ln = Number(m[2]);
+      const ls = (ln > 0 ? '+' : '') + ln;
+      return team + ' ' + ls;
+    }
+  }
   const names = (sides || []).map((s) => s && s.name).filter(Boolean);
   if (names.some((n) => String(n).toLowerCase() === String(pick).toLowerCase())) return pick;
-  // pick must appear in event title for team MLs
   const blob = String(eventTitle || '').toLowerCase();
   const nick = String(pick).toLowerCase().replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter((w) => w.length > 3).pop() || '';
   if (nick && blob.includes(nick)) return pick;
-  // fallback to first side name if pick is foreign team
   return names[0] || pick;
 }
 
