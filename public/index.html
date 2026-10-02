@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.29</title>
+  <title>EliteOdds v3.4.30</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.29</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.30</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -832,7 +832,12 @@
                     <option value="nhl">NHL</option>
                     <option value="cfb">CFB</option>
                     <option value="cbb">CBB</option>
-                    <option value="mls">MLS / Soccer</option>
+                    <option value="soccer">Soccer (all)</option>
+                    <option value="epl">EPL</option>
+                    <option value="mls">MLS</option>
+                    <option value="lal">La Liga</option>
+                    <option value="bun">Bundesliga</option>
+                    <option value="sea">Serie A</option>
                     <option value="esports">Esports</option>
                   </select>
                 </label>
@@ -1452,7 +1457,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.29</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.30</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1641,7 +1646,10 @@
     { id: 'ufc', label: 'UFC' },
     { id: 'atp', label: 'ATP' },
     { id: 'wta', label: 'WTA' },
+    { id: 'soccer', label: 'Soccer' },
+    { id: 'epl', label: 'EPL' },
     { id: 'mls', label: 'MLS' },
+    { id: 'lal', label: 'La Liga' },
     { id: 'esports', label: 'Esports' },
     { id: 'all', label: 'All' }
   ];
@@ -1774,6 +1782,36 @@
       { id: 'total', label: 'Total sets/games' },
       { id: 'spread', label: 'Handicap' }
     ],
+    soccer: [
+      { id: 'moneyline', label: 'Moneyline' },
+      { id: 'spread', label: 'Spread / Handicap' },
+      { id: 'total', label: 'Total' },
+      { id: 'all', label: 'All markets' }
+    ],
+    epl: [
+      { id: 'moneyline', label: 'Moneyline' },
+      { id: 'spread', label: 'Spread / Handicap' },
+      { id: 'total', label: 'Total' },
+      { id: 'all', label: 'All markets' }
+    ],
+    lal: [
+      { id: 'moneyline', label: 'Moneyline' },
+      { id: 'spread', label: 'Spread / Handicap' },
+      { id: 'total', label: 'Total' },
+      { id: 'all', label: 'All markets' }
+    ],
+    bun: [
+      { id: 'moneyline', label: 'Moneyline' },
+      { id: 'spread', label: 'Spread / Handicap' },
+      { id: 'total', label: 'Total' },
+      { id: 'all', label: 'All markets' }
+    ],
+    sea: [
+      { id: 'moneyline', label: 'Moneyline' },
+      { id: 'spread', label: 'Spread / Handicap' },
+      { id: 'total', label: 'Total' },
+      { id: 'all', label: 'All markets' }
+    ],
     mls: [
       { id: 'moneyline', label: 'Moneyline' },
       { id: 'spread', label: 'Spread / Handicap' },
@@ -1806,8 +1844,18 @@
   };
 
   
-  var APP_VERSION = '3.4.29';
+  var APP_VERSION = '3.4.30';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.30',
+      date: '2026-10-02',
+      title: 'Soccer games load (EPL / La Liga / etc.)',
+      items: [
+        'FIXED — Soccer used wrong/empty league paths. Polymarket US slugs: epl, mls, lal (La Liga), bun (Bundesliga), sea (Serie A), ucl, uefa.',
+        'ADDED — Sport “Soccer (all)” pulls every soccer league so the board is not blank when MLS has no markets.',
+        'NOTE — MLS may show 0 events in the off-window; use Soccer or EPL to see live European fixtures.'
+      ]
+    },
     {
       version: '3.4.29',
       date: '2026-10-01',
@@ -4281,7 +4329,7 @@
   /** Per-league fetch when Sport=All — batched so Vercel does not time out empty */
   async function fetchPolyAllLeagues(mt, rankF, minEv, minEdge, minSc, strict, allowMkt) {
     // Active books first; esports last (heavier / thinner)
-    var leagues = ['mlb', 'nfl', 'nba', 'nhl', 'cfb', 'cbb', 'wnba', 'ufc', 'mls', 'esports'];
+    var leagues = ['mlb', 'nfl', 'nba', 'nhl', 'cfb', 'epl', 'lal', 'bun', 'sea', 'mls', 'cbb', 'wnba', 'ufc', 'mls', 'esports'];
     var merged = [];
     var seen = {};
     function addAll(arr) {

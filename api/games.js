@@ -542,8 +542,15 @@ module.exports = async function handler(req, res) {
     if (league === 'esports') {
       const es = await Promise.all(['lol', 'cs2', 'dota2', 'valorant', 'cod'].map((l) => fetchLeagueEvents(l, { limit: 18 })));
       events = es.flat();
-    } else if (league && league !== 'all' && LEAGUES.includes(league)) {
+    } else if (league === 'soccer' || league === 'football') {
+      // All soccer leagues on Polymarket US (EPL/MLS/La Liga/etc.)
+      events = await fetchSoccerEvents({ limitPerLeague: marketType === 'all' ? 16 : 22 });
+    } else if (league && league !== 'all' && (LEAGUES.includes(league) || (SOCCER_LEAGUES && SOCCER_LEAGUES.includes(league)))) {
       events = await fetchLeagueEvents(league, { limit: marketType === 'all' ? 28 : 35 });
+      // MLS often empty in off-window — soft-fallback to full soccer slate so UI is not blank
+      if ((!events || !events.length) && (league === 'mls' || league === 'ucl' || league === 'uefa' || league === 'fwc')) {
+        events = await fetchSoccerEvents({ limitPerLeague: 16 });
+      }
     } else {
       // all sports + all markets
       events = await fetchAllSportsEvents({ limitPerLeague: marketType === 'all' ? 12 : 14 });
@@ -555,8 +562,17 @@ module.exports = async function handler(req, res) {
       events = events.filter((e) => !e.ended);
     }
     // safety filter
-    if (league && league !== 'esports' && league !== 'all') events = events.filter((e) => String(e.league).toLowerCase() === league);
-    if (league === 'esports') events = events.filter((e) => ['lol', 'cs2', 'dota2', 'valorant', 'cod'].includes(String(e.league).toLowerCase()));
+    if (league === 'soccer' || league === 'football') {
+      events = events.filter((e) => isSoccerLeague(e.league));
+    } else if (league === 'esports') {
+      events = events.filter((e) => ['lol', 'cs2', 'dota2', 'valorant', 'cod'].includes(String(e.league).toLowerCase()));
+    } else if (league && league !== 'all') {
+      // Keep exact league; if we soft-fallback filled soccer family for empty MLS, keep those
+      const only = String(league).toLowerCase();
+      const hasExact = events.some((e) => String(e.league).toLowerCase() === only);
+      if (hasExact) events = events.filter((e) => String(e.league).toLowerCase() === only);
+      else if (isSoccerLeague(only)) events = events.filter((e) => isSoccerLeague(e.league));
+    }
 
     events.sort((a, b) => {
       if (a.live !== b.live) return a.live ? -1 : 1;
