@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.55</title>
+  <title>EliteOdds v3.4.58</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.55</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.58</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1405,15 +1405,30 @@
                   <input id="pm-auto-min-edge" type="number" min="0" step="0.5" value="3" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs" />
                 </label>
               </div>
-              <label class="block text-[10px] text-bb-muted">Polymarket / Kalshi API key
-                <input id="pm-api-key" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 font-mono text-xs" placeholder="Required for Live" autocomplete="off" />
+              <label class="block text-[10px] text-bb-muted">Polymarket Key ID <span class="text-bb-muted">(UUID from polymarket.us/developer)</span>
+                <input id="pm-api-key" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 font-mono text-xs" placeholder="Key ID (not wallet address)" autocomplete="off" />
               </label>
-              <label class="block text-[10px] text-bb-muted">API secret / private key
-                <input id="pm-api-secret" type="password" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 font-mono text-xs" placeholder="Kalshi PEM or Poly secret" autocomplete="off" />
+              <label class="block text-[10px] text-bb-muted">Polymarket Secret Key <span class="text-bb-muted">(shown once — Ed25519)</span>
+                <input id="pm-api-secret" type="password" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 font-mono text-xs" placeholder="Secret key for signing" autocomplete="off" />
               </label>
-              <label class="block text-[10px] text-bb-muted">API passphrase (if any)
-                <input id="pm-api-pass" type="password" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 font-mono text-xs" placeholder="Optional" autocomplete="off" />
+              <label class="block text-[10px] text-bb-muted">Kalshi only · private key PEM <span class="text-bb-muted">(optional)</span>
+                <input id="pm-api-pass" type="password" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 font-mono text-xs" placeholder="Kalshi PEM if separate from secret field" autocomplete="off" />
               </label>
+              <label class="block text-[10px] text-bb-muted">Auto-trade Discord webhook
+                <input id="webhook-auto" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 font-mono text-xs" placeholder="https://discord.com/api/webhooks/… (placed / declined / errors)" />
+              </label>
+              <label class="flex items-center gap-2 text-xs cursor-pointer">
+                <input type="checkbox" id="pm-auto-webhook-dry" class="rounded" />
+                Also notify on dry-run / paper (off = live + real errors only)
+              </label>
+              <p class="text-[10px] text-amber-100/80 border border-amber-500/30 rounded-lg px-2 py-1.5 leading-snug">
+                Live Polymarket orders need <strong class="text-white">both</strong> Key ID + Secret from
+                <strong class="text-white">polymarket.us/developer</strong> (US app). We sign each request with Ed25519.
+                For Kalshi put Key ID + PEM in key/secret fields.
+              </p>
+              <p class="text-[10px] text-bb-muted leading-snug">
+                Auto webhook posts <strong class="text-bb-green">✅ placed</strong>, <strong class="text-bb-orange">⏭ declined/skipped</strong>, and <strong class="text-bb-red">❌ errors</strong>.
+              </p>
               <p class="text-[10px] text-bb-muted border border-bb-border rounded-lg px-2 py-1.5 leading-snug">
                 <strong class="text-white">Paper</strong> auto-logs fills to journal/paper · <strong class="text-white">Dry-run</strong> only messages ·
                 <strong class="text-white">Live</strong> hits venue APIs (Kalshi sign / Polymarket US orders). Start Paper or Dry-run first.
@@ -1549,7 +1564,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.55</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.58</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1978,8 +1993,39 @@
   };
 
   
-  var APP_VERSION = '3.4.55';
+  var APP_VERSION = '3.4.58';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.58',
+      date: '2026-10-04',
+      title: 'Auto-trade Discord webhook (placed / declined / errors)',
+      items: [
+        'ADDED — Auto-trade webhook URL in Settings for placed, declined/skipped, and error embeds.',
+        'ADDED — Optional notify on dry-run/paper; default is live + real declines/errors only.'
+      ]
+    },
+    {
+      version: '3.4.57',
+      date: '2026-10-04',
+      title: 'Live orders: real Polymarket US Ed25519 signing',
+      items: [
+        'FIXED — Live path now signs POST /v1/orders with X-PM-Access-Key + X-PM-Timestamp + X-PM-Signature (Ed25519).',
+        'FIXED — Requires Key ID + Secret from polymarket.us/developer (not Bearer-only).',
+        'FIXED — Clearer errors for missing secret, bad sign, 401/400 from venue.',
+        'Kalshi live still uses RSA-SHA256 portfolio orders.'
+      ]
+    },
+    {
+      version: '3.4.56',
+      date: '2026-10-04',
+      title: 'NBA form → model probability (preseason-ready)',
+      items: [
+        'ADDED — NBA/WNBA/CBB form uses 1+ games (not only 3+) so preseason L10 feeds model %.',
+        'ADDED — Falls back to all-games L10 when home/away splits are thin.',
+        'ADDED — NBA totals projection from team PPG form for Over/Under cards.',
+        'CHANGED — Thin-sample weight scales by sample size so 1–2 games inform but do not dominate.'
+      ]
+    },
     {
       version: '3.4.55',
       date: '2026-10-04',
@@ -4104,6 +4150,56 @@
       localStorage.setItem('bb_auto_trade_day', JSON.stringify(j));
     } catch (e) {}
   }
+
+  async function notifyAutoTrade(kind, g, detail) {
+    try {
+      var st = settings();
+      var wh = '';
+      if ($('webhook-auto') && $('webhook-auto').value) wh = String($('webhook-auto').value).trim();
+      if (!wh) wh = st.webhookAuto || '';
+      if (!wh) return;
+      var mode = (detail && detail.mode) || st.pmAutoMode || '';
+      // Skip dry/paper unless user opted in
+      if ((mode === 'dry-run' || mode === 'paper') && !st.pmAutoWebhookDry) {
+        if (!($('pm-auto-webhook-dry') && $('pm-auto-webhook-dry').checked)) return;
+      }
+      var title = g.eventTitle || g.title || 'Pick';
+      var pick = g.modelPick || detail.pick || '—';
+      var venue = String(g.venue || g.source || 'polymarket').toUpperCase();
+      var color = kind === 'placed' ? 0x22c55e : kind === 'declined' ? 0xf59e0b : 0xef4444;
+      var emoji = kind === 'placed' ? '✅' : kind === 'declined' ? '⏭' : '❌';
+      var head = kind === 'placed' ? 'ORDER PLACED' : kind === 'declined' ? 'DECLINED / SKIPPED' : 'ORDER ERROR';
+      var mk = g.market_probability;
+      if (mk != null && mk <= 1) mk = Math.round(mk * 1000) / 10;
+      var fields = [
+        { name: 'Pick', value: String(pick).slice(0, 200), inline: true },
+        { name: 'Venue', value: venue, inline: true },
+        { name: 'Mode', value: String(mode || '—'), inline: true },
+        { name: 'Rank', value: String(g.rank || '—'), inline: true },
+        { name: 'Market', value: mk != null ? mk + '%' : '—', inline: true },
+        { name: 'Model', value: g.model_probability != null ? (g.model_probability <= 1 ? Math.round(g.model_probability * 1000) / 10 : g.model_probability) + '%' : '—', inline: true }
+      ];
+      if (detail && detail.stake != null) fields.push({ name: 'Stake', value: '$' + detail.stake, inline: true });
+      if (detail && detail.orderId) fields.push({ name: 'Order ID', value: String(detail.orderId).slice(0, 80), inline: false });
+      if (detail && detail.reason) fields.push({ name: 'Reason', value: String(detail.reason).slice(0, 400), inline: false });
+      var embed = {
+        title: emoji + ' ' + head,
+        description: String(title).slice(0, 250),
+        color: color,
+        fields: fields,
+        footer: { text: 'EliteOdds auto-trade · ' + (detail && detail.slug ? detail.slug : '') },
+        timestamp: new Date().toISOString()
+      };
+      await fetch('/api/discord', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ webhookUrl: wh, embeds: [embed] })
+      });
+    } catch (e) {
+      try { console.warn('auto webhook', e); } catch (e2) {}
+    }
+  }
+
   async function placeBet(g, opts) {
     opts = opts || {};
     var st = settings();
@@ -4113,6 +4209,8 @@
       if ($('pm-api-key') && $('pm-api-key').value) st.pmApiKey = $('pm-api-key').value.trim();
       if ($('pm-api-secret') && $('pm-api-secret').value) st.pmApiSecret = $('pm-api-secret').value.trim();
       if ($('pm-api-pass') && $('pm-api-pass').value) st.pmApiPass = $('pm-api-pass').value.trim();
+      // Kalshi: allow PEM in pass field if secret empty
+      if (!st.pmApiSecret && st.pmApiPass) st.pmApiSecret = st.pmApiPass;
       if ($('pm-auto-units')) st.pmAutoUnits = Number($('pm-auto-units').value) || st.pmAutoUnits;
       if ($('pm-auto-max-daily')) st.pmAutoMaxDaily = $('pm-auto-max-daily').value;
       if ($('pm-auto-max-price')) st.pmAutoMaxPrice = Number($('pm-auto-max-price').value);
@@ -4131,6 +4229,7 @@
     var used = autoTradeDailyUsed();
     if (!unlimited && used + units > maxDaily + 1e-9) {
       if (!opts.silent) alert('Daily unit cap: ' + used + '/' + maxDaily + ' used. Raise max daily or choose Unlimited.');
+      try { notifyAutoTrade('declined', g, { mode: mode, reason: 'Daily unit cap ' + used + '/' + maxDaily }); } catch (e) {}
       return { ok: false, skipped: true, reason: 'daily_cap' };
     }
     var rank = String(g.rank || '').toLowerCase();
@@ -4156,6 +4255,7 @@
     if (!(maxPx > 0)) maxPx = 99;
     if (!opts.manual && cents != null && cents > maxPx) {
       if (!opts.silent) alert('Skipped: price ~' + Math.round(cents) + '¢ > max ' + maxPx + '¢ (raise Max price in Settings)');
+      try { notifyAutoTrade('declined', g, { mode: mode, reason: 'Price ~' + Math.round(cents) + '¢ > max ' + maxPx + '¢' }); } catch (e) {}
       return { ok: false, skipped: true, reason: 'price' };
     }
 
@@ -4219,14 +4319,33 @@
         if (mode === 'paper' || mode === 'live') {
           try { logBet(g); } catch (eL) {}
         }
+        try {
+          notifyAutoTrade(mode === 'dry-run' ? 'placed' : 'placed', g, {
+            mode: mode,
+            pick: g.modelPick,
+            stake: Math.round(units * unitSize * 100) / 100,
+            orderId: d.orderId || (d.order && (d.order.id || d.order.orderId)),
+            slug: g.marketSlug || g.slug,
+            reason: d.message || 'ok'
+          });
+        } catch (eN) {}
         if (!opts.silent) alert(d.message || (mode + ' OK'));
         return d;
       }
       var err = (d && (d.reason || d.error)) || ('HTTP ' + r.status);
+      try {
+        notifyAutoTrade(d && d.skipped ? 'declined' : 'error', g, {
+          mode: mode,
+          pick: g.modelPick,
+          stake: Math.round(units * unitSize * 100) / 100,
+          slug: g.marketSlug || g.slug,
+          reason: err + (d && d.hint ? ' · ' + d.hint : '')
+        });
+      } catch (eN2) {}
       if (!opts.silent) {
         var extra = '';
         if (d && d.hint) extra = '\n\n' + d.hint;
-        if (mode === 'live') extra += '\n\nTip: switch mode to Paper or Dry-run to verify flow; Live needs a trading-capable key.';
+        if (mode === 'live') extra += '\n\nTip: switch mode to Paper or Dry-run to verify flow; Live needs Key ID + Secret.';
         alert((d && d.skipped ? 'Skipped: ' : 'Trade failed: ') + err + extra);
       }
       return d || { ok: false, error: err };
@@ -7942,6 +8061,8 @@ function renderSlate() {
       pmApiKey: ($('pm-api-key') && $('pm-api-key').value) || '',
       pmApiSecret: ($('pm-api-secret') && $('pm-api-secret').value) || '',
       pmApiPass: ($('pm-api-pass') && $('pm-api-pass').value) || '',
+      webhookAuto: ($('webhook-auto') && $('webhook-auto').value) || '',
+      pmAutoWebhookDry: !!($('pm-auto-webhook-dry') && $('pm-auto-webhook-dry').checked),
 
       pandascore: ($('pandascore') && $('pandascore').value) || '',
       oddsKey: ($('odds-key') && $('odds-key').value) || '',
@@ -8006,6 +8127,8 @@ function renderSlate() {
   if ($('pm-api-key')) $('pm-api-key').value = st.pmApiKey || '';
   if ($('pm-api-secret')) $('pm-api-secret').value = st.pmApiSecret || '';
   if ($('pm-api-pass')) $('pm-api-pass').value = st.pmApiPass || '';
+  if ($('webhook-auto')) $('webhook-auto').value = st.webhookAuto || '';
+  if ($('pm-auto-webhook-dry')) $('pm-auto-webhook-dry').checked = !!st.pmAutoWebhookDry;
 
   if ($('pandascore')) $('pandascore').value = st.pandascore || '';
   if ($('odds-key')) $('odds-key').value = st.oddsKey || '';
