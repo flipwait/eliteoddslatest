@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.47</title>
+  <title>EliteOdds v3.4.51</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,13 +708,14 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.47</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.51</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
           <button type="button" data-mode="both" class="mode-btn pill-on px-3 py-1.5 rounded-full border border-bb-border text-[11px]">Live + Pregame</button>
           <span class="hidden sm:inline text-bb-muted/40 mx-0.5">|</span>
-          <button type="button" data-day="today" class="day-btn pill-on px-3 py-1.5 rounded-full border border-bb-border text-[11px]">Today</button>
+          <button type="button" data-day="next3" class="day-btn pill-on px-3 py-1.5 rounded-full border border-bb-border text-[11px]">Next 3 days</button>
+          <button type="button" data-day="today" class="day-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Today</button>
           <button type="button" data-day="tomorrow" class="day-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Tomorrow</button>
           <button type="button" data-day="all" class="day-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">All days</button>
         </div>
@@ -1341,62 +1342,76 @@
             <p class="text-[10px] text-bb-muted">Won/Lost webhooks make tracking easier in separate channels. Leave blank to skip.</p>
             <p class="text-[10px] text-bb-muted leading-snug">Friend “I took this” links need the same placed URL as Vercel env <code class="text-bb-muted">DISCORD_WEBHOOK_PLACED</code>.</p>
 
-            <div class="mt-4 rounded-xl border border-dashed border-amber-500/35 bg-amber-500/5 p-3 space-y-2.5">
+                                    <div class="mt-4 rounded-xl border border-violet-500/35 bg-violet-500/5 p-3 space-y-2.5">
               <div class="flex items-center justify-between gap-2">
-                <h3 class="text-xs font-semibold text-amber-100 uppercase tracking-wider">Polymarket auto-trade</h3>
-                <span class="text-[10px] px-2 py-0.5 rounded-full border border-amber-400/40 text-amber-200 bg-amber-500/10 font-semibold">Coming soon</span>
+                <h3 class="text-xs font-semibold text-violet-100 uppercase tracking-wider">Auto-trade</h3>
+                <span class="text-[10px] px-2 py-0.5 rounded-full border border-bb-green/40 text-bb-green bg-bb-green/10 font-semibold">Live ready</span>
               </div>
               <p class="text-[10px] text-bb-muted leading-snug">
-                Save your preferences now. <strong class="text-white">No orders are placed</strong> until auto-trade is enabled in a future release.
-                You will still confirm risk limits before any live trading is turned on.
+                Pick a mode. <strong class="text-white">Paper</strong> = track only.
+                <strong class="text-white">Dry-run</strong> = simulate.
+                <strong class="text-white">Live</strong> = real orders when keys work.
               </p>
-              <label class="flex items-center gap-2 text-xs cursor-not-allowed opacity-70">
-                <input type="checkbox" id="pm-auto-enabled" class="rounded" disabled />
-                Enable auto-trade (disabled — coming soon)
+              <label class="block text-[10px] text-bb-muted">Trade mode
+                <select id="pm-auto-mode" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs">
+                  <option value="dry-run">Dry-run (safe default)</option>
+                  <option value="paper">Paper auto (log fills, no money)</option>
+                  <option value="live">Live auto (real orders)</option>
+                </select>
               </label>
-              <label class="flex items-center gap-2 text-xs cursor-not-allowed opacity-70">
-                <input type="checkbox" id="pm-auto-confirm" class="rounded" checked disabled />
-                Require manual confirm before each order (recommended)
+              <label class="flex items-center gap-2 text-xs cursor-pointer">
+                <input type="checkbox" id="pm-auto-enabled" class="rounded" />
+                Fully auto on scan (Elite / rank filter below)
+              </label>
+              <label class="flex items-center gap-2 text-xs cursor-pointer">
+                <input type="checkbox" id="pm-auto-confirm" class="rounded" checked />
+                Require confirm before each order
               </label>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <label class="block text-[10px] text-bb-muted">Min rank to trade
-                  <select id="pm-auto-min-rank" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs text-bb-muted" disabled>
-                    <option value="elite">Elite only</option>
+                <label class="block text-[10px] text-bb-muted">Min rank
+                  <select id="pm-auto-min-rank" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs">
+                    <option value="elite">Elite + Super Elite</option>
                     <option value="super">Super Elite only</option>
                     <option value="good">Good + Elite</option>
                   </select>
                 </label>
-                <label class="block text-[10px] text-bb-muted">Markets
-                  <select id="pm-auto-markets" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs text-bb-muted" disabled>
-                    <option value="ml">Moneyline only</option>
-                    <option value="ml_ou">ML + full-game O/U</option>
-                    <option value="all">All supported</option>
+                <label class="block text-[10px] text-bb-muted">Stake units
+                  <input id="pm-auto-units" type="number" min="0.25" step="0.25" value="1" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs" />
+                </label>
+                <label class="block text-[10px] text-bb-muted">Max daily units
+                  <select id="pm-auto-max-daily" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3" selected>3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="unlimited">Unlimited</option>
                   </select>
                 </label>
-                <label class="block text-[10px] text-bb-muted">Max stake (units)
-                  <input id="pm-auto-max-units" type="number" min="0.1" step="0.1" value="0.5" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs text-bb-muted" disabled />
-                </label>
-                <label class="block text-[10px] text-bb-muted">Max daily risk (units)
-                  <input id="pm-auto-max-daily" type="number" min="0" step="0.5" value="3" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs text-bb-muted" disabled />
-                </label>
-                <label class="block text-[10px] text-bb-muted">Max price (¢) — skip expensive sides
-                  <input id="pm-auto-max-price" type="number" min="1" max="99" value="75" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs text-bb-muted" disabled />
+                <label class="block text-[10px] text-bb-muted">Max price (¢)
+                  <input id="pm-auto-max-price" type="number" min="1" max="99" value="75" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs" />
                 </label>
                 <label class="block text-[10px] text-bb-muted">Min edge (pp)
-                  <input id="pm-auto-min-edge" type="number" min="0" step="0.5" value="3" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs text-bb-muted" disabled />
+                  <input id="pm-auto-min-edge" type="number" min="0" step="0.5" value="3" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs" />
                 </label>
               </div>
-              <label class="block text-[10px] text-bb-muted">Polymarket API key <span class="text-amber-200/80">(coming soon)</span>
-                <input id="pm-api-key" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 font-mono text-xs text-bb-muted" placeholder="Not active yet" disabled autocomplete="off" />
+              <label class="block text-[10px] text-bb-muted">Polymarket / Kalshi API key
+                <input id="pm-api-key" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 font-mono text-xs" placeholder="Required for Live" autocomplete="off" />
               </label>
-              <label class="block text-[10px] text-bb-muted">API secret <span class="text-amber-200/80">(coming soon)</span>
-                <input id="pm-api-secret" type="password" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 font-mono text-xs text-bb-muted" placeholder="Not active yet" disabled autocomplete="off" />
+              <label class="block text-[10px] text-bb-muted">API secret / private key
+                <input id="pm-api-secret" type="password" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 font-mono text-xs" placeholder="Kalshi PEM or Poly secret" autocomplete="off" />
               </label>
-              <label class="block text-[10px] text-bb-muted">API passphrase <span class="text-amber-200/80">(coming soon)</span>
-                <input id="pm-api-pass" type="password" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 font-mono text-xs text-bb-muted" placeholder="Not active yet" disabled autocomplete="off" />
+              <label class="block text-[10px] text-bb-muted">API passphrase (if any)
+                <input id="pm-api-pass" type="password" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 font-mono text-xs" placeholder="Optional" autocomplete="off" />
               </label>
-              <p class="text-[10px] text-amber-100/70 border border-amber-500/20 rounded-lg px-2 py-1.5">
-                Roadmap: optional <strong class="text-white">semi-auto</strong> (confirm each order) first, then optional full auto with hard kill-switch. Credentials stay local until trading is built.
+              <p class="text-[10px] text-bb-muted border border-bb-border rounded-lg px-2 py-1.5 leading-snug">
+                <strong class="text-white">Paper</strong> auto-logs fills to journal/paper · <strong class="text-white">Dry-run</strong> only messages ·
+                <strong class="text-white">Live</strong> hits venue APIs (Kalshi sign / Polymarket US orders). Start Paper or Dry-run first.
               </p>
             </div>
 
@@ -1529,7 +1544,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.47</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.51</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1913,8 +1928,51 @@
   };
 
   
-  var APP_VERSION = '3.4.47';
+  var APP_VERSION = '3.4.51';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.51',
+      date: '2026-10-04',
+      title: 'Paper / Dry-run / Live auto-trade + daily 1–10 or Unlimited',
+      items: [
+        'ADDED — Trade mode: Paper auto (log only), Dry-run (simulate), Live (real venue orders).',
+        'ADDED — Max daily units: 1–10 or Unlimited.',
+        'ADDED — Fully auto on scan when enabled; Place still works one-click.',
+        'LIVE — Kalshi signed order attempt + Polymarket US /v1/orders when keys are set.'
+      ]
+    },
+    {
+      version: '3.4.50',
+      date: '2026-10-04',
+      title: 'Auto-trade unlocked (dry-run default) + Place on cards',
+      items: [
+        'UNLOCKED — Auto-trade settings: dry-run ON by default, rank/edge/price/daily unit caps, API key fields editable.',
+        'ADDED — Place button on game cards (confirm → dry-run log or live preview).',
+        'ADDED — /api/trade endpoint for dry-run intents; live fill still requires full trading auth.'
+      ]
+    },
+    {
+      version: '3.4.49',
+      date: '2026-10-04',
+      title: 'NFL/CFB market side map fix (Bills 74¢ not 26¢)',
+      items: [
+        'FIXED — Model pick market % now prices the PICKED team by outcome name (BUF Bills 74¢, not Patriots 26¢ on a Bills pick).',
+        'FIXED — Stronger team name matching (Bills / Buffalo Bills / BUF) for YES/NO and home/away.',
+        'CHANGED — Early-season thin L10 is less strict: form still counts; Elite only demoted when form fights a disagreeing market by a wide margin.'
+      ]
+    },
+    {
+      version: '3.4.48',
+      date: '2026-10-03',
+      title: 'Honest form samples + Next 3 days + Live Focus / Coach fixes',
+      items: [
+        'FIXED — Thin L10 samples (e.g. 2-0 vs 0-2) no longer produce Elite 78% models on 26¢ dogs; form shrinks toward market; Elite blocked on very thin samples.',
+        'ADDED — Scan day filter default: Next 3 days (today + tomorrow + day after). All days still available.',
+        'FIXED — Auto Coach AI now reads the OpenAI key from Settings (was looking for wrong field name).',
+        'FIXED — Live Focus openModal hardened (errors surface; Close always works).',
+        'IMPROVED — Parlay AI slip output lists each leg with market/model before the AI note.'
+      ]
+    },
     {
       version: '3.4.47',
       date: '2026-10-03',
@@ -2422,7 +2480,7 @@
     return /nrfi|yrfi|total|f5|spread|inning|prop|player_|pitcher_|map_/.test(mt);
   }
 
-  var sport = 'all', mode = 'both', dayFilter = 'today', marketType = 'all', venue = 'polymarket';
+  var sport = 'all', mode = 'both', dayFilter = 'next3', marketType = 'all', venue = 'polymarket';
   var boardRefreshedAt = null;
   var sortMode = 'time';
 
@@ -2552,7 +2610,7 @@
       '<p class="text-xs text-bb-muted">Best lean · <span class="text-white font-medium">' + String(g.modelPick || '—').replace(/</g,'') + '</span> · ' + lines.length + ' markets</p>' +
       '<div class="hub-lines">' + linesHtml + '</div>' +
       '<div class="flex flex-wrap gap-1.5 pt-1">' +
-        '<button type="button" class="btn-focus text-[11px] px-2.5 py-1 rounded-lg border border-bb-border text-bb-muted" data-id="' + String(g.id || '').replace(/"/g,'') + '">Focus</button>' +
+        '<button type="button" class="btn-focus text-[11px] px-2.5 py-1 rounded-lg border border-bb-border text-bb-muted" data-id="' + String(g.id || '').replace(/"/g,'') + '">Focus</button><button type="button" class="btn-place text-[11px] px-2.5 py-1 rounded-lg border border-bb-green/40 text-bb-green">Place</button>' +
         '<button type="button" class="btn-verdict text-[11px] px-2.5 py-1 rounded-lg border border-bb-border text-bb-muted" data-id="' + String(g.id || '').replace(/"/g,'') + '">Verdict</button>' +
         '<a class="text-[11px] px-2.5 py-1 rounded-lg border border-violet-400/40 text-violet-200" href="' + String(tradeHrefFor(g)).replace(/"/g,'') + '" target="_blank" rel="noopener">Trade best</a>' +
       '</div></article>';
@@ -2763,11 +2821,11 @@
   }
 
   function applyTonightPreset() {
-    dayFilter = 'today';
+    dayFilter = 'next3';
     mode = 'pregame';
     marketType = marketType || 'moneyline';
     document.querySelectorAll('.day-btn').forEach(function (b) {
-      var on = b.getAttribute('data-day') === 'today';
+      var on = b.getAttribute('data-day') === 'next3';
       b.classList.toggle('pill-on', on);
       b.classList.toggle('text-bb-muted', !on);
     });
@@ -3357,7 +3415,7 @@
           sizingBlock(g) +
         '</div></details>' +
       '<div class="v3-actions pt-1 border-t border-bb-border/80" style="grid-template-columns:repeat(4,minmax(0,1fr))">' +
-        '<button type="button" class="btn-focus">Focus</button>' +
+        '<button type="button" class="btn-focus">Focus</button><button type="button" class="btn-place text-[11px] px-2.5 py-1 rounded-lg border border-bb-green/40 text-bb-green">Place</button>' +
         '<button type="button" class="btn-verdict">Verdict</button>' +
         '<button type="button" class="btn-log">Log</button>' +
         '<a class="btn-trade" href="' + tradeHrefFor(g) + '" target="_blank" rel="noopener">Trade</a>' +
@@ -3930,6 +3988,128 @@
       alert(text);
     }
   }
+
+  function autoTradeDailyUsed() {
+    try {
+      var j = JSON.parse(localStorage.getItem('bb_auto_trade_day') || '{}');
+      var k = new Date().toISOString().slice(0, 10);
+      if (j.day !== k) return 0;
+      return Number(j.units) || 0;
+    } catch (e) { return 0; }
+  }
+  function autoTradeDailyAdd(u) {
+    try {
+      var k = new Date().toISOString().slice(0, 10);
+      var j = JSON.parse(localStorage.getItem('bb_auto_trade_day') || '{}');
+      if (j.day !== k) j = { day: k, units: 0 };
+      j.units = (Number(j.units) || 0) + (Number(u) || 0);
+      localStorage.setItem('bb_auto_trade_day', JSON.stringify(j));
+    } catch (e) {}
+  }
+  async function placeBet(g, opts) {
+    opts = opts || {};
+    var st = settings();
+    var mode = st.pmAutoMode || 'dry-run';
+    if (opts.forceMode) mode = opts.forceMode;
+    var units = Number(st.pmAutoUnits) || 1;
+    var unitSize = Number(st.unitSize) || 5;
+    var maxDailyRaw = st.pmAutoMaxDaily;
+    var unlimited = String(maxDailyRaw) === 'unlimited' || maxDailyRaw === '' || maxDailyRaw == null;
+    var maxDaily = unlimited ? Infinity : (Number(maxDailyRaw) || 3);
+    var used = autoTradeDailyUsed();
+    if (!unlimited && used + units > maxDaily + 1e-9) {
+      if (!opts.silent) alert('Daily unit cap reached (' + used + '/' + maxDaily + '). Set Unlimited or wait until tomorrow.');
+      return { ok: false, skipped: true };
+    }
+    var rank = String(g.rank || '').toLowerCase();
+    var minR = st.pmAutoMinRank || 'elite';
+    if (!opts.manual) {
+      if (minR === 'elite' && rank !== 'elite' && rank.indexOf('super') < 0) return { ok: false };
+      if (minR === 'super' && rank.indexOf('super') < 0) return { ok: false };
+      if (minR === 'good' && rank !== 'good' && rank !== 'elite' && rank.indexOf('super') < 0) return { ok: false };
+    }
+    var edge = g.probability_edge != null ? Number(g.probability_edge) : (g.netEdge != null ? Number(g.netEdge) : null);
+    if (!opts.manual && edge != null && edge < (Number(st.pmAutoMinEdge) || 0)) {
+      if (!opts.silent) alert('Edge ' + edge + 'pp below min');
+      return { ok: false };
+    }
+    var needConfirm = st.pmAutoConfirm !== false;
+    if (opts.manual) needConfirm = true;
+    if (opts.skipConfirm) needConfirm = false;
+    if (needConfirm) {
+      var mk = g.market_probability;
+      if (mk != null && mk <= 1) mk = Math.round(mk * 1000) / 10;
+      var tag = mode === 'live' ? '[LIVE]' : mode === 'paper' ? '[PAPER]' : '[DRY RUN]';
+      var msg = tag + ' ' + units + 'u ($' + (units * unitSize) + ') on ' + (g.modelPick || '?') +
+        '\n' + (g.eventTitle || g.title || '') +
+        '\nMkt ~' + (mk != null ? mk + '%' : '?') + ' · Rank ' + (g.rank || '') +
+        '\nMode: ' + mode +
+        (mode === 'dry-run' ? '\n\nNo order, no paper.' : '') +
+        (mode === 'paper' ? '\n\nPaper fill only — no exchange order.' : '') +
+        (mode === 'live' ? '\n\nREAL order path — money can move if keys work.' : '');
+      if (!confirm(msg)) return { ok: false };
+    }
+    try {
+      var r = await fetch('/api/trade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: mode,
+          venue: g.venue || g.source || 'polymarket',
+          pick: g.modelPick,
+          title: g.eventTitle || g.title,
+          slug: g.marketSlug || g.slug,
+          ticker: g.ticker || g.kalshiTicker || g.marketSlug || g.slug,
+          rank: g.rank,
+          side: g.side || 'YES',
+          market_probability: g.market_probability,
+          model_probability: g.model_probability,
+          units: units,
+          unitSize: unitSize,
+          maxPriceCents: st.pmAutoMaxPrice,
+          minEdgePp: st.pmAutoMinEdge,
+          apiKey: st.pmApiKey,
+          apiSecret: st.pmApiSecret,
+          apiPass: st.pmApiPass
+        })
+      });
+      var d = await r.json();
+      if (d.ok) {
+        autoTradeDailyAdd(units);
+        if (mode === 'paper' || mode === 'live') {
+          try { logBet(g); } catch (eL) {}
+        }
+        if (!opts.silent) alert(d.message || (mode + ' OK'));
+        return d;
+      }
+      if (!opts.silent) alert((d.skipped ? 'Skipped: ' : 'Trade: ') + (d.reason || d.error || 'failed'));
+      return d;
+    } catch (e) {
+      if (!opts.silent) alert('Trade error: ' + (e.message || e));
+      return { ok: false, error: String(e.message || e) };
+    }
+  }
+
+  /** After scan: fully auto if enabled */
+  async function runAutoTradeOnGames(list) {
+    var st = settings();
+    if (!st.pmAutoEnabled) return;
+    list = list || [];
+    var n = 0;
+    for (var i = 0; i < list.length && n < 15; i++) {
+      var g = list[i];
+      if (!g) continue;
+      var r = await placeBet(g, { manual: false, silent: true, skipConfirm: st.pmAutoConfirm === false });
+      if (r && r.ok) n++;
+    }
+    if (n > 0) {
+      try {
+        var el = document.getElementById('scan-status') || document.getElementById('games-status');
+        if (el) el.textContent = 'Auto-trade: ' + n + ' action(s) (' + (st.pmAutoMode || 'dry-run') + ')';
+      } catch (e) {}
+    }
+  }
+
   function bindCards(root, list) {
     if (!root) return;
     var arts = root.querySelectorAll('article');
@@ -3940,6 +4120,8 @@
       var t = art.querySelector('.btn-ticket');
       var d = art.querySelector('.btn-discord');
       if (f) f.onclick = function () { openModal(g); };
+      var pl = art.querySelector('.btn-place');
+      if (pl) pl.onclick = function () { placeBet(g, { manual: true }); };
       if (t) t.onclick = function () {
         var u = prompt('Units?', String(g.rank).toLowerCase() === 'elite' ? '1' : '0.5');
         if (u === null) return;
@@ -5131,8 +5313,9 @@
     updateOpenBreakdownUI();
     if ($('coach-ai') && $('coach-ai').checked) {
       var st = settings();
-      if (!st.openaiKey) {
-        out.innerHTML += '<div class="text-bb-orange mt-1">AI coach: add OpenAI key in Settings.</div>';
+      var oai = (st.openai || st.openaiKey || ($('openai') && $('openai').value) || '').trim();
+      if (!oai) {
+        out.innerHTML += '<div class="text-bb-orange mt-1">AI coach: add OpenAI key in Settings and click Save.</div>';
         return;
       }
       out.innerHTML += '<div class="text-bb-muted mt-1">AI coach thinking…</div>';
@@ -5141,7 +5324,7 @@
         var r = await fetch('/api/tools', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'openai', openaiKey: st.openaiKey, prompt: prompt, max_tokens: 350 })
+          body: JSON.stringify({ action: 'openai', openaiKey: oai, prompt: prompt, max_tokens: 350 })
         });
         var d = await r.json();
         var text = (d && (d.text || d.reply || d.content)) || (d.error ? ('AI error: ' + d.error) : 'No AI reply');
@@ -5284,21 +5467,29 @@
     } else if (rankF === 'pass') {
       list = list.filter(function (g) { return String(g.rank||'').toLowerCase() === 'pass'; });
     }
-    // Day filter: Today / Tomorrow / All (local timezone)
-    var df = typeof dayFilter !== 'undefined' ? dayFilter : 'all';
+    // Day filter: Next 3 days (default) / Today / Tomorrow / All
+    var df = typeof dayFilter !== 'undefined' ? dayFilter : 'next3';
     if (df && df !== 'all') {
       var nowD = new Date();
-      var todayKey = nowD.getFullYear() + '-' + (nowD.getMonth() + 1 < 10 ? '0' : '') + (nowD.getMonth() + 1) + '-' + (nowD.getDate() < 10 ? '0' : '') + nowD.getDate();
+      function dayKeyFromDate(d) {
+        return d.getFullYear() + '-' + (d.getMonth() + 1 < 10 ? '0' : '') + (d.getMonth() + 1) + '-' + (d.getDate() < 10 ? '0' : '') + d.getDate();
+      }
+      var todayKey = dayKeyFromDate(nowD);
       var tomD = new Date(nowD.getFullYear(), nowD.getMonth(), nowD.getDate() + 1);
-      var tomKey = tomD.getFullYear() + '-' + (tomD.getMonth() + 1 < 10 ? '0' : '') + (tomD.getMonth() + 1) + '-' + (tomD.getDate() < 10 ? '0' : '') + tomD.getDate();
+      var tomKey = dayKeyFromDate(tomD);
+      var d2 = new Date(nowD.getFullYear(), nowD.getMonth(), nowD.getDate() + 2);
+      var d2Key = dayKeyFromDate(d2);
+      var allowed = {};
+      if (df === 'today') allowed[todayKey] = 1;
+      else if (df === 'tomorrow') allowed[tomKey] = 1;
+      else if (df === 'next3') { allowed[todayKey] = 1; allowed[tomKey] = 1; allowed[d2Key] = 1; }
       list = list.filter(function (g) {
         var iso = g.startTime || g.commenceTime || g.start;
         if (!iso) return false;
         var d = new Date(iso);
         if (isNaN(d.getTime())) return false;
-        var k = d.getFullYear() + '-' + (d.getMonth() + 1 < 10 ? '0' : '') + (d.getMonth() + 1) + '-' + (d.getDate() < 10 ? '0' : '') + d.getDate();
-        if (df === 'today') return k === todayKey;
-        if (df === 'tomorrow') return k === tomKey;
+        var k = dayKeyFromDate(d);
+        if (df === 'next3' || df === 'today' || df === 'tomorrow') return !!allowed[k];
         return true;
       });
     }
@@ -5636,6 +5827,7 @@
       renderSlate();
       trackElitePicks(games);
       maybeAutoDiscordElite(games);
+      try { runAutoTradeOnGames(games); } catch (eAuto) { console.warn('auto-trade', eAuto); }
       try { updateDeskStats(); renderLineShop(); } catch (e) {}
     } catch (e) {
       console.error(e);
@@ -6795,7 +6987,14 @@ function renderSlate() {
         if (out) out.textContent = 'Slip built. AI note failed: ' + (d.error || 'error');
         return;
       }
-      if (out) out.textContent = d.text || 'Slip ready.';
+      if (out) {
+        var legLines = picked.map(function (g, i) {
+          var mk = g.market_probability; if (mk != null && mk <= 1) mk = Math.round(mk * 1000) / 10;
+          var md = g.model_probability; if (md != null && md <= 1) md = Math.round(md * 1000) / 10;
+          return (i + 1) + ') ' + (g.modelPick || '?') + ' · ' + (g.eventTitle || g.title || '') + ' · ' + (g.rank || '') + ' · mkt ' + (mk != null ? mk + '%' : '—') + ' model ' + (md != null ? md + '%' : '—');
+        }).join('\n');
+        out.textContent = 'SLIP (' + picked.length + ' legs)\n' + legLines + '\n\n' + (d.text || 'AI note ready. Review correlation — same-game legs stack risk.');
+      }
     } catch (e) {
       if (out) out.textContent = 'Slip built. AI note error: ' + (e.message || e);
     }
@@ -7056,7 +7255,11 @@ function renderSlate() {
   }
 
   function openModal(g) {
-    $('modal').classList.remove('hidden');
+    try {
+    var modal = $('modal');
+    if (!modal) { alert('Live Focus: modal missing'); return; }
+    modal.classList.remove('hidden');
+    if (!g) { alert('Live Focus: no game'); return; }
     var la = g.liveAnalysis || {};
     var z = la.zones || {};
     var st = z.state || {};
@@ -7275,8 +7478,13 @@ function renderSlate() {
         out.textContent = 'Verdict failed';
       });
     };
+    } catch (err) {
+      console.error('Live Focus error', err);
+      try { alert('Live Focus error: ' + (err && err.message ? err.message : err)); } catch (e2) {}
+    }
   }
-  window.closeModal = function () { $('modal').classList.add('hidden'); };
+  window.closeModal = function () { var m = $('modal'); if (m) m.classList.add('hidden'); };
+  window.openModal = openModal;
 
   function switchTab(name) {
     if (!name) return;
@@ -7486,6 +7694,18 @@ function renderSlate() {
 
       webhookLost: ($('webhook-lost') && $('webhook-lost').value) || '',
       openai: $('openai').value || '',
+      pmAutoMode: ($('pm-auto-mode') && $('pm-auto-mode').value) || 'dry-run',
+      pmAutoEnabled: !!($('pm-auto-enabled') && $('pm-auto-enabled').checked),
+      pmAutoConfirm: !($('pm-auto-confirm') && !$('pm-auto-confirm').checked),
+      pmAutoMinRank: ($('pm-auto-min-rank') && $('pm-auto-min-rank').value) || 'elite',
+      pmAutoUnits: Number(($('pm-auto-units') && $('pm-auto-units').value) || 1) || 1,
+      pmAutoMaxDaily: ($('pm-auto-max-daily') && $('pm-auto-max-daily').value) || '3',
+      pmAutoMaxPrice: Number(($('pm-auto-max-price') && $('pm-auto-max-price').value) || 75) || 75,
+      pmAutoMinEdge: Number(($('pm-auto-min-edge') && $('pm-auto-min-edge').value) || 3) || 3,
+      pmApiKey: ($('pm-api-key') && $('pm-api-key').value) || '',
+      pmApiSecret: ($('pm-api-secret') && $('pm-api-secret').value) || '',
+      pmApiPass: ($('pm-api-pass') && $('pm-api-pass').value) || '',
+
       pandascore: ($('pandascore') && $('pandascore').value) || '',
       oddsKey: ($('odds-key') && $('odds-key').value) || '',
       workerUrl: ($('worker-url') && $('worker-url').value) || '',
@@ -7537,6 +7757,18 @@ function renderSlate() {
 
   if ($('webhook-lost')) $('webhook-lost').value = st.webhookLost || '';
   if ($('openai')) $('openai').value = st.openai || '';
+  if ($('pm-auto-mode')) $('pm-auto-mode').value = st.pmAutoMode || (st.pmAutoDry === false ? 'live' : 'dry-run');
+  if ($('pm-auto-enabled')) $('pm-auto-enabled').checked = !!st.pmAutoEnabled;
+  if ($('pm-auto-confirm')) $('pm-auto-confirm').checked = st.pmAutoConfirm !== false;
+  if ($('pm-auto-min-rank') && st.pmAutoMinRank) $('pm-auto-min-rank').value = st.pmAutoMinRank;
+  if ($('pm-auto-units') && st.pmAutoUnits != null) $('pm-auto-units').value = st.pmAutoUnits;
+  if ($('pm-auto-max-daily') && st.pmAutoMaxDaily != null) $('pm-auto-max-daily').value = st.pmAutoMaxDaily;
+  if ($('pm-auto-max-price') && st.pmAutoMaxPrice != null) $('pm-auto-max-price').value = st.pmAutoMaxPrice;
+  if ($('pm-auto-min-edge') && st.pmAutoMinEdge != null) $('pm-auto-min-edge').value = st.pmAutoMinEdge;
+  if ($('pm-api-key')) $('pm-api-key').value = st.pmApiKey || '';
+  if ($('pm-api-secret')) $('pm-api-secret').value = st.pmApiSecret || '';
+  if ($('pm-api-pass')) $('pm-api-pass').value = st.pmApiPass || '';
+
   if ($('pandascore')) $('pandascore').value = st.pandascore || '';
   if ($('odds-key')) $('odds-key').value = st.oddsKey || '';
   if ($('worker-url')) $('worker-url').value = st.workerUrl || '';

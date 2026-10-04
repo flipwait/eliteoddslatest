@@ -229,6 +229,19 @@ function scoreOne(m, ev, matchup, rankOpts, yesIsHome) {
   let prior = null;
   if (mv && mv.from != null) prior = mv.from;
   const book = getBook(id);
+  let yesName = null;
+  let noName = null;
+  try {
+    const outcomes = m.outcomes || m.tokens || m.shortOutcomes || [];
+    if (Array.isArray(outcomes) && outcomes.length >= 2) {
+      yesName = outcomes[0].name || outcomes[0].title || outcomes[0];
+      noName = outcomes[1].name || outcomes[1].title || outcomes[1];
+      if (typeof yesName === 'object') yesName = yesName.name || yesName.title;
+      if (typeof noName === 'object') noName = noName.name || noName.title;
+    }
+    const will = String(m.question || '').match(/will\s+(?:the\s+)?(.+?)\s+(?:win|cover|beat)/i);
+    if (will && will[1]) yesName = yesName || will[1].trim();
+  } catch (eLab) {}
   return buildSignal({
     id,
     question: m.question || ev.title,
@@ -244,6 +257,10 @@ function scoreOne(m, ev, matchup, rankOpts, yesIsHome) {
     matchup: matchup || null,
     marketType: classifyMarket(m),
     yesIsHome: yesIsHome,
+    yesName: yesName,
+    noName: noName,
+    yesLabel: yesName,
+    noLabel: noName,
     league: (ev && ev.league) || (matchup && matchup.league) || null,
     live: !!(ev && ev.live),
     eventTitle: (ev && (ev.title || ev.name)) || null,
@@ -252,10 +269,19 @@ function scoreOne(m, ev, matchup, rankOpts, yesIsHome) {
 
 function nameHit(a, b) {
   if (!a || !b) return false;
-  const x = String(a).toLowerCase().replace(/[^a-z0-9 ]/g, ' ').trim();
-  const y = String(b).toLowerCase().replace(/[^a-z0-9 ]/g, ' ').trim();
-  if (!x || !y) return false;
-  return x === y || x.includes(y.slice(0, 6)) || y.includes(x.slice(0, 6));
+  const na = String(a).toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+  const nb = String(b).toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!na || !nb) return false;
+  if (na === nb || na.includes(nb) || nb.includes(na)) return true;
+  const ta = na.split(' ').filter((w) => w.length > 2);
+  const tb = nb.split(' ').filter((w) => w.length > 2);
+  if (ta.length && tb.length) {
+    const la = ta[ta.length - 1];
+    const lb = tb[tb.length - 1];
+    if (la.length > 3 && la === lb) return true;
+    if (ta.some((w) => w.length > 3 && tb.includes(w))) return true;
+  }
+  return false;
 }
 
 function sidesFromMarket(m, evTitle, type, matchup) {
