@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.52</title>
+  <title>EliteOdds v3.4.55</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.52</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.55</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -724,7 +724,7 @@
           <button type="button" data-venue="kalshi" class="venue-btn px-3 py-1.5 rounded-full border border-bb-green/50 text-[11px] text-bb-green">Kalshi</button>
           <button type="button" data-venue="both" class="venue-btn px-3 py-1.5 rounded-full border border-violet-400/40 text-[11px] text-violet-200">Both</button>
         </div>
-        <button type="button" id="btn-load" class="px-2.5 py-1.5 rounded-full border border-bb-border text-bb-muted text-[11px]" title="Refresh">↻</button>
+        <button type="button" id="btn-load" class="px-2.5 py-1.5 rounded-full border border-bb-border text-bb-muted text-[11px]" title="Refresh">↻</button><button type="button" id="btn-scan-auto" class="px-2.5 py-1.5 rounded-full border border-violet-400/50 text-violet-200 text-[11px]" title="Scan for Auto only">Auto</button>
         <button type="button" id="btn-snap" class="hidden">LM</button>
         <nav class="eo-main-nav text-[11px] ml-2">
           <button type="button" data-tab="scanner" class="tab pill-on px-2.5 py-1 rounded-lg border border-bb-border">Scan</button>
@@ -1361,8 +1361,13 @@
               </label>
               <label class="flex items-center gap-2 text-xs cursor-pointer">
                 <input type="checkbox" id="pm-auto-enabled" class="rounded" />
-                Fully auto on scan (Elite / rank filter below)
+                Enable auto pipeline (required for Scan for Auto)
               </label>
+              <label class="flex items-center gap-2 text-xs cursor-pointer">
+                <input type="checkbox" id="pm-auto-on-regular" class="rounded" />
+                Also run auto after regular Scan (optional)
+              </label>
+              <p class="text-[10px] text-bb-muted">Prefer the purple <strong class="text-white">Auto</strong> button next to refresh — keeps normal Scan clean.</p>
               <label class="flex items-center gap-2 text-xs cursor-pointer">
                 <input type="checkbox" id="pm-auto-confirm" class="rounded" checked />
                 Require confirm before each order
@@ -1544,7 +1549,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.52</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.55</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1761,6 +1766,51 @@
       { id: 'team_total_fg', label: 'Team total' },
       { id: 'player_props', label: 'Player props' }
     ],
+
+    nba: [
+      { id: 'all', label: 'All markets' },
+      { id: 'moneyline', label: 'ML' },
+      { id: 'spread', label: 'FG spread' },
+      { id: 'spread_1h', label: '1H spread' },
+      { id: 'spread_q1', label: 'Q1 spread' },
+      { id: 'spread_q2', label: 'Q2 spread' },
+      { id: 'spread_q3', label: 'Q3 spread' },
+      { id: 'spread_q4', label: 'Q4 spread' },
+      { id: 'total', label: 'Full game O/U' },
+      { id: 'total_1h', label: '1H O/U' },
+      { id: 'total_q1', label: 'Q1 O/U' },
+      { id: 'total_q2', label: 'Q2 O/U' },
+      { id: 'total_q3', label: 'Q3 O/U' },
+      { id: 'total_q4', label: 'Q4 O/U' },
+      { id: 'team_total_fg', label: 'FG team total' },
+      { id: 'team_total_1h', label: '1H team total' },
+      { id: 'moneyline_1h', label: '1H winner' },
+      { id: 'player_props', label: 'Player props' },
+      { id: 'player_pts', label: 'Points' },
+      { id: 'player_reb', label: 'Rebounds' },
+      { id: 'player_ast', label: 'Assists' },
+      { id: 'player_pra', label: 'Pts+Reb+Ast' },
+      { id: 'player_threes', label: '3-pointers' }
+    ],
+    wnba: [
+      { id: 'all', label: 'All markets' },
+      { id: 'moneyline', label: 'ML' },
+      { id: 'spread', label: 'FG spread' },
+      { id: 'total', label: 'Full game O/U' },
+      { id: 'total_1h', label: '1H O/U' },
+      { id: 'team_total_fg', label: 'Team total' },
+      { id: 'player_props', label: 'Player props' }
+    ],
+    cbb: [
+      { id: 'all', label: 'All markets' },
+      { id: 'moneyline', label: 'ML' },
+      { id: 'spread', label: 'FG spread' },
+      { id: 'spread_1h', label: '1H spread' },
+      { id: 'total', label: 'Full game O/U' },
+      { id: 'total_1h', label: '1H O/U' },
+      { id: 'team_total_fg', label: 'Team total' },
+      { id: 'player_props', label: 'Player props' }
+    ],
     mlb: [
       { id: 'all', label: 'All' },
       { id: 'moneyline', label: 'ML' },
@@ -1928,8 +1978,39 @@
   };
 
   
-  var APP_VERSION = '3.4.52';
+  var APP_VERSION = '3.4.55';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.55',
+      date: '2026-10-04',
+      title: 'NBA open for preseason + regular (full market menu)',
+      items: [
+        'ADDED — NBA / WNBA / CBB market menus on Scan (ML, spreads, halves, quarters, totals, team totals, player props).',
+        'ADDED — ESPN form pulls preseason + regular season schedules for NBA form L10.',
+        'CHANGED — Super Elite NBA markets include spreads and player props options.'
+      ]
+    },
+    {
+      version: '3.4.54',
+      date: '2026-10-04',
+      title: 'Scan for Auto button + Live Focus stickyLive fix + AI key helper',
+      items: [
+        'ADDED — Purple Auto button (Scan for Auto) next to refresh; normal Scan stays clean.',
+        'ADDED — Settings: optional “Also run auto after regular Scan”.',
+        'FIXED — Live Focus: stickyLive / score / period variables defined (error gone).',
+        'FIXED — AI Coach / Verdict / Parlay read OpenAI key via getOpenAIKey() (form + saved settings).'
+      ]
+    },
+    {
+      version: '3.4.53',
+      date: '2026-10-04',
+      title: 'Auto-trade status after scan + batch confirm',
+      items: [
+        'FIXED — Meta line shows why auto did nothing: Auto off / 0 candidates / cancelled / N ok.',
+        'FIXED — One batch confirm for all auto picks instead of silent no-ops.',
+        'FIXED — Save settings confirms Auto ON/OFF and mode.'
+      ]
+    },
     {
       version: '3.4.52',
       date: '2026-10-04',
@@ -2948,6 +3029,13 @@
 
   function settings() {
     try { return JSON.parse(localStorage.getItem('bb_settings') || '{}'); } catch (e) { return {}; }
+  }
+
+  function getOpenAIKey() {
+    var st = settings();
+    var fromForm = ($('openai') && $('openai').value) ? String($('openai').value).trim() : '';
+    var k = fromForm || st.openai || st.openaiKey || st.openAiKey || '';
+    return String(k || '').trim();
   }
 
   function paintSports() {
@@ -4151,29 +4239,78 @@
   /** After scan: fully auto if enabled */
   async function runAutoTradeOnGames(list) {
     var st = settings();
-    if (!st.pmAutoEnabled) return;
+    try {
+      if ($('pm-auto-enabled')) st.pmAutoEnabled = !!$('pm-auto-enabled').checked;
+      if ($('pm-auto-mode')) st.pmAutoMode = $('pm-auto-mode').value || st.pmAutoMode;
+      if ($('pm-auto-confirm')) st.pmAutoConfirm = !!$('pm-auto-confirm').checked;
+      if ($('pm-auto-min-rank')) st.pmAutoMinRank = $('pm-auto-min-rank').value || st.pmAutoMinRank;
+      if ($('pm-auto-max-price')) st.pmAutoMaxPrice = Number($('pm-auto-max-price').value) || st.pmAutoMaxPrice;
+      if ($('pm-auto-min-edge')) st.pmAutoMinEdge = Number($('pm-auto-min-edge').value) || st.pmAutoMinEdge;
+    } catch (eR) {}
+
+    function status(msg) {
+      try {
+        if ($('meta')) $('meta').textContent = ($('meta').textContent || '') + ' · ' + msg;
+      } catch (e) {}
+      try { console.log('[auto-trade]', msg); } catch (e2) {}
+    }
+
+    if (!st.pmAutoEnabled) {
+      status('Auto off (enable Fully auto on scan + Save)');
+      return;
+    }
+
     list = list || [];
-    var n = 0, fails = 0;
-    for (var i = 0; i < list.length && n < 20; i++) {
+    var minR = st.pmAutoMinRank || 'elite';
+    var minEdge = Number(st.pmAutoMinEdge) || 0;
+    var maxPx = Number(st.pmAutoMaxPrice) || 99;
+    var candidates = [];
+    for (var i = 0; i < list.length; i++) {
       var g = list[i];
       if (!g) continue;
-      // Fully auto: skip confirm only if user turned confirm OFF
-      var r = await placeBet(g, {
+      var rank = String(g.rank || '').toLowerCase();
+      if (minR === 'elite' && rank !== 'elite' && rank.indexOf('super') < 0) continue;
+      if (minR === 'super' && rank.indexOf('super') < 0) continue;
+      if (minR === 'good' && rank !== 'good' && rank !== 'elite' && rank.indexOf('super') < 0) continue;
+      var edge = g.probability_edge != null ? Number(g.probability_edge) : (g.netEdge != null ? Number(g.netEdge) : null);
+      if (edge != null && edge < minEdge) continue;
+      var mk01 = g.market_probability;
+      if (mk01 != null && mk01 > 1) mk01 = mk01 / 100;
+      var cents = mk01 != null ? mk01 * 100 : null;
+      if (cents != null && cents > maxPx) continue;
+      candidates.push(g);
+    }
+
+    if (!candidates.length) {
+      status('Auto on but 0 candidates (rank/edge/price filters)');
+      return;
+    }
+
+    // One batch confirm for fully auto (avoids silent no-ops)
+    if (st.pmAutoConfirm !== false) {
+      var names = candidates.slice(0, 8).map(function (x) { return x.modelPick || x.title || '?'; }).join('\n• ');
+      var ok = confirm(
+        'AUTO (' + (st.pmAutoMode || 'dry-run') + '): ' + candidates.length + ' pick(s)\n\n• ' + names +
+        (candidates.length > 8 ? '\n…' : '') +
+        '\n\nOK to run all?'
+      );
+      if (!ok) {
+        status('Auto cancelled');
+        return;
+      }
+    }
+
+    var n = 0, fails = 0;
+    for (var j = 0; j < candidates.length && n < 20; j++) {
+      var r = await placeBet(candidates[j], {
         manual: false,
         silent: true,
-        skipConfirm: st.pmAutoConfirm === false
+        skipConfirm: true
       });
       if (r && r.ok) n++;
-      else if (r && !r.skipped) fails++;
+      else fails++;
     }
-    if (n > 0 || fails > 0) {
-      try {
-        if ($('meta')) {
-          var prev = $('meta').textContent || '';
-          $('meta').textContent = prev + ' · Auto ' + (st.pmAutoMode || '') + ': ' + n + ' ok' + (fails ? (', ' + fails + ' fail') : '');
-        }
-      } catch (e) {}
-    }
+    status('Auto ' + (st.pmAutoMode || '') + ': ' + n + ' ok' + (fails ? (', ' + fails + ' fail') : '') + ' / ' + candidates.length + ' candidates');
   }
 
   function bindCards(root, list) {
@@ -4355,7 +4492,7 @@
       var r = await fetch('/api/ai?action=verdict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ apiKey: st.openai, game: payload })
+        body: JSON.stringify({ apiKey: getOpenAIKey(), game: payload })
       });
       var d = await r.json();
       if (!d.ok) {
@@ -4404,7 +4541,7 @@
       var r = await fetch('/api/ai?action=research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ apiKey: st.openai, game: payload })
+        body: JSON.stringify({ apiKey: getOpenAIKey(), game: payload })
       });
       var d = await r.json();
       if (!d.ok) {
@@ -5379,7 +5516,7 @@
     updateOpenBreakdownUI();
     if ($('coach-ai') && $('coach-ai').checked) {
       var st = settings();
-      var oai = (st.openai || st.openaiKey || ($('openai') && $('openai').value) || '').trim();
+      var oai = getOpenAIKey();
       if (!oai) {
         out.innerHTML += '<div class="text-bb-orange mt-1">AI coach: add OpenAI key in Settings and click Save.</div>';
         return;
@@ -5390,7 +5527,7 @@
         var r = await fetch('/api/tools', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'openai', openaiKey: oai, prompt: prompt, max_tokens: 350 })
+          body: JSON.stringify({ action: 'openai', openaiKey: getOpenAIKey(), prompt: prompt, max_tokens: 350 })
         });
         var d = await r.json();
         var text = (d && (d.text || d.reply || d.content)) || (d.error ? ('AI error: ' + d.error) : 'No AI reply');
@@ -5893,7 +6030,10 @@
       renderSlate();
       trackElitePicks(games);
       maybeAutoDiscordElite(games);
-      try { runAutoTradeOnGames(games); } catch (eAuto) { console.warn('auto-trade', eAuto); }
+      try {
+        var _stA = settings();
+        if (_stA.pmAutoOnRegular && _stA.pmAutoEnabled) runAutoTradeOnGames(games);
+      } catch (eAuto) { console.warn('auto-trade', eAuto); }
       try { updateDeskStats(); renderLineShop(); } catch (e) {}
     } catch (e) {
       console.error(e);
@@ -6010,10 +6150,13 @@
       { id: 'total_2h', label: '2H O/U' }
     ],
     nba: [
-      { id: 'all', label: 'All (ML + every O/U)' },
+      { id: 'all', label: 'All (ML + every O/U + spreads)' },
       { id: 'moneyline', label: 'Moneyline' },
+      { id: 'spread', label: 'Spreads' },
       { id: 'total', label: 'Full game O/U' },
-      { id: 'total_1h', label: '1H O/U' }
+      { id: 'total_1h', label: '1H O/U' },
+      { id: 'team_total_fg', label: 'Team totals' },
+      { id: 'player_props', label: 'Player props' }
     ],
     cbb: [
       { id: 'all', label: 'All (ML + every O/U)' },
@@ -7015,8 +7158,8 @@ function renderSlate() {
     }
     if (out) out.textContent = 'Built ' + picked.length + '-leg slip from top ranked independent events. Running AI ticket note…';
     var st = settings();
-    if (!st.openai) {
-      if (out) out.textContent = 'Slip built (' + picked.length + ' legs). Add OpenAI key for AI parlay write-up. Legs are on the slip — run AI Verdict legs when ready.';
+    if (!getOpenAIKey()) {
+      if (out) out.textContent = 'Slip built (' + picked.length + ' legs). Add OpenAI key in Settings + Save for AI parlay write-up. Legs are on the slip — run AI Verdict when ready.';
       return;
     }
     try {
@@ -7043,9 +7186,10 @@ function renderSlate() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          apiKey: st.openai,
+          apiKey: getOpenAIKey(),
           game: payload,
-          parlayMode: true
+          parlayMode: true,
+          systemHint: 'You are a sharp sports betting analyst. For this parlay: (1) list each leg with market vs model, (2) correlation risk (same game / same side of total), (3) pass or play with one clear reason, (4) never invent injuries or scores.'
         })
       });
       var d = await r.json();
@@ -7073,7 +7217,7 @@ function renderSlate() {
       return;
     }
     var st = settings();
-    if (!st.openai) {
+    if (!getOpenAIKey()) {
       if (out) out.textContent = 'Add OpenAI key in Settings for leg verdicts.';
       return;
     }
@@ -7086,7 +7230,7 @@ function renderSlate() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            apiKey: st.openai,
+            apiKey: getOpenAIKey(),
             game: {
               marketType: x.marketType || 'moneyline',
               league: x.league,
@@ -7481,6 +7625,24 @@ function renderSlate() {
         '</div>' +
       '</div>';
 
+    var stickyLive = !!(g.live || g.isLive || (g.liveAnalysis && g.liveAnalysis.live) || (la && la.live));
+    var stickyScore = '';
+    try {
+      if (g.homeScore != null && g.awayScore != null) stickyScore = g.awayScore + '–' + g.homeScore;
+      else if (g.score) stickyScore = String(g.score);
+      else if (st && (st.homeScore != null || st.awayScore != null)) stickyScore = (st.awayScore != null ? st.awayScore : '—') + '–' + (st.homeScore != null ? st.homeScore : '—');
+      else if (la && la.score) stickyScore = String(la.score);
+    } catch (eSc) {}
+    var stickyPer = '';
+    try {
+      stickyPer = g.period || g.periodLabel || (st && st.period) || (la && (la.period || la.clockLabel)) || '';
+      stickyPer = String(stickyPer || '');
+    } catch (ePe) { stickyPer = ''; }
+    var stickyClock = '';
+    try {
+      stickyClock = g.clock || g.displayClock || (st && st.clock) || (la && la.clock) || '';
+      stickyClock = String(stickyClock || '');
+    } catch (eCl) { stickyClock = ''; }
     var stickyHead = '<div class="live-sticky-head">' +
       '<div class="flex items-center justify-between gap-2">' +
         '<div class="min-w-0">' +
@@ -7488,7 +7650,7 @@ function renderSlate() {
           '<p class="text-sm font-semibold text-white m-0">' +
             (stickyLive ? '<span class="text-bb-red">LIVE</span> · ' : '') +
             (stickyScore ? stickyScore + ' · ' : '') +
-            (stickyPer || '—') +
+            (stickyPer || (stickyLive ? 'In progress' : 'Pregame')) +
             (stickyClock ? ' · ' + stickyClock : '') +
           '</p>' +
         '</div>' +
@@ -7734,6 +7896,21 @@ function renderSlate() {
   };
 
   $('btn-load').onclick = loadGames;
+  if ($('btn-scan-auto')) $('btn-scan-auto').onclick = async function () {
+    var st = settings();
+    if ($('pm-auto-enabled')) st.pmAutoEnabled = !!$('pm-auto-enabled').checked;
+    if (!st.pmAutoEnabled) {
+      alert('Turn on “Enable auto pipeline” in Settings → Auto-trade, then Save.');
+      return;
+    }
+    try {
+      if ($('meta')) $('meta').textContent = 'Scan for Auto…';
+      await loadGames();
+      await runAutoTradeOnGames(games || []);
+    } catch (e) {
+      alert('Scan for Auto: ' + (e.message || e));
+    }
+  };
   $('btn-snap').onclick = async function () {
     try {
       var r = await fetch('/api/tools?action=snapshot');
@@ -7742,26 +7919,20 @@ function renderSlate() {
     } catch (e) { alert(String(e.message || e)); }
   };
   $('btn-save').onclick = function () {
+    var _autoOn = !!($('pm-auto-enabled') && $('pm-auto-enabled').checked);
+    var _mode = ($('pm-auto-mode') && $('pm-auto-mode').value) || 'dry-run';
     localStorage.setItem('bb_settings', JSON.stringify({
+
       webhook: ($('webhook') && $('webhook').value || '').trim(),
       webhook2: (($('webhook-2') && $('webhook-2').value) || '').trim(),
       webhookSuper: (($('webhook-super') && $('webhook-super').value) || '').trim(),
       webhookPlaced: ($('webhook-placed') && $('webhook-placed').value) || '',
       webhookWon: ($('webhook-won') && $('webhook-won').value) || '',
-      pmAutoEnabled: false,
-      pmAutoConfirm: true,
-      pmAutoMinRank: ($('pm-auto-min-rank') && $('pm-auto-min-rank').value) || 'elite',
-      pmAutoMarkets: ($('pm-auto-markets') && $('pm-auto-markets').value) || 'ml',
-      pmAutoMaxUnits: ($('pm-auto-max-units') && $('pm-auto-max-units').value) || '0.5',
-      pmAutoMaxDaily: ($('pm-auto-max-daily') && $('pm-auto-max-daily').value) || '3',
-      pmAutoMaxPrice: ($('pm-auto-max-price') && $('pm-auto-max-price').value) || '75',
-      pmAutoMinEdge: ($('pm-auto-min-edge') && $('pm-auto-min-edge').value) || '3',
-      // API secrets intentionally not stored until feature is live
-
       webhookLost: ($('webhook-lost') && $('webhook-lost').value) || '',
       openai: $('openai').value || '',
       pmAutoMode: ($('pm-auto-mode') && $('pm-auto-mode').value) || 'dry-run',
       pmAutoEnabled: !!($('pm-auto-enabled') && $('pm-auto-enabled').checked),
+      pmAutoOnRegular: !!($('pm-auto-on-regular') && $('pm-auto-on-regular').checked),
       pmAutoConfirm: !($('pm-auto-confirm') && !$('pm-auto-confirm').checked),
       pmAutoMinRank: ($('pm-auto-min-rank') && $('pm-auto-min-rank').value) || 'elite',
       pmAutoUnits: Number(($('pm-auto-units') && $('pm-auto-units').value) || 1) || 1,
@@ -7825,6 +7996,7 @@ function renderSlate() {
   if ($('openai')) $('openai').value = st.openai || '';
   if ($('pm-auto-mode')) $('pm-auto-mode').value = st.pmAutoMode || (st.pmAutoDry === false ? 'live' : 'dry-run');
   if ($('pm-auto-enabled')) $('pm-auto-enabled').checked = !!st.pmAutoEnabled;
+  if ($('pm-auto-on-regular')) $('pm-auto-on-regular').checked = !!st.pmAutoOnRegular;
   if ($('pm-auto-confirm')) $('pm-auto-confirm').checked = st.pmAutoConfirm !== false;
   if ($('pm-auto-min-rank') && st.pmAutoMinRank) $('pm-auto-min-rank').value = st.pmAutoMinRank;
   if ($('pm-auto-units') && st.pmAutoUnits != null) $('pm-auto-units').value = st.pmAutoUnits;

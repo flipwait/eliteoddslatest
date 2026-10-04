@@ -217,6 +217,13 @@ function classifyMarket(m) {
   if (/rebounds|assists|points scored by|batter|pitcher|player/.test(blob))
     return 'player_prop';
 
+  // NBA / WNBA style player props
+  if (/\bpoints\b|\bpts\b/.test(blob) && /player|over|under|prop/.test(blob)) return 'player_pts';
+  if (/\brebounds?\b|\brebs?\b/.test(blob)) return 'player_reb';
+  if (/\bassists?\b/.test(blob) && !/pass(?:ing)?/.test(blob)) return 'player_ast';
+  if (/pts\s*\+\s*reb|points\s*\+\s*rebound|\bpra\b|pts\+reb\+ast/.test(blob)) return 'player_pra';
+  if (/three.?pointers?|3\s*-?pointers?|made threes|threes made/.test(blob)) return 'player_threes';
+
   return 'prop';
 }
 
@@ -535,6 +542,11 @@ function matchesType(type, marketType) {
   if (marketType === 'player_receptions') return type === 'player_receptions' || type === 'player_prop';
   if (marketType === 'player_atd') return type === 'player_atd' || type === 'player_prop';
   if (marketType === 'moneyline_1h') return type === 'moneyline_1h';
+  if (marketType === 'player_pts') return type === 'player_pts' || type === 'player_prop';
+  if (marketType === 'player_reb') return type === 'player_reb' || type === 'player_prop';
+  if (marketType === 'player_ast') return type === 'player_ast' || type === 'player_prop';
+  if (marketType === 'player_pra') return type === 'player_pra' || type === 'player_prop';
+  if (marketType === 'player_threes') return type === 'player_threes' || type === 'player_prop';
   if (marketType === 'player_props') return String(type).startsWith('player_') || String(type).startsWith('pitcher_') || type === 'player_prop' || type === 'prop';
   if (marketType === 'team_props') return type === 'team_prop';
   if (marketType === 'game_props') return type === 'game_prop';
