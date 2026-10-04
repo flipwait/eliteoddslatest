@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.51</title>
+  <title>EliteOdds v3.4.52</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.51</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.52</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1544,7 +1544,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.51</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.52</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1928,8 +1928,18 @@
   };
 
   
-  var APP_VERSION = '3.4.51';
+  var APP_VERSION = '3.4.52';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.52',
+      date: '2026-10-04',
+      title: 'Auto-trade clearer errors (why Place failed)',
+      items: [
+        'FIXED — Place/auto now explains skips: daily cap, max price ¢, missing key, missing slug, API errors.',
+        'FIXED — Reads API keys from Settings fields even mid-session; dry-run works without keys.',
+        'FIXED — Live fails with tip to use Paper/Dry-run if venue rejects the key.'
+      ]
+    },
     {
       version: '3.4.51',
       date: '2026-10-04',
@@ -4009,46 +4019,84 @@
   async function placeBet(g, opts) {
     opts = opts || {};
     var st = settings();
+    // Always re-read live form fields if present (so Save is not required mid-session)
+    try {
+      if ($('pm-auto-mode')) st.pmAutoMode = $('pm-auto-mode').value || st.pmAutoMode;
+      if ($('pm-api-key') && $('pm-api-key').value) st.pmApiKey = $('pm-api-key').value.trim();
+      if ($('pm-api-secret') && $('pm-api-secret').value) st.pmApiSecret = $('pm-api-secret').value.trim();
+      if ($('pm-api-pass') && $('pm-api-pass').value) st.pmApiPass = $('pm-api-pass').value.trim();
+      if ($('pm-auto-units')) st.pmAutoUnits = Number($('pm-auto-units').value) || st.pmAutoUnits;
+      if ($('pm-auto-max-daily')) st.pmAutoMaxDaily = $('pm-auto-max-daily').value;
+      if ($('pm-auto-max-price')) st.pmAutoMaxPrice = Number($('pm-auto-max-price').value);
+      if ($('pm-auto-min-edge')) st.pmAutoMinEdge = Number($('pm-auto-min-edge').value);
+      if ($('unit-size') && $('unit-size').value) st.unitSize = Number($('unit-size').value) || st.unitSize;
+    } catch (eR) {}
+
     var mode = st.pmAutoMode || 'dry-run';
     if (opts.forceMode) mode = opts.forceMode;
     var units = Number(st.pmAutoUnits) || 1;
     var unitSize = Number(st.unitSize) || 5;
+    if (!(unitSize > 0)) unitSize = 5;
     var maxDailyRaw = st.pmAutoMaxDaily;
-    var unlimited = String(maxDailyRaw) === 'unlimited' || maxDailyRaw === '' || maxDailyRaw == null;
+    var unlimited = String(maxDailyRaw) === 'unlimited';
     var maxDaily = unlimited ? Infinity : (Number(maxDailyRaw) || 3);
     var used = autoTradeDailyUsed();
     if (!unlimited && used + units > maxDaily + 1e-9) {
-      if (!opts.silent) alert('Daily unit cap reached (' + used + '/' + maxDaily + '). Set Unlimited or wait until tomorrow.');
-      return { ok: false, skipped: true };
+      if (!opts.silent) alert('Daily unit cap: ' + used + '/' + maxDaily + ' used. Raise max daily or choose Unlimited.');
+      return { ok: false, skipped: true, reason: 'daily_cap' };
     }
     var rank = String(g.rank || '').toLowerCase();
     var minR = st.pmAutoMinRank || 'elite';
     if (!opts.manual) {
-      if (minR === 'elite' && rank !== 'elite' && rank.indexOf('super') < 0) return { ok: false };
-      if (minR === 'super' && rank.indexOf('super') < 0) return { ok: false };
-      if (minR === 'good' && rank !== 'good' && rank !== 'elite' && rank.indexOf('super') < 0) return { ok: false };
+      if (minR === 'elite' && rank !== 'elite' && rank.indexOf('super') < 0)
+        return { ok: false, skipped: true, reason: 'rank' };
+      if (minR === 'super' && rank.indexOf('super') < 0)
+        return { ok: false, skipped: true, reason: 'rank' };
+      if (minR === 'good' && rank !== 'good' && rank !== 'elite' && rank.indexOf('super') < 0)
+        return { ok: false, skipped: true, reason: 'rank' };
     }
     var edge = g.probability_edge != null ? Number(g.probability_edge) : (g.netEdge != null ? Number(g.netEdge) : null);
     if (!opts.manual && edge != null && edge < (Number(st.pmAutoMinEdge) || 0)) {
-      if (!opts.silent) alert('Edge ' + edge + 'pp below min');
-      return { ok: false };
+      if (!opts.silent) alert('Skipped: edge ' + edge + 'pp < min ' + st.pmAutoMinEdge + 'pp');
+      return { ok: false, skipped: true, reason: 'edge' };
     }
+    // Max price check client-side (market as ¢)
+    var mk01 = g.market_probability;
+    if (mk01 != null && mk01 > 1) mk01 = mk01 / 100;
+    var cents = mk01 != null ? mk01 * 100 : null;
+    var maxPx = Number(st.pmAutoMaxPrice);
+    if (!(maxPx > 0)) maxPx = 99;
+    if (!opts.manual && cents != null && cents > maxPx) {
+      if (!opts.silent) alert('Skipped: price ~' + Math.round(cents) + '¢ > max ' + maxPx + '¢ (raise Max price in Settings)');
+      return { ok: false, skipped: true, reason: 'price' };
+    }
+
     var needConfirm = st.pmAutoConfirm !== false;
     if (opts.manual) needConfirm = true;
     if (opts.skipConfirm) needConfirm = false;
     if (needConfirm) {
-      var mk = g.market_probability;
-      if (mk != null && mk <= 1) mk = Math.round(mk * 1000) / 10;
+      var mk = cents != null ? Math.round(cents * 10) / 10 : null;
       var tag = mode === 'live' ? '[LIVE]' : mode === 'paper' ? '[PAPER]' : '[DRY RUN]';
-      var msg = tag + ' ' + units + 'u ($' + (units * unitSize) + ') on ' + (g.modelPick || '?') +
+      var msg = tag + ' ' + units + 'u ($' + (Math.round(units * unitSize * 100) / 100) + ') on ' + (g.modelPick || '?') +
         '\n' + (g.eventTitle || g.title || '') +
-        '\nMkt ~' + (mk != null ? mk + '%' : '?') + ' · Rank ' + (g.rank || '') +
+        '\nMkt ~' + (mk != null ? mk + '¢' : '?') + ' · Rank ' + (g.rank || '') +
         '\nMode: ' + mode +
-        (mode === 'dry-run' ? '\n\nNo order, no paper.' : '') +
-        (mode === 'paper' ? '\n\nPaper fill only — no exchange order.' : '') +
-        (mode === 'live' ? '\n\nREAL order path — money can move if keys work.' : '');
-      if (!confirm(msg)) return { ok: false };
+        (mode === 'dry-run' ? '\n\nSafe: no order, no paper.' : '') +
+        (mode === 'paper' ? '\n\nPaper fill only.' : '') +
+        (mode === 'live' ? '\n\nREAL order if API accepts keys.' : '');
+      if (!confirm(msg)) return { ok: false, skipped: true, reason: 'cancelled' };
     }
+
+    var slug = g.marketSlug || g.slug || '';
+    if (mode === 'live' && !slug && !(g.ticker || g.kalshiTicker)) {
+      if (!opts.silent) alert('No market slug/ticker on this card — open Trade manually. Auto needs a slug.');
+      return { ok: false, reason: 'no_slug' };
+    }
+    if (mode === 'live' && !(st.pmApiKey || '').trim()) {
+      if (!opts.silent) alert('Live mode needs API key in Settings → Auto-trade. Save settings, or switch to Dry-run / Paper.');
+      return { ok: false, reason: 'no_key' };
+    }
+
     try {
       var r = await fetch('/api/trade', {
         method: 'POST',
@@ -4058,23 +4106,27 @@
           venue: g.venue || g.source || 'polymarket',
           pick: g.modelPick,
           title: g.eventTitle || g.title,
-          slug: g.marketSlug || g.slug,
-          ticker: g.ticker || g.kalshiTicker || g.marketSlug || g.slug,
+          slug: slug,
+          ticker: g.ticker || g.kalshiTicker || slug,
           rank: g.rank,
           side: g.side || 'YES',
           market_probability: g.market_probability,
           model_probability: g.model_probability,
           units: units,
           unitSize: unitSize,
-          maxPriceCents: st.pmAutoMaxPrice,
+          maxPriceCents: maxPx,
           minEdgePp: st.pmAutoMinEdge,
           apiKey: st.pmApiKey,
           apiSecret: st.pmApiSecret,
           apiPass: st.pmApiPass
         })
       });
-      var d = await r.json();
-      if (d.ok) {
+      var d = null;
+      try { d = await r.json(); } catch (eJ) {
+        if (!opts.silent) alert('Trade API bad response (' + r.status + '). Redeploy so /api/trade exists.');
+        return { ok: false, reason: 'bad_json' };
+      }
+      if (d && d.ok) {
         autoTradeDailyAdd(units);
         if (mode === 'paper' || mode === 'live') {
           try { logBet(g); } catch (eL) {}
@@ -4082,10 +4134,16 @@
         if (!opts.silent) alert(d.message || (mode + ' OK'));
         return d;
       }
-      if (!opts.silent) alert((d.skipped ? 'Skipped: ' : 'Trade: ') + (d.reason || d.error || 'failed'));
-      return d;
+      var err = (d && (d.reason || d.error)) || ('HTTP ' + r.status);
+      if (!opts.silent) {
+        var extra = '';
+        if (d && d.hint) extra = '\n\n' + d.hint;
+        if (mode === 'live') extra += '\n\nTip: switch mode to Paper or Dry-run to verify flow; Live needs a trading-capable key.';
+        alert((d && d.skipped ? 'Skipped: ' : 'Trade failed: ') + err + extra);
+      }
+      return d || { ok: false, error: err };
     } catch (e) {
-      if (!opts.silent) alert('Trade error: ' + (e.message || e));
+      if (!opts.silent) alert('Trade network error: ' + (e.message || e) + '\nIs /api/trade deployed on Vercel?');
       return { ok: false, error: String(e.message || e) };
     }
   }
@@ -4095,17 +4153,25 @@
     var st = settings();
     if (!st.pmAutoEnabled) return;
     list = list || [];
-    var n = 0;
-    for (var i = 0; i < list.length && n < 15; i++) {
+    var n = 0, fails = 0;
+    for (var i = 0; i < list.length && n < 20; i++) {
       var g = list[i];
       if (!g) continue;
-      var r = await placeBet(g, { manual: false, silent: true, skipConfirm: st.pmAutoConfirm === false });
+      // Fully auto: skip confirm only if user turned confirm OFF
+      var r = await placeBet(g, {
+        manual: false,
+        silent: true,
+        skipConfirm: st.pmAutoConfirm === false
+      });
       if (r && r.ok) n++;
+      else if (r && !r.skipped) fails++;
     }
-    if (n > 0) {
+    if (n > 0 || fails > 0) {
       try {
-        var el = document.getElementById('scan-status') || document.getElementById('games-status');
-        if (el) el.textContent = 'Auto-trade: ' + n + ' action(s) (' + (st.pmAutoMode || 'dry-run') + ')';
+        if ($('meta')) {
+          var prev = $('meta').textContent || '';
+          $('meta').textContent = prev + ' · Auto ' + (st.pmAutoMode || '') + ': ' + n + ' ok' + (fails ? (', ' + fails + ' fail') : '');
+        }
       } catch (e) {}
     }
   }
