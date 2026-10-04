@@ -1,5 +1,6 @@
 const { finalResultForEvent, pickWonMoneyline, pickWonTotal } = require('../lib/espn');
 const { settleMlbSpecial, isNrfiType, isF5Type } = require('../lib/mlb-settle');
+const { settleEsportsSpecial, isEsportsLeague } = require('../lib/esports-settle');
 
 function isMoneylineType(mt) {
   const t = String(mt || '').toLowerCase();
@@ -35,6 +36,7 @@ module.exports = async function handler(req, res) {
     }
     body = body || {};
     const picks = Array.isArray(body.picks) ? body.picks.slice(0, 50) : [];
+    const pandascoreToken = (body.pandascoreToken || body.pandascore || process.env.PANDASCORE_TOKEN || '').trim();
     const out = [];
 
     for (const p of picks) {
@@ -43,6 +45,21 @@ module.exports = async function handler(req, res) {
       const pick = p.pick || p.modelPick || '';
       const mt = String(p.marketType || 'moneyline').toLowerCase();
       const totalLine = p.totalLine != null ? p.totalLine : null;
+
+      // Esports series / match winner
+      if (isEsportsLeague(league)) {
+        try {
+          out.push(await settleEsportsSpecial(p, { pandascoreToken }));
+        } catch (e) {
+          out.push({
+            key: p.key,
+            completed: false,
+            error: e.message || 'esports settle failed',
+            kind: 'esports-ml',
+          });
+        }
+        continue;
+      }
 
       if (isNrfiType(mt, pick) || isF5Type(mt, pick)) {
         try {

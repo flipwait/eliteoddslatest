@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.42</title>
+  <title>EliteOdds v3.4.47</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.42</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.47</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -976,6 +976,10 @@
                 <h2>Calendar</h2>
                 <p class="text-[10px] text-bb-muted">Slate · paper · replay by day</p>
               </div>
+              <div class="flex flex-col gap-1 items-end">
+                <button type="button" id="cal-share-month" class="text-[10px] px-2.5 py-1.5 rounded-md border border-violet-400/45 text-violet-200 font-medium">Share month image 📅</button>
+                <button type="button" id="cal-share-week" class="text-[10px] px-2.5 py-1.5 rounded-md border border-bb-border text-bb-muted">Share week image</button>
+              </div>
             </div>
             <div class="cal-month-nav">
               <button type="button" id="cal-prev" aria-label="Previous month">‹</button>
@@ -999,6 +1003,11 @@
                 <div>Open paper<strong id="cal-st-open">0</strong></div>
                 <div>Super<strong id="cal-st-super">0</strong></div>
                 <div>PnL<strong id="cal-st-pnl">+0u</strong></div>
+              </div>
+              <div class="mt-2 flex flex-wrap gap-1.5">
+                <button type="button" id="cal-share-day" class="text-[10px] px-2.5 py-1.5 rounded-md border border-sky-500/40 text-sky-200 font-medium">Share day scope</button>
+                <button type="button" id="cal-share-wins" class="text-[10px] px-2.5 py-1.5 rounded-md border border-bb-green/45 text-bb-green font-medium">Share day wins ✅</button>
+                <span id="cal-share-wins-hint" class="text-[10px] text-bb-muted self-center"></span>
               </div>
             </div>
             <div class="cal-book-row" id="cal-book-filters">
@@ -1286,7 +1295,7 @@
                 <button type="button" id="elite-week-discord" class="px-2.5 py-1.5 rounded-lg border border-[#5865F2]/40 text-[#5865F2]">Send week → Discord</button>
                 <button type="button" id="elite-refresh" class="px-2.5 py-1.5 rounded-lg border border-bb-border text-bb-muted">Refresh</button>
               </div>
-              <p class="text-[10px] text-bb-muted">Auto-settle: <strong class="text-white">ML + full-game O/U</strong> (ESPN) · <strong class="text-white">NRFI/YRFI + F5</strong> (MLB linescore). Spreads/props manual.</p>
+              <p class="text-[10px] text-bb-muted">Auto-settle: <strong class="text-white">ML + O/U</strong> (ESPN) · <strong class="text-white">NRFI/F5</strong> (MLB) · <strong class="text-white">Esports ML</strong> (PandaScore / OpenDota). Spreads/map props manual.</p>
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 <div class="rounded-xl border border-sky-500/30 bg-sky-500/5 p-2.5 space-y-2">
                   <div class="flex justify-between items-center">
@@ -1396,7 +1405,7 @@
             <label class="block text-xs text-bb-muted mt-3">PandaScore API token (esports form — free tier OK)
               <input id="pandascore" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="Bearer token from pandascore.co dashboard" />
             </label>
-            <p class="text-[10px] text-bb-muted mt-0.5">Unlocks CS2 / LoL / Valorant map L10 + H2H. Dota2 still uses free OpenDota. Optional env: PANDASCORE_TOKEN.</p>
+            <p class="text-[10px] text-bb-muted mt-0.5">Unlocks CS2 / LoL / Valorant map L10 + H2H and auto-settle for esports match winners. Dota2 can settle via free OpenDota. Optional env: PANDASCORE_TOKEN.</p>
             </label>
             <label class="block text-xs">The Odds API key <span class="text-bb-muted">(shortlist only · 20m cache)</span>
               <input id="odds-key" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" />
@@ -1520,7 +1529,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.42</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.47</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1904,8 +1913,58 @@
   };
 
   
-  var APP_VERSION = '3.4.42';
+  var APP_VERSION = '3.4.47';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.47',
+      date: '2026-10-03',
+      title: 'Calendar image share (looks like the grid)',
+      items: [
+        'ADDED — Share month image: PNG of the full month grid with E / o / W / L badges (Discord-ready).',
+        'ADDED — Share week image: visual week strip with counters and pick snippets.',
+        'FALLBACK — Saves PNG if share sheet cannot attach files; text summary still available underneath.'
+      ]
+    },
+    {
+      version: '3.4.46',
+      date: '2026-10-03',
+      title: 'Share full Calendar scope',
+      items: [
+        'ADDED — Share month 📅: full month counters by day (Elites, open, W-L, PnL) as text for Discord.',
+        'ADDED — Share week: 7-day scope with pick snippets and week totals.',
+        'ADDED — Share day scope: full day counters + open/wins/losses list (not only wins).'
+      ]
+    },
+    {
+      version: '3.4.45',
+      date: '2026-10-03',
+      title: 'Calendar Share + Share wins',
+      items: [
+        'ADDED — Share on Calendar board rows and paper Elite rows (same share sheet / copy as Scan).',
+        'ADDED — Share win ✅ on cashed paper picks — formats a win message with final score and units.',
+        'ADDED — Share day wins button in Calendar summary to flex all wins for the selected day.'
+      ]
+    },
+    {
+      version: '3.4.44',
+      date: '2026-10-03',
+      title: 'All Sports board + CFB pick side fix',
+      items: [
+        'FIXED — Sport=All was empty: per-league Elite filter + timeouts. Now fetches all ranks then filters client-side; longer timeouts; soccer bucket.',
+        'FIXED — CFB/NFL form pick could show dog (e.g. MTSU 9.5¢) with home win% (67%). Pick name always follows form home/away; market% maps to that team.',
+        'ADDED — Guard when YES/home mapping is unknown: no fake Elite on deep dogs.'
+      ]
+    },
+    {
+      version: '3.4.43',
+      date: '2026-10-02',
+      title: 'Esports match auto-settle',
+      items: [
+        'ADDED — Esports series/match winner auto-settle via PandaScore finished matches (CS2/LoL/Val/etc.).',
+        'ADDED — Dota2 fallback via free OpenDota when no PandaScore token.',
+        'NOTE — Map 1/2/3, spreads, and totals still settle manually.'
+      ]
+    },
     {
       version: '3.4.42',
       date: '2026-10-02',
@@ -3316,7 +3375,8 @@
       '<div class="verdict-panel hidden text-[11px] text-bb-muted bg-cyan-500/5 border border-cyan-500/20 rounded-lg p-2.5 mt-1 whitespace-pre-wrap max-h-72 overflow-y-auto"></div></article>';
   }
 
-  function buildShareText(g) {
+  function buildShareText(g, opts) {
+    opts = opts || {};
     var venue = (typeof resolveVenue === 'function' ? resolveVenue(g) : '') || String(g.venue || g.source || 'polymarket');
     var isK = String(venue).toLowerCase() === 'kalshi';
     var book = isK ? 'Kalshi' : 'Polymarket';
@@ -3337,18 +3397,503 @@
         when = new Date(g.startTime).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
       } catch (e) { when = ''; }
     }
-    var lines = [
-      '🎯 ' + book + ' · ' + rank,
-      title + (league ? ' (' + league + ')' : ''),
-      'Pick: ' + pick + (mt ? ' · ' + mt : ''),
-      (model != null ? 'Model ' + model + '%' : '') + (market != null ? ' · Mkt ' + market + '%' : '') + (edge != null ? ' · Edge ' + (edge >= 0 ? '+' : '') + edge + 'pp' : ''),
-      when ? ('When: ' + when) : '',
-      'Trade: ' + url
-    ].filter(Boolean);
+    var res = String(g.result || '').toLowerCase();
+    var isWin = opts.asWin || res === 'won' || res === 'win';
+    var lines;
+    if (isWin) {
+      var pnlStr = '';
+      if (g.pnl != null && Number.isFinite(Number(g.pnl))) {
+        var p = Number(g.pnl);
+        pnlStr = (p >= 0 ? '+' : '') + p + 'u';
+      }
+      lines = [
+        '✅ CASHED · ' + book + (rank && rank !== 'PASS' ? ' · ' + rank : ''),
+        title + (league ? ' (' + league + ')' : ''),
+        'Pick: ' + pick + (mt ? ' · ' + mt : ''),
+        (model != null ? 'Model ' + model + '%' : '') + (market != null ? ' · Mkt ' + market + '%' : ''),
+        g.finalScore ? ('Final: ' + g.finalScore) : '',
+        pnlStr ? ('Result: WIN ' + pnlStr) : 'Result: WIN',
+        when ? ('Game: ' + when) : '',
+        'via EliteOdds'
+      ].filter(Boolean);
+    } else {
+      lines = [
+        '🎯 ' + book + ' · ' + rank,
+        title + (league ? ' (' + league + ')' : ''),
+        'Pick: ' + pick + (mt ? ' · ' + mt : ''),
+        (model != null ? 'Model ' + model + '%' : '') + (market != null ? ' · Mkt ' + market + '%' : '') + (edge != null ? ' · Edge ' + (edge >= 0 ? '+' : '') + edge + 'pp' : ''),
+        when ? ('When: ' + when) : '',
+        'Trade: ' + url
+      ].filter(Boolean);
+    }
     return lines.join('\n');
   }
-  async function sharePick(g, btn) {
-    var text = buildShareText(g);
+  function buildDayWinsShareText(list, dayLabel) {
+    list = (list || []).filter(function (e) {
+      var r = String(e.result || '').toLowerCase();
+      return r === 'won' || r === 'win';
+    });
+    if (!list.length) return '';
+    var lines = ['🏆 EliteOdds · Wins' + (dayLabel ? (' · ' + dayLabel) : ''), ''];
+    var units = 0;
+    list.forEach(function (e, i) {
+      var book = String(e.venue || e.source || '').toLowerCase() === 'kalshi' ? 'Kalshi' : 'PM';
+      var pick = String(e.pick || e.modelPick || '—');
+      var title = String(e.title || e.eventTitle || '');
+      var pnl = e.pnl != null ? Number(e.pnl) : null;
+      if (pnl != null && Number.isFinite(pnl)) units += pnl;
+      lines.push((i + 1) + '. ✅ ' + pick + ' · ' + title + ' (' + book + ')' +
+        (e.finalScore ? ' · ' + e.finalScore : '') +
+        (pnl != null && Number.isFinite(pnl) ? ' · ' + (pnl >= 0 ? '+' : '') + pnl + 'u' : ''));
+    });
+    lines.push('');
+    lines.push('Record: ' + list.length + 'W' + (units ? (' · ' + (units >= 0 ? '+' : '') + (Math.round(units * 10) / 10) + 'u') : ''));
+    lines.push('via EliteOdds');
+    return lines.join('\n');
+  }
+
+  function buildCalendarMonthText(y, m, book) {
+    book = book || 'all';
+    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var daysInMonth = new Date(y, m + 1, 0).getDate();
+    var bookLabel = book === 'kalshi' ? 'Kalshi' : book === 'polymarket' ? 'Polymarket' : 'All books';
+    var lines = [
+      '📅 EliteOdds Calendar',
+      months[m] + ' ' + y + ' · ' + bookLabel,
+      ''
+    ];
+    var totE = 0, totOpen = 0, totW = 0, totL = 0, totSe = 0, totPnl = 0;
+    var dayLines = [];
+    for (var d = 1; d <= daysInMonth; d++) {
+      var key = y + '-' + calPad(m + 1) + '-' + calPad(d);
+      var b = calDayBadges(key);
+      // Apply book filter roughly via calItemsForDay
+      var it = calItemsForDay(key, book);
+      var eN = it.elite.length;
+      var open = it.elite.filter(function (e) { return e.result === 'open'; }).length;
+      var won = it.elite.filter(function (e) { return e.result === 'won' || e.result === 'win'; }).length;
+      var lost = it.elite.filter(function (e) { return e.result === 'lost'; }).length;
+      var pnl = 0;
+      it.elite.forEach(function (e) {
+        if (e.result === 'won' || e.result === 'win') pnl += e.pnl != null ? Number(e.pnl) : 1;
+        if (e.result === 'lost') pnl += e.pnl != null ? Number(e.pnl) : -1;
+      });
+      var se = b.se || 0;
+      if (!eN && !se && !open) continue; // skip empty days for readability
+      totE += eN; totOpen += open; totW += won; totL += lost; totSe += se; totPnl += pnl;
+      var dt = new Date(y, m, d);
+      var label = dt.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+      var bits = [];
+      if (eN) bits.push(eN + 'E');
+      if (se) bits.push(se + 'SE');
+      if (open) bits.push(open + ' open');
+      if (won || lost) bits.push(won + 'W-' + lost + 'L');
+      if (pnl) bits.push((pnl >= 0 ? '+' : '') + (Math.round(pnl * 10) / 10) + 'u');
+      dayLines.push(label + ' · ' + bits.join(' · '));
+    }
+    lines.push('MONTH TOTALS');
+    lines.push('Elites ' + totE + ' · Open ' + totOpen + ' · Super ' + totSe);
+    lines.push('Record ' + totW + 'W-' + totL + 'L · PnL ' + (totPnl >= 0 ? '+' : '') + (Math.round(totPnl * 10) / 10) + 'u');
+    lines.push('');
+    if (dayLines.length) {
+      lines.push('BY DAY');
+      dayLines.forEach(function (ln) { lines.push(ln); });
+    } else {
+      lines.push('(No paper/elite activity this month)');
+    }
+    lines.push('');
+    lines.push('via EliteOdds');
+    return lines.join('\n');
+  }
+  function buildCalendarWeekText(anchorKey, book) {
+    book = book || 'all';
+    var base = calParseKey(anchorKey);
+    var start = new Date(base);
+    start.setDate(start.getDate() - start.getDay());
+    var bookLabel = book === 'kalshi' ? 'Kalshi' : book === 'polymarket' ? 'Polymarket' : 'All books';
+    var lines = ['📅 EliteOdds · Week scope', 'Week of ' + start.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) + ' · ' + bookLabel, ''];
+    var totE = 0, totOpen = 0, totW = 0, totL = 0, totPnl = 0;
+    for (var i = 0; i < 7; i++) {
+      var x = new Date(start);
+      x.setDate(start.getDate() + i);
+      var key = calKey(x);
+      var it = calItemsForDay(key, book);
+      var eN = it.elite.length;
+      var open = it.elite.filter(function (e) { return e.result === 'open'; }).length;
+      var won = it.elite.filter(function (e) { return e.result === 'won' || e.result === 'win'; }).length;
+      var lost = it.elite.filter(function (e) { return e.result === 'lost'; }).length;
+      var pnl = 0;
+      it.elite.forEach(function (e) {
+        if (e.result === 'won' || e.result === 'win') pnl += e.pnl != null ? Number(e.pnl) : 1;
+        if (e.result === 'lost') pnl += e.pnl != null ? Number(e.pnl) : -1;
+      });
+      totE += eN; totOpen += open; totW += won; totL += lost; totPnl += pnl;
+      var label = x.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+      var bits = [];
+      if (eN) bits.push(eN + 'E');
+      if (open) bits.push(open + ' open');
+      if (won || lost) bits.push(won + 'W-' + lost + 'L');
+      if (pnl) bits.push((pnl >= 0 ? '+' : '') + (Math.round(pnl * 10) / 10) + 'u');
+      // list picks briefly
+      var pickBits = it.elite.slice(0, 4).map(function (e) {
+        var r = String(e.result || 'open').toUpperCase();
+        return r[0] + ':' + String(e.pick || '—').slice(0, 22);
+      });
+      lines.push(label + (bits.length ? (' · ' + bits.join(' · ')) : ' · —'));
+      if (pickBits.length) lines.push('   ' + pickBits.join(' | '));
+    }
+    lines.push('');
+    lines.push('WEEK TOTALS · Elites ' + totE + ' · Open ' + totOpen + ' · ' + totW + 'W-' + totL + 'L · PnL ' + (totPnl >= 0 ? '+' : '') + (Math.round(totPnl * 10) / 10) + 'u');
+    lines.push('via EliteOdds');
+    return lines.join('\n');
+  }
+  function buildCalendarDayScopeText(key, book) {
+    book = book || 'all';
+    var d = calParseKey(key);
+    var label = d.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+    var bookLabel = book === 'kalshi' ? 'Kalshi' : book === 'polymarket' ? 'Polymarket' : 'All books';
+    var it = calItemsForDay(key, book);
+    var open = it.elite.filter(function (e) { return e.result === 'open'; });
+    var won = it.elite.filter(function (e) { return e.result === 'won' || e.result === 'win'; });
+    var lost = it.elite.filter(function (e) { return e.result === 'lost'; });
+    var pnl = 0;
+    it.elite.forEach(function (e) {
+      if (e.result === 'won' || e.result === 'win') pnl += e.pnl != null ? Number(e.pnl) : 1;
+      if (e.result === 'lost') pnl += e.pnl != null ? Number(e.pnl) : -1;
+    });
+    var lines = [
+      '📅 EliteOdds · Day scope',
+      label + ' · ' + bookLabel,
+      '',
+      'COUNTERS · Elites ' + it.elite.length + ' · Open ' + open.length + ' · ' + won.length + 'W-' + lost.length + 'L · PnL ' + (pnl >= 0 ? '+' : '') + (Math.round(pnl * 10) / 10) + 'u',
+      ''
+    ];
+    function pushSection(title, arr) {
+      if (!arr.length) return;
+      lines.push(title);
+      arr.forEach(function (e, i) {
+        var book2 = String(e.venue || e.source || '').toLowerCase() === 'kalshi' ? 'Kal' : 'PM';
+        var r = String(e.result || 'open').toUpperCase();
+        var p = e.pnl != null && r !== 'OPEN' ? (' · ' + (Number(e.pnl) >= 0 ? '+' : '') + e.pnl + 'u') : '';
+        var sc = e.finalScore ? (' · ' + e.finalScore) : '';
+        lines.push((i + 1) + '. [' + r + '] ' + String(e.pick || '—') + ' · ' + String(e.title || '') + ' (' + book2 + ')' + sc + p);
+      });
+      lines.push('');
+    }
+    pushSection('OPEN', open);
+    pushSection('WINS ✅', won);
+    pushSection('LOSSES', lost);
+    if (!it.elite.length) lines.push('(No paper elites this day)');
+    lines.push('via EliteOdds');
+    return lines.join('\n');
+  }
+
+  function calMonthStats(y, m, book) {
+    book = book || 'all';
+    var daysInMonth = new Date(y, m + 1, 0).getDate();
+    var totE = 0, totOpen = 0, totW = 0, totL = 0, totPnl = 0;
+    var byDay = {};
+    for (var d = 1; d <= daysInMonth; d++) {
+      var key = y + '-' + calPad(m + 1) + '-' + calPad(d);
+      var it = calItemsForDay(key, book);
+      var eN = it.elite.length;
+      var open = it.elite.filter(function (e) { return e.result === 'open'; }).length;
+      var won = it.elite.filter(function (e) { return e.result === 'won' || e.result === 'win'; }).length;
+      var lost = it.elite.filter(function (e) { return e.result === 'lost'; }).length;
+      var pnl = 0;
+      it.elite.forEach(function (e) {
+        if (e.result === 'won' || e.result === 'win') pnl += e.pnl != null ? Number(e.pnl) : 1;
+        if (e.result === 'lost') pnl += e.pnl != null ? Number(e.pnl) : -1;
+      });
+      byDay[key] = { eN: eN, open: open, won: won, lost: lost, pnl: pnl };
+      totE += eN; totOpen += open; totW += won; totL += lost; totPnl += pnl;
+    }
+    return { byDay: byDay, totE: totE, totOpen: totOpen, totW: totW, totL: totL, totPnl: totPnl, daysInMonth: daysInMonth };
+  }
+
+  /** Draw calendar grid image matching the app look (for Discord / share) */
+  function renderCalendarMonthCanvas(y, m, book) {
+    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var stats = calMonthStats(y, m, book);
+    var bookLabel = book === 'kalshi' ? 'Kalshi' : book === 'polymarket' ? 'Polymarket' : 'All books';
+    var W = 720;
+    var cell = 92;
+    var pad = 20;
+    var headerH = 88;
+    var footH = 56;
+    var gridTop = headerH + 28;
+    var first = new Date(y, m, 1);
+    var startPad = first.getDay();
+    var rows = Math.ceil((startPad + stats.daysInMonth) / 7);
+    var H = gridTop + rows * (cell + 8) + footH;
+    var canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    var ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#0b1020';
+    ctx.fillRect(0, 0, W, H);
+    // subtle gradient
+    var g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#12182c');
+    g.addColorStop(1, '#0b1020');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    // Title
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 28px system-ui, -apple-system, sans-serif';
+    ctx.fillText('Calendar', pad, 36);
+    ctx.fillStyle = '#8b9bb4';
+    ctx.font = '13px system-ui, -apple-system, sans-serif';
+    ctx.fillText('Slate · paper · replay by day', pad, 56);
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = 'bold 18px system-ui, -apple-system, sans-serif';
+    var title = months[m] + ' ' + y;
+    var tw = ctx.measureText(title).width;
+    ctx.fillText(title, (W - tw) / 2, 40);
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '12px system-ui, -apple-system, sans-serif';
+    var bl = bookLabel;
+    var blw = ctx.measureText(bl).width;
+    ctx.fillText(bl, (W - blw) / 2, 60);
+
+    // DOW headers
+    var dows = ['SU','MO','TU','WE','TH','FR','SA'];
+    var gridW = 7 * cell + 6 * 8;
+    var gridLeft = (W - gridW) / 2;
+    ctx.fillStyle = '#8b9bb4';
+    ctx.font = '11px system-ui, -apple-system, sans-serif';
+    for (var i = 0; i < 7; i++) {
+      var dx = gridLeft + i * (cell + 8);
+      ctx.fillText(dows[i], dx + cell / 2 - 8, gridTop - 10);
+    }
+
+    var todayKey = calKey(new Date());
+    var dayNum = 1;
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < 7; c++) {
+        var idx = r * 7 + c;
+        var x = gridLeft + c * (cell + 8);
+        var y0 = gridTop + r * (cell + 8);
+        var inMonth = idx >= startPad && dayNum <= stats.daysInMonth;
+        // cell bg
+        ctx.fillStyle = '#141b2e';
+        roundRect(ctx, x, y0, cell, cell, 12);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(148,163,184,0.12)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        if (!inMonth) {
+          // muted trailing/leading from adjacent month — skip numbers for clean share
+          continue;
+        }
+        var key = y + '-' + calPad(m + 1) + '-' + calPad(dayNum);
+        var st = stats.byDay[key] || { eN: 0, open: 0, won: 0, lost: 0, pnl: 0 };
+        if (key === todayKey) {
+          ctx.strokeStyle = 'rgba(167,139,250,0.85)';
+          ctx.lineWidth = 2;
+          roundRect(ctx, x + 1, y0 + 1, cell - 2, cell - 2, 11);
+          ctx.stroke();
+        }
+        // day number
+        ctx.fillStyle = '#f1f5f9';
+        ctx.font = 'bold 15px system-ui, -apple-system, sans-serif';
+        ctx.fillText(String(dayNum), x + 10, y0 + 22);
+
+        // badges
+        var by = y0 + 36;
+        ctx.font = 'bold 11px system-ui, -apple-system, sans-serif';
+        var bx = x + 8;
+        function badge(label, color) {
+          var w = ctx.measureText(label).width + 8;
+          if (bx + w > x + cell - 6) { bx = x + 8; by += 14; }
+          ctx.fillStyle = color.bg;
+          roundRect(ctx, bx, by - 10, w, 13, 4);
+          ctx.fill();
+          ctx.fillStyle = color.fg;
+          ctx.fillText(label, bx + 4, by);
+          bx += w + 3;
+        }
+        if (st.eN) badge(st.eN + 'E', { bg: 'rgba(245,158,11,0.28)', fg: '#fbbf24' });
+        if (st.open) badge(st.open + 'o', { bg: 'rgba(148,163,184,0.22)', fg: '#94a3b8' });
+        if (st.won) badge('W' + st.won, { bg: 'rgba(34,197,94,0.2)', fg: '#4ade80' });
+        if (st.lost) badge('L' + st.lost, { bg: 'rgba(248,113,113,0.2)', fg: '#f87171' });
+
+        dayNum++;
+      }
+    }
+
+    // Footer totals
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '13px system-ui, -apple-system, sans-serif';
+    var foot = 'Elites ' + stats.totE + ' · Open ' + stats.totOpen + ' · ' + stats.totW + 'W-' + stats.totL + 'L · PnL ' +
+      (stats.totPnl >= 0 ? '+' : '') + (Math.round(stats.totPnl * 10) / 10) + 'u';
+    var fw = ctx.measureText(foot).width;
+    ctx.fillText(foot, (W - fw) / 2, H - 28);
+    ctx.fillStyle = '#64748b';
+    ctx.font = '11px system-ui, -apple-system, sans-serif';
+    var via = 'EliteOdds';
+    ctx.fillText(via, (W - ctx.measureText(via).width) / 2, H - 12);
+
+    return canvas;
+  }
+  function roundRect(ctx, x, y, w, h, r) {
+    var rr = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + rr, y);
+    ctx.arcTo(x + w, y, x + w, y + h, rr);
+    ctx.arcTo(x + w, y + h, x, y + h, rr);
+    ctx.arcTo(x, y + h, x, y, rr);
+    ctx.arcTo(x, y, x + w, y, rr);
+    ctx.closePath();
+  }
+  function renderCalendarWeekCanvas(anchorKey, book) {
+    book = book || 'all';
+    var base = calParseKey(anchorKey);
+    var start = new Date(base);
+    start.setDate(start.getDate() - start.getDay());
+    var W = 720;
+    var pad = 20;
+    var cellH = 72;
+    var headerH = 70;
+    var H = headerH + 7 * (cellH + 8) + 40;
+    var canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#0b1020';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
+    ctx.fillText('Week scope', pad, 32);
+    ctx.fillStyle = '#8b9bb4';
+    ctx.font = '13px system-ui, -apple-system, sans-serif';
+    var sub = 'Week of ' + start.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    ctx.fillText(sub, pad, 52);
+
+    var totW = 0, totL = 0, totE = 0, totPnl = 0;
+    for (var i = 0; i < 7; i++) {
+      var x = new Date(start);
+      x.setDate(start.getDate() + i);
+      var key = calKey(x);
+      var it = calItemsForDay(key, book);
+      var eN = it.elite.length;
+      var open = it.elite.filter(function (e) { return e.result === 'open'; }).length;
+      var won = it.elite.filter(function (e) { return e.result === 'won' || e.result === 'win'; }).length;
+      var lost = it.elite.filter(function (e) { return e.result === 'lost'; }).length;
+      var pnl = 0;
+      it.elite.forEach(function (e) {
+        if (e.result === 'won' || e.result === 'win') pnl += e.pnl != null ? Number(e.pnl) : 1;
+        if (e.result === 'lost') pnl += e.pnl != null ? Number(e.pnl) : -1;
+      });
+      totE += eN; totW += won; totL += lost; totPnl += pnl;
+      var y0 = headerH + i * (cellH + 8);
+      ctx.fillStyle = '#141b2e';
+      roundRect(ctx, pad, y0, W - pad * 2, cellH, 12);
+      ctx.fill();
+      ctx.fillStyle = '#f1f5f9';
+      ctx.font = 'bold 15px system-ui, -apple-system, sans-serif';
+      var label = x.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+      ctx.fillText(label, pad + 14, y0 + 26);
+      ctx.font = '12px system-ui, -apple-system, sans-serif';
+      ctx.fillStyle = '#fbbf24';
+      var bits = [];
+      if (eN) bits.push(eN + 'E');
+      if (open) bits.push(open + 'o');
+      if (won) bits.push('W' + won);
+      if (lost) bits.push('L' + lost);
+      ctx.fillText(bits.join('  ') || '—', pad + 14, y0 + 48);
+      ctx.fillStyle = '#94a3b8';
+      var picks = it.elite.slice(0, 3).map(function (e) { return String(e.pick || '').slice(0, 18); }).join(' · ');
+      if (picks) ctx.fillText(picks, pad + 200, y0 + 48);
+    }
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '13px system-ui, -apple-system, sans-serif';
+    var foot = 'Elites ' + totE + ' · ' + totW + 'W-' + totL + 'L · PnL ' + (totPnl >= 0 ? '+' : '') + (Math.round(totPnl * 10) / 10) + 'u';
+    ctx.fillText(foot, pad, H - 14);
+    return canvas;
+  }
+  async function shareCalendarImage(canvas, filename, textFallback, btn) {
+    if (!canvas) return;
+    function flash(msg) {
+      if (!btn) return;
+      var old = btn.textContent;
+      btn.textContent = msg;
+      setTimeout(function () { btn.textContent = old; }, 1800);
+    }
+    var blob = await new Promise(function (resolve) {
+      try { canvas.toBlob(function (b) { resolve(b); }, 'image/png'); }
+      catch (e) { resolve(null); }
+    });
+    if (blob) {
+      var file = new File([blob], filename || 'eliteodds-calendar.png', { type: 'image/png' });
+      try {
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'EliteOdds Calendar',
+            text: textFallback || 'EliteOdds calendar'
+          });
+          flash('Shared');
+          return;
+        }
+      } catch (e) {
+        if (e && (e.name === 'AbortError' || String(e.message || '').toLowerCase().indexOf('abort') >= 0)) return;
+      }
+      // Download fallback (works on desktop + many mobiles)
+      try {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = filename || 'eliteodds-calendar.png';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { try { URL.revokeObjectURL(url); } catch (e2) {} }, 2000);
+        flash('Saved PNG');
+        var h = $('cal-share-wins-hint');
+        if (h) h.textContent = 'Image saved — upload to Discord';
+        return;
+      } catch (e3) {}
+    }
+    // Text fallback
+    if (textFallback) sharePlainText(textFallback, 'EliteOdds Calendar', btn);
+  }
+
+  async function sharePlainText(text, title, btn) {
+    if (!text) return;
+    function flash(msg) {
+      if (!btn) return;
+      var old = btn.textContent;
+      btn.textContent = msg;
+      setTimeout(function () { btn.textContent = old; }, 1600);
+    }
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: title || 'EliteOdds Calendar', text: text });
+        flash('Shared');
+        return;
+      }
+    } catch (e) {
+      if (e && (e.name === 'AbortError' || String(e.message || '').toLowerCase().indexOf('abort') >= 0)) return;
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        flash('Copied');
+        var h = $('cal-share-wins-hint');
+        if (h) h.textContent = 'Copied full calendar text';
+        return;
+      }
+    } catch (e2) {}
+    try { prompt('Copy calendar text for Discord:', text); } catch (e3) { alert(text); }
+  }
+
+  async function sharePick(g, btn, opts) {
+    var text = buildShareText(g, opts);
     var url = (typeof tradeHrefFor === 'function') ? tradeHrefFor(g) : (g.url || '');
     var title = String(g.eventTitle || g.title || 'EliteOdds pick');
     function flash(msg) {
@@ -4340,9 +4885,19 @@
     a.click();
   }
 
-  function isAutoSettleableBet(mt, pick) {
+  function isEsportsLeagueClient(lg) {
+    lg = String(lg || '').toLowerCase();
+    return /esports|lol|cs2|csgo|^cs$|dota|valorant|^val$|cod|^rl$/.test(lg);
+  }
+  function isAutoSettleableBet(mt, pick, league) {
     var t = String(mt || '').toLowerCase();
     var p = String(pick || '').toLowerCase();
+    var lg = String(league || '').toLowerCase();
+    // Esports series/match winner (not map markets)
+    if (isEsportsLeagueClient(lg)) {
+      if (/map_|map\s*[123]|spread|total|handicap/.test(t + ' ' + p)) return false;
+      return true; // match winner / moneyline
+    }
     // MLB NRFI/YRFI + F5: auto via MLB linescore
     if (/nrfi|yrfi/.test(t) || /\bnrfi\b|\byrfi\b|no run first|yes run first/.test(p)) return true;
     if (/f5/.test(t) || /\bf5\b|first\s*5|first five/.test(p)) return true;
@@ -4357,10 +4912,10 @@
   async function settleMlFromEspn(opts) {
     opts = opts || {};
     var elite = eliteLedger().filter(function (e) {
-      return e.result === 'open' && isAutoSettleableBet(e.marketType, e.pick);
+      return e.result === 'open' && isAutoSettleableBet(e.marketType, e.pick, e.league);
     });
     var journal = journalBets().filter(function (b) {
-      return b.result === 'open' && isAutoSettleableBet(b.marketType, b.pick);
+      return b.result === 'open' && isAutoSettleableBet(b.marketType, b.pick, b.league);
     });
     var picks = [];
     elite.forEach(function (e) {
@@ -4404,10 +4959,14 @@
     }
     if (!opts.quiet && !confirm('Settle up to ' + Math.min(40, picks.length) + ' open ML / O/U / NRFI / F5 picks?\n\n' + (futureN ? (futureN + ' future games skipped (not started).\n') : '') + '(Spreads / props stay manual. NRFI/F5 use MLB linescore.)')) return;
     try {
+      var stSettle = settings();
       var r = await fetch('/api/settle-ml', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ picks: picks.slice(0, 40) })
+        body: JSON.stringify({
+          picks: picks.slice(0, 40),
+          pandascoreToken: stSettle.pandascoreToken || stSettle.pandascore || ''
+        })
       });
       var d = await r.json();
       if (!d.ok) throw new Error(d.error || 'settle failed');
@@ -4818,38 +5377,53 @@
 
   /** Per-league fetch when Sport=All — batched so Vercel does not time out empty */
   async function fetchPolyAllLeagues(mt, rankF, minEv, minEdge, minSc, strict, allowMkt) {
-    // Active books first; esports last (heavier / thinner)
-    var leagues = ['mlb', 'nfl', 'nba', 'nhl', 'cfb', 'epl', 'lal', 'bun', 'sea', 'mls', 'cbb', 'wnba', 'ufc', 'mls', 'esports'];
+    // Core sports first (most liquidity). Soccer/esports after.
+    var leagues = ['mlb', 'nfl', 'cfb', 'nba', 'nhl', 'cbb', 'wnba', 'soccer', 'ufc', 'esports'];
     var merged = [];
     var seen = {};
+    var errors = [];
     function addAll(arr) {
       (arr || []).forEach(function (g) {
-        var id = String(g.id || g.slug || '') + '|' + String(g.eventTitle || '') + '|' +
-          String(g.marketType || '') + '|' + String(g.modelPick || '');
+        var id = String(g.id || g.slug || '') + '|' + String(g.eventTitle || g.title || '') + '|' +
+          String(g.marketType || '') + '|' + String(g.modelPick || g.pick || '');
         if (!id || seen[id]) return;
         seen[id] = 1;
         merged.push(g);
       });
     }
-    // Prefer server rank filter when Elite-only so each league returns less data faster
-    var rf = rankF || '';
+    // IMPORTANT: do NOT pass rank=elite to each league call on All Sports.
+    // Empty Elite boards per league + timeouts looked like "nothing loads".
+    // Fetch all ranks from API; client filterGamesClient applies rank.
+    var rfServer = '';
     async function oneLeague(lg) {
-      var d = await fetchJsonTimeout(polyQuery(mt || 'all', rf, minEv, minEdge, minSc, strict, allowMkt, lg), 15000);
-      return (d && d.ok && d.games) ? d.games : [];
+      try {
+        var d = await fetchJsonTimeout(polyQuery(mt || 'all', rfServer, minEv, minEdge, minSc, strict, allowMkt, lg), 22000);
+        if (d && d.games && d.games.length) return d.games;
+        if (d && d.error) errors.push(lg + ': ' + d.error);
+        return [];
+      } catch (e) {
+        errors.push(lg + ': ' + String(e.message || e));
+        return [];
+      }
     }
-    // Batch of 3 to avoid 9 cold starts dying together
-    for (var i = 0; i < leagues.length; i += 3) {
-      var batch = leagues.slice(i, i + 3);
+    // Batch of 4
+    for (var i = 0; i < leagues.length; i += 4) {
+      var batch = leagues.slice(i, i + 4);
       var parts = await Promise.all(batch.map(oneLeague));
       parts.forEach(addAll);
     }
-    // Fallback: single all-sports API if every league came back empty
+    // Fallback: single server all-sports if still empty
     if (!merged.length) {
       try {
-        var rAll = await fetch(polyQuery(mt || 'all', rf, minEv, minEdge, minSc, strict, allowMkt, 'all'));
-        var dAll = await rAll.json();
-        if (dAll && dAll.ok && dAll.games) addAll(dAll.games);
-      } catch (e2) {}
+        var dAll = await fetchJsonTimeout(polyQuery(mt || 'all', rfServer, minEv, minEdge, minSc, strict, allowMkt, 'all'), 25000);
+        if (dAll && dAll.games) addAll(dAll.games);
+        if (dAll && dAll.error) errors.push('all: ' + dAll.error);
+      } catch (e2) {
+        errors.push('all: ' + String(e2.message || e2));
+      }
+    }
+    if (!merged.length && errors.length && typeof console !== 'undefined') {
+      console.warn('fetchPolyAllLeagues empty', errors.slice(0, 6));
     }
     return merged;
   }
@@ -5773,8 +6347,12 @@
     });
     var elite = items.elite;
     var open = elite.filter(function (e) { return e.result === 'open'; }).length;
-    var won = elite.filter(function (e) { return e.result === 'won'; }).length;
+    var wonList = elite.filter(function (e) { return e.result === 'won' || e.result === 'win'; });
+    var won = wonList.length;
     var lost = elite.filter(function (e) { return e.result === 'lost'; }).length;
+    try { window.__calDayWins = wonList; } catch (eW) {}
+    var shareHint = $('cal-share-wins-hint');
+    if (shareHint) shareHint.textContent = won ? (won + ' win' + (won === 1 ? '' : 's') + ' ready') : '';
     var pnl = 0;
     elite.forEach(function (e) {
       if (e.result === 'won') pnl += e.pnl != null ? Number(e.pnl) : 1;
@@ -5826,8 +6404,9 @@
             '<div class="text-right shrink-0 text-[10px]">' +
             '<div class="' + (isK ? 'text-bb-green' : 'text-violet-300') + '">' + (isK ? 'Kalshi' : 'PM') + ' · ' + String(g.rank || 'elite').toUpperCase() + '</div>' +
             '<div class="text-bb-muted">model ' + (mp != null ? mp + '%' : '—') + ' · ' + px + '</div></div></div>' +
-            '<div class="flex gap-1.5 mt-1.5">' +
+            '<div class="flex flex-wrap gap-1.5 mt-1.5">' +
             '<button type="button" class="cal-act-details text-[10px] px-2 py-1 rounded-md border border-bb-border text-bb-muted hover:text-white" data-cal-gid="' + gid + '">Details</button>' +
+            '<button type="button" class="cal-act-share text-[10px] px-2 py-1 rounded-md border border-sky-500/40 text-sky-200" data-cal-gid="' + gid + '">Share</button>' +
             '<a class="text-[10px] px-2 py-1 rounded-md border border-violet-400/40 text-violet-200 hover:bg-violet-500/15" href="' + String(tradeHref).replace(/"/g, '') + '" target="_blank" rel="noopener">Trade</a>' +
             '</div></div>';
         }).join('');
@@ -5858,8 +6437,10 @@
             (e.finalScore ? ' · ' + String(e.finalScore).replace(/</g,'') : '') +
             (e.pnl != null && res !== 'open' ? ' · ' + (e.pnl >= 0 ? '+' : '') + e.pnl + 'u' : '') +
             '</div>' +
-            '<div class="flex gap-1.5 mt-1.5">' +
+            '<div class="flex flex-wrap gap-1.5 mt-1.5">' +
             '<button type="button" class="cal-act-details text-[10px] px-2 py-1 rounded-md border border-bb-border text-bb-muted hover:text-white" data-cal-gid="' + gid2 + '">Details</button>' +
+            '<button type="button" class="cal-act-share text-[10px] px-2 py-1 rounded-md border border-sky-500/40 text-sky-200" data-cal-gid="' + gid2 + '">Share</button>' +
+            (res === 'won' ? ('<button type="button" class="cal-act-share-win text-[10px] px-2 py-1 rounded-md border border-bb-green/50 text-bb-green font-medium" data-cal-gid="' + gid2 + '">Share win ✅</button>') : '') +
             (res === 'open' ? ('<a class="text-[10px] px-2 py-1 rounded-md border border-violet-400/40 text-violet-200" href="' + String(tradeHref2).replace(/"/g,'') + '" target="_blank" rel="noopener">Trade</a>') : '') +
             '</div></div>';
         }).join('');
@@ -6747,22 +7328,68 @@ function renderSlate() {
   });
 
 
-  // Calendar Details → open same Focus/details modal as Scan cards
+  // Calendar Details / Share / Share win
   document.addEventListener('click', function calActDetailsClick(ev) {
     var t = ev.target;
-    if (!t || !t.classList || !t.classList.contains('cal-act-details')) return;
+    if (!t || !t.classList) return;
     var gid = t.getAttribute('data-cal-gid');
-    var g = window.__calGameCache && window.__calGameCache[gid];
-    if (!g) return;
-    // Prefer live board copy if same event still loaded
-    var boardHit = null;
-    (games || []).forEach(function (x) {
-      if (boardHit) return;
-      if (g.url && x.url && g.url === x.url) boardHit = x;
-      else if (String(g.eventTitle || '') && String(g.eventTitle) === String(x.eventTitle || x.title || '') &&
-               String(g.modelPick || '') === String(x.modelPick || '')) boardHit = x;
-    });
-    try { openModal(boardHit || g); } catch (err) { console.warn(err); }
+    var g = gid && window.__calGameCache ? window.__calGameCache[gid] : null;
+
+    if (t.classList.contains('cal-act-details')) {
+      if (!g) return;
+      var boardHit = null;
+      (games || []).forEach(function (x) {
+        if (boardHit) return;
+        if (g.url && x.url && g.url === x.url) boardHit = x;
+        else if (String(g.eventTitle || '') && String(g.eventTitle) === String(x.eventTitle || x.title || '') &&
+                 String(g.modelPick || '') === String(x.modelPick || '')) boardHit = x;
+      });
+      try { openModal(boardHit || g); } catch (err) { console.warn(err); }
+      return;
+    }
+    if (t.classList.contains('cal-act-share') || t.classList.contains('cal-act-share-win')) {
+      if (!g) return;
+      var asWin = t.classList.contains('cal-act-share-win');
+      sharePick(g, t, asWin ? { asWin: true } : {});
+      return;
+    }
+  });
+
+  document.addEventListener('click', function calShareScopeClick(ev) {
+    var t = ev.target;
+    if (!t || !t.id) return;
+    calEnsureView();
+    var book = (calView && calView.book) || 'all';
+    if (t.id === 'cal-share-month') {
+      var textM = buildCalendarMonthText(calView.y, calView.m, book);
+      var canvasM = renderCalendarMonthCanvas(calView.y, calView.m, book);
+      var fnameM = 'eliteodds-calendar-' + calView.y + '-' + calPad(calView.m + 1) + '.png';
+      shareCalendarImage(canvasM, fnameM, textM, t);
+      return;
+    }
+    if (t.id === 'cal-share-week') {
+      var textW = buildCalendarWeekText(calView.selected, book);
+      var canvasW = renderCalendarWeekCanvas(calView.selected, book);
+      shareCalendarImage(canvasW, 'eliteodds-week.png', textW, t);
+      return;
+    }
+    if (t.id === 'cal-share-day') {
+      var textD = buildCalendarDayScopeText(calView.selected, book);
+      sharePlainText(textD, 'EliteOdds Day Scope', t);
+      return;
+    }
+    if (t.id === 'cal-share-wins') {
+      var wins = (window.__calDayWins || []).slice();
+      if (!wins.length) {
+        var hint = $('cal-share-wins-hint');
+        if (hint) hint.textContent = 'No wins this day yet';
+        return;
+      }
+      var label = ($('cal-sum-title') && $('cal-sum-title').textContent) || '';
+      var text = buildDayWinsShareText(wins, label);
+      if (!text) return;
+      sharePlainText(text, 'EliteOdds wins', t);
+    }
   });
 
   document.querySelectorAll('.day-btn').forEach(function (btn) {
