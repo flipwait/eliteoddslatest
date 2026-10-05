@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.58</title>
+  <title>EliteOdds v3.4.59</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.58</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.59</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1429,6 +1429,8 @@
               <p class="text-[10px] text-bb-muted leading-snug">
                 Auto webhook posts <strong class="text-bb-green">✅ placed</strong>, <strong class="text-bb-orange">⏭ declined/skipped</strong>, and <strong class="text-bb-red">❌ errors</strong>.
               </p>
+              <button type="button" id="btn-test-live" class="px-3 py-1.5 rounded-lg border border-violet-400/50 text-violet-200 text-xs bg-violet-500/10">Test live keys (sign + dry probe)</button>
+              <p id="live-test-out" class="text-[10px] text-bb-muted whitespace-pre-wrap hidden"></p>
               <p class="text-[10px] text-bb-muted border border-bb-border rounded-lg px-2 py-1.5 leading-snug">
                 <strong class="text-white">Paper</strong> auto-logs fills to journal/paper · <strong class="text-white">Dry-run</strong> only messages ·
                 <strong class="text-white">Live</strong> hits venue APIs (Kalshi sign / Polymarket US orders). Start Paper or Dry-run first.
@@ -1564,7 +1566,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.58</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.59</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1993,8 +1995,18 @@
   };
 
   
-  var APP_VERSION = '3.4.58';
+  var APP_VERSION = '3.4.59';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.59',
+      date: '2026-10-04',
+      title: 'Live trade body parse + Test live keys button',
+      items: [
+        'FIXED — /api/trade reads JSON body from Vercel request stream (empty body was forcing dry-run defaults).',
+        'ADDED — Settings → Test live keys button (sign probe + clear auth vs slug errors).',
+        'IMPROVED — Live Place always shows full API response text.'
+      ]
+    },
     {
       version: '3.4.58',
       date: '2026-10-04',
@@ -4329,7 +4341,9 @@
             reason: d.message || 'ok'
           });
         } catch (eN) {}
-        if (!opts.silent) alert(d.message || (mode + ' OK'));
+        if (!opts.silent || mode === 'live') {
+          alert((d.message || (mode + ' OK')) + (mode === 'live' && d.orderId ? ('\nOrder: ' + d.orderId) : ''));
+        }
         return d;
       }
       var err = (d && (d.reason || d.error)) || ('HTTP ' + r.status);
@@ -4342,10 +4356,10 @@
           reason: err + (d && d.hint ? ' · ' + d.hint : '')
         });
       } catch (eN2) {}
-      if (!opts.silent) {
+      if (!opts.silent || mode === 'live') {
         var extra = '';
         if (d && d.hint) extra = '\n\n' + d.hint;
-        if (mode === 'live') extra += '\n\nTip: switch mode to Paper or Dry-run to verify flow; Live needs Key ID + Secret.';
+        if (mode === 'live') extra += '\n\nCheck: Mode=Live, Key ID + Secret saved, market slug present.\nRaw: ' + JSON.stringify(d).slice(0, 280);
         alert((d && d.skipped ? 'Skipped: ' : 'Trade failed: ') + err + extra);
       }
       return d || { ok: false, error: err };
@@ -8014,6 +8028,59 @@ function renderSlate() {
     if (d) d.classList.toggle('hidden');
   };
 
+  if ($('btn-test-live')) $('btn-test-live').onclick = async function () {
+    var out = $('live-test-out');
+    if (out) { out.classList.remove('hidden'); out.textContent = 'Testing…'; }
+    var key = ($('pm-api-key') && $('pm-api-key').value || '').trim() || (settings().pmApiKey || '');
+    var secret = ($('pm-api-secret') && $('pm-api-secret').value || '').trim() || (settings().pmApiSecret || '');
+    if (!key || !secret) {
+      var msg = 'Missing Key ID or Secret in Settings. Paste both from polymarket.us/developer and Save.';
+      if (out) out.textContent = msg;
+      alert(msg);
+      return;
+    }
+    try {
+      // Force save keys to localStorage first
+      var st = settings();
+      st.pmApiKey = key; st.pmApiSecret = secret;
+      if ($('pm-auto-mode')) st.pmAutoMode = $('pm-auto-mode').value || st.pmAutoMode;
+      localStorage.setItem('bb_settings', JSON.stringify(st));
+      var r = await fetch('/api/trade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'live',
+          previewOnly: true,
+          venue: 'polymarket',
+          pick: 'TEST',
+          title: 'Live key test',
+          slug: 'test-invalid-slug-probe',
+          market_probability: 0.5,
+          units: 1,
+          unitSize: 1,
+          maxPriceCents: 99,
+          apiKey: key,
+          apiSecret: secret
+        })
+      });
+      var d = await r.json();
+      var text = 'HTTP ' + r.status + '\n' + JSON.stringify(d, null, 2);
+      // 400 on bad slug after auth = keys work; 401 = keys bad; sign fail = secret format
+      if (d && d.error && /Sign failed/i.test(d.error)) {
+        text = '❌ SIGN FAILED — Secret Key format not accepted.\n\n' + text;
+      } else if (d && d.error && /401|403|Auth/i.test(String(d.error))) {
+        text = '❌ AUTH FAILED — Key ID or Secret wrong.\n\n' + text;
+      } else if (d && (d.ok || (d.error && /400|slug|not found|invalid/i.test(String(d.error))))) {
+        text = '✅ Signing reached Polymarket (keys likely OK). Order body rejected test slug as expected.\n\n' + text;
+      }
+      if (out) out.textContent = text;
+      alert(text.slice(0, 900));
+    } catch (e) {
+      var err = 'Network/API error: ' + (e.message || e) + '\nIs /api/trade on this deployment?';
+      if (out) out.textContent = err;
+      alert(err);
+    }
+  };
   $('btn-load').onclick = loadGames;
   if ($('btn-scan-auto')) $('btn-scan-auto').onclick = async function () {
     var st = settings();

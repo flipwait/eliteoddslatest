@@ -5,15 +5,26 @@
  */
 const crypto = require('crypto');
 
-function parseBody(req) {
-  if (req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body)) return req.body;
-  if (typeof req.body === 'string') {
-    try { return JSON.parse(req.body || '{}'); } catch (e) { return {}; }
+async function parseBody(req) {
+  if (req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body) && Object.keys(req.body).length) {
+    return req.body;
   }
-  if (Buffer.isBuffer(req.body)) {
-    try { return JSON.parse(req.body.toString('utf8') || '{}'); } catch (e) { return {}; }
+  if (typeof req.body === 'string' && req.body) {
+    try { return JSON.parse(req.body); } catch (e) { /* fall through */ }
   }
-  return {};
+  if (Buffer.isBuffer(req.body) && req.body.length) {
+    try { return JSON.parse(req.body.toString('utf8')); } catch (e) { /* fall through */ }
+  }
+  // Vercel / raw Node: body may only be on the stream
+  try {
+    if (typeof req[Symbol.asyncIterator] === 'function') {
+      const chunks = [];
+      for await (const chunk of req) chunks.push(Buffer.from(chunk));
+      const raw = Buffer.concat(chunks).toString('utf8');
+      if (raw) return JSON.parse(raw);
+    }
+  } catch (e) {}
+  return (req.body && typeof req.body === 'object') ? req.body : {};
 }
 
 function normalizeMode(body) {
@@ -92,7 +103,7 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'POST only' });
 
-  const body = parseBody(req);
+  const body = await parseBody(req);
   const mode = normalizeMode(body);
 
   const venue = String(body.venue || 'polymarket').toLowerCase();
