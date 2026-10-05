@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.62</title>
+  <title>EliteOdds v3.4.63</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.62</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.63</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1578,7 +1578,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.62</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.63</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -2007,8 +2007,19 @@
   };
 
   
-  var APP_VERSION = '3.4.62';
+  var APP_VERSION = '3.4.63';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.63',
+      date: '2026-10-05',
+      title: 'FIX: Under picks no longer buy Over (side + price)',
+      items: [
+        'FIXED — Cards now carry side YES/NO from the model (was missing → defaulted to YES/Over).',
+        'FIXED — Place/Auto: Under → ORDER_INTENT_BUY_SHORT (No); Over → BUY_LONG (Yes).',
+        'FIXED — Live limit uses Under (No) ¢ when pick is Under, not Over ¢.',
+        'FIXED — Trade API refuses to buy Over when pick label says Under.'
+      ]
+    },
     {
       version: '3.4.62',
       date: '2026-10-05',
@@ -4295,34 +4306,38 @@
   /** Live card price for the model pick side (0–1). Prefer pick-side market %, then cents. */
   function resolveLiveCardPrice01(g) {
     if (!g) return null;
+    var side = typeof resolveOrderSide === 'function' ? resolveOrderSide(g) : String(g.side || 'YES').toUpperCase();
+    var pick = String(g.modelPick || '').toLowerCase();
     var p = null;
-    // Prefer already-aligned pick-side market probability from score pipeline
+    // Prefer pick-side market % from score (must match Under→No / Over→Yes)
     if (g.market_probability != null && Number.isFinite(Number(g.market_probability))) {
       p = Number(g.market_probability);
       if (p > 1) p = p / 100;
     }
-    if ((p == null || !Number.isFinite(p)) && g.marketPriceCents != null) {
-      p = Number(g.marketPriceCents) / 100;
+    // If card says Under but market % looks like the Over price (~favorite), prefer noPrice
+    if (/under/.test(pick) && g.yesPrice != null && g.noPrice != null) {
+      var yp0 = Number(g.yesPrice); if (yp0 > 1) yp0 /= 100;
+      var np0 = Number(g.noPrice); if (np0 > 1) np0 /= 100;
+      if (p != null && yp0 != null && Math.abs(p - yp0) < 0.03 && np0 != null && np0 < yp0) {
+        p = np0; // was showing Over ¢ on an Under pick
+      }
     }
-    if ((p == null || !Number.isFinite(p)) && g.impliedPct != null) {
-      p = Number(g.impliedPct);
+    if ((p == null || !Number.isFinite(p)) && g.marketPriceCents != null) {
+      p = Number(g.marketPriceCents);
       if (p > 1) p = p / 100;
     }
-    // Side-aware fallback from yes/no prices
     if ((p == null || !Number.isFinite(p)) && (g.yesPrice != null || g.noPrice != null)) {
-      var side = String(g.side || 'YES').toUpperCase();
       var yp = g.yesPrice != null ? Number(g.yesPrice) : null;
       var np = g.noPrice != null ? Number(g.noPrice) : null;
       if (yp != null && yp > 1) yp = yp / 100;
       if (np != null && np > 1) np = np / 100;
       p = side === 'NO' ? np : yp;
-      if (p == null && yp != null && np != null) p = side === 'NO' ? (1 - yp) : yp;
+      if (p == null && yp != null) p = side === 'NO' ? clamp01(1 - yp) : yp;
     }
     if (p == null || !Number.isFinite(p) || p <= 0 || p >= 1) return null;
-    // Clamp to valid cent ticks (0.001)
-    p = Math.round(p * 1000) / 1000;
-    return p;
+    return Math.round(p * 1000) / 1000;
   }
+  function clamp01(x) { return Math.max(0.01, Math.min(0.99, Number(x) || 0.5)); }
 
 
   function autoMarketsAllowed() {
@@ -4358,6 +4373,23 @@
     // props / maps / innings / other
     if (t.indexOf('player') >= 0 || t.indexOf('prop') >= 0 || t.indexOf('map') >= 0 || t.indexOf('inning') >= 0) return !!a.props;
     return !!a.props;
+  }
+
+  function resolveOrderSide(g) {
+    if (!g) return 'YES';
+    var s = String(g.side || '').toUpperCase();
+    if (s === 'YES' || s === 'NO') {
+      // Sanity: Under pick must be NO on Over-framed PM totals
+      var pick = String(g.modelPick || g.pick || '').toLowerCase();
+      if (/\bunder\b/.test(pick) && s === 'YES') return 'NO';
+      if (/\bover\b/.test(pick) && s === 'NO' && !/\bunder\b/.test(pick)) return 'YES';
+      if (/\bnrfi\b/.test(pick) && s === 'YES') return 'NO'; // NRFI often No on YRFI market
+      return s;
+    }
+    var pick = String(g.modelPick || '').toLowerCase();
+    if (/\bunder\b/.test(pick) || /\bnrfi\b/.test(pick)) return 'NO';
+    if (/\bover\b/.test(pick) || /\byrfi\b/.test(pick)) return 'YES';
+    return 'YES';
   }
 
   async function placeBet(g, opts) {
@@ -4466,7 +4498,7 @@
           slug: slug,
           ticker: g.ticker || g.kalshiTicker || slug,
           rank: g.rank,
-          side: g.side || 'YES',
+          side: resolveOrderSide(g),
           market_probability: mk01,
           limitPrice01: mk01,
           limitPriceCents: cents,

@@ -813,6 +813,7 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
             spreadLine: (sc && sc.spreadLine != null) ? sc.spreadLine : ((type === 'spread' || String(type).startsWith('spread_') || type === 'f5_spread') && m.line != null ? Number(m.line) : null),
             totalLine: (sc && sc.totalLine != null) ? sc.totalLine : ((type === 'total' || type === 'f5_total' || String(type).startsWith('total_')) && m.line != null ? Number(m.line) : null),
             line: m.line != null ? Number(m.line) : null,
+            side: sc && sc.side ? sc.side : 'YES',
             rank: sc ? sc.rank : 'Pass',
             netEdge: sc ? sc.netEdge : 0,
             probability_edge: sc ? sc.probability_edge : null,

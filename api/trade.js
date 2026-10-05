@@ -148,7 +148,12 @@ module.exports = async function handler(req, res) {
   const unitSize = Number(body.unitSize) || 5;
   const stake = Math.round(units * unitSize * 100) / 100;
   const maxPrice = body.maxPriceCents != null ? Number(body.maxPriceCents) : 99;
-  const side = String(body.side || 'YES').toUpperCase();
+  let side = String(body.side || 'YES').toUpperCase();
+  const pickLower = String(pick || '').toLowerCase();
+  // Never buy Over when label says Under (root cause of wrong PM fills)
+  if (/\bunder\b/.test(pickLower) || /\bnrfi\b/.test(pickLower)) side = 'NO';
+  else if (/\bover\b/.test(pickLower) || /\byrfi\b/.test(pickLower)) side = 'YES';
+  if (side !== 'YES' && side !== 'NO') side = 'YES';
   const previewOnly = !!body.previewOnly;
 
   let price01 = marketProb;
@@ -163,6 +168,11 @@ module.exports = async function handler(req, res) {
   }
   // Tick to 0.1¢ precision as shown on card
   price01 = Math.round(price01 * 1000) / 1000;
+  // Under/NO should not use a favorite Over price (~60¢+) when pick says Under
+  if (side === 'NO' && /\bunder\b/.test(pickLower) && price01 >= 0.55) {
+    // Client likely sent Over ¢ — invert to approximate Under ¢
+    price01 = Math.round((1 - price01) * 1000) / 1000;
+  }
   const priceCents = Math.round(price01 * 1000) / 10;
 
   if (priceCents != null && maxPrice < 100 && priceCents > maxPrice) {
