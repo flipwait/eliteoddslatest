@@ -136,7 +136,12 @@ module.exports = async function handler(req, res) {
   const title = body.title || body.eventTitle || '';
   const slug = String(body.slug || body.marketSlug || '').trim();
   const ticker = String(body.ticker || body.kalshiTicker || slug || '').trim();
-  let marketProb = body.market_probability != null ? Number(body.market_probability) : null;
+  // Prefer explicit card limit price (live board ¢) — never invent a higher bid
+  let marketProb = body.limitPrice01 != null ? Number(body.limitPrice01)
+    : (body.market_probability != null ? Number(body.market_probability) : null);
+  if (body.limitPriceCents != null && (marketProb == null || !Number.isFinite(marketProb))) {
+    marketProb = Number(body.limitPriceCents) / 100;
+  }
   const modelProb = body.model_probability != null ? Number(body.model_probability) : null;
   const rank = body.rank || '';
   const units = Number(body.units) || 1;
@@ -148,7 +153,16 @@ module.exports = async function handler(req, res) {
 
   let price01 = marketProb;
   if (price01 != null && price01 > 1) price01 = price01 / 100;
-  if (price01 == null || !Number.isFinite(price01)) price01 = 0.5;
+  if (price01 == null || !Number.isFinite(price01) || price01 <= 0 || price01 >= 1) {
+    return res.status(200).json({
+      ok: false,
+      mode,
+      skipped: true,
+      reason: 'No valid live card price (refused to default to 50¢)',
+    });
+  }
+  // Tick to 0.1¢ precision as shown on card
+  price01 = Math.round(price01 * 1000) / 1000;
   const priceCents = Math.round(price01 * 1000) / 10;
 
   if (priceCents != null && maxPrice < 100 && priceCents > maxPrice) {

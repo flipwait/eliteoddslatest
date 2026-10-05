@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.60</title>
+  <title>EliteOdds v3.4.62</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -708,7 +708,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.60</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.62</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -743,7 +743,7 @@
             <label class="text-[10px] text-bb-muted flex items-center gap-1.5">Market
               <select id="market-select"></select>
             </label>
-            <div id="cat-chips" class="hidden"></div>
+            <div id="cat-chips" class="flex flex-wrap gap-1 items-center"></div>
             <p id="meta" class="text-[10px] text-bb-muted ml-auto"></p>
           </div>
 
@@ -1398,12 +1398,24 @@
                     <option value="unlimited">Unlimited</option>
                   </select>
                 </label>
-                <label class="block text-[10px] text-bb-muted">Max price (¢)
-                  <input id="pm-auto-max-price" type="number" min="1" max="99" value="75" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs" />
+                <label class="block text-[10px] text-bb-muted">Max price (¢) <span class="text-bb-muted">(-190 ≈ 66¢)</span>
+                  <input id="pm-auto-max-price" type="number" min="1" max="99" value="66" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs" />
                 </label>
                 <label class="block text-[10px] text-bb-muted">Min edge (pp)
                   <input id="pm-auto-min-edge" type="number" min="0" step="0.5" value="3" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs" />
                 </label>
+              </div>
+              <div class="rounded-lg border border-bb-border bg-bb-bg/50 p-2.5 space-y-1.5">
+                <p class="text-[10px] text-bb-muted font-semibold uppercase tracking-wider">Auto markets <span class="font-normal normal-case">(which cards can auto)</span></p>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-[11px]">
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="pm-auto-mkt-ml" class="rounded" checked /> Moneyline</label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="pm-auto-mkt-total" class="rounded" checked /> Totals O/U</label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="pm-auto-mkt-f5" class="rounded" /> F5 (winner / O/U / spread)</label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="pm-auto-mkt-spread" class="rounded" /> Spreads</label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="pm-auto-mkt-nrfi" class="rounded" /> NRFI / YRFI</label>
+                  <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="pm-auto-mkt-props" class="rounded" /> Props / other</label>
+                </div>
+                <p class="text-[10px] text-bb-muted leading-snug">Uncheck what you don’t want. Example: only <strong class="text-white">Moneyline</strong> + <strong class="text-white">Totals</strong> for a day.</p>
               </div>
               <label class="block text-[10px] text-bb-muted">Polymarket Key ID <span class="text-bb-muted">(UUID from polymarket.us/developer)</span>
                 <input id="pm-api-key" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 font-mono text-xs" placeholder="Key ID (not wallet address)" autocomplete="off" />
@@ -1566,7 +1578,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.60</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.62</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -1995,8 +2007,27 @@
   };
 
   
-  var APP_VERSION = '3.4.60';
+  var APP_VERSION = '3.4.62';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.62',
+      date: '2026-10-05',
+      title: 'Market chips (ML / totals / F5) + max price ~66¢ for -190',
+      items: [
+        'ADDED — Quick market chips under Market dropdown: All, ML, totals, F5, spreads, NRFI when the sport supports them.',
+        'CHANGED — Default max auto price 66¢ (~-190 American). Label shows -190 ≈ 66¢.'
+      ]
+    },
+    {
+      version: '3.4.61',
+      date: '2026-10-05',
+      title: 'Auto/live limit = exact live card price',
+      items: [
+        'CHANGED — Place/Auto uses the market ¢ shown on the game card (pick side) as the limit price.',
+        'CHANGED — No default to 50¢; refuses order if card has no live price.',
+        'CHANGED — Confirm shows “@ card XX¢” so you see the price before send.'
+      ]
+    },
     {
       version: '3.4.60',
       date: '2026-10-05',
@@ -3175,7 +3206,45 @@
       };
     }
     var box = $('cat-chips');
-    if (box) box.innerHTML = '';
+    if (box) {
+      // Quick filters: always show core types when available in this sport's CATS
+      var quickIds = ['all', 'moneyline', 'total', 'f5_total', 'f5', 'spread', 'nrfi'];
+      var byId = {};
+      cats.forEach(function (c) { byId[c.id] = c; });
+      var chips = [];
+      quickIds.forEach(function (id) {
+        if (!byId[id]) return;
+        var on = marketType === id;
+        chips.push(
+          '<button type="button" data-mt="' + id + '" class="px-2 py-1 rounded-full border text-[10px] ' +
+          (on ? 'pill-on border-bb-border text-white' : 'border-bb-border text-bb-muted') + '">' +
+          byId[id].label + '</button>'
+        );
+      });
+      // If sport has no quick matches, show first few cats
+      if (!chips.length) {
+        cats.slice(0, 6).forEach(function (c) {
+          var on = marketType === c.id;
+          chips.push(
+            '<button type="button" data-mt="' + c.id + '" class="px-2 py-1 rounded-full border text-[10px] ' +
+            (on ? 'pill-on border-bb-border text-white' : 'border-bb-border text-bb-muted') + '">' +
+            c.label + '</button>'
+          );
+        });
+      }
+      box.innerHTML = chips.join('');
+      box.querySelectorAll('button[data-mt]').forEach(function (btn) {
+        btn.onclick = function () {
+          marketType = btn.getAttribute('data-mt') || 'all';
+          if (sel) sel.value = marketType;
+          if (typeof isSpecialMarket === 'function' && isSpecialMarket(marketType) && $('f-rank')) {
+            $('f-rank').value = '';
+          }
+          paintCats();
+          loadGames();
+        };
+      });
+    }
   }
 
   function evalBars(g) {
@@ -4222,6 +4291,75 @@
     }
   }
 
+
+  /** Live card price for the model pick side (0–1). Prefer pick-side market %, then cents. */
+  function resolveLiveCardPrice01(g) {
+    if (!g) return null;
+    var p = null;
+    // Prefer already-aligned pick-side market probability from score pipeline
+    if (g.market_probability != null && Number.isFinite(Number(g.market_probability))) {
+      p = Number(g.market_probability);
+      if (p > 1) p = p / 100;
+    }
+    if ((p == null || !Number.isFinite(p)) && g.marketPriceCents != null) {
+      p = Number(g.marketPriceCents) / 100;
+    }
+    if ((p == null || !Number.isFinite(p)) && g.impliedPct != null) {
+      p = Number(g.impliedPct);
+      if (p > 1) p = p / 100;
+    }
+    // Side-aware fallback from yes/no prices
+    if ((p == null || !Number.isFinite(p)) && (g.yesPrice != null || g.noPrice != null)) {
+      var side = String(g.side || 'YES').toUpperCase();
+      var yp = g.yesPrice != null ? Number(g.yesPrice) : null;
+      var np = g.noPrice != null ? Number(g.noPrice) : null;
+      if (yp != null && yp > 1) yp = yp / 100;
+      if (np != null && np > 1) np = np / 100;
+      p = side === 'NO' ? np : yp;
+      if (p == null && yp != null && np != null) p = side === 'NO' ? (1 - yp) : yp;
+    }
+    if (p == null || !Number.isFinite(p) || p <= 0 || p >= 1) return null;
+    // Clamp to valid cent ticks (0.001)
+    p = Math.round(p * 1000) / 1000;
+    return p;
+  }
+
+
+  function autoMarketsAllowed() {
+    var st = settings();
+    function on(id, stKey, def) {
+      if ($(id)) return !!$(id).checked;
+      if (st[stKey] != null) return !!st[stKey];
+      return def;
+    }
+    return {
+      ml: on('pm-auto-mkt-ml', 'pmAutoMktMl', true),
+      total: on('pm-auto-mkt-total', 'pmAutoMktTotal', true),
+      f5: on('pm-auto-mkt-f5', 'pmAutoMktF5', false),
+      spread: on('pm-auto-mkt-spread', 'pmAutoMktSpread', false),
+      nrfi: on('pm-auto-mkt-nrfi', 'pmAutoMktNrfi', false),
+      props: on('pm-auto-mkt-props', 'pmAutoMktProps', false)
+    };
+  }
+  function gameMatchesAutoMarket(g) {
+    var a = autoMarketsAllowed();
+    var t = String(g.marketType || g.type || 'moneyline').toLowerCase();
+    var q = String(g.question || g.title || g.eventTitle || '').toLowerCase();
+    // F5 family first
+    if (t.indexOf('f5') >= 0 || /first\s*5|first five|\bf5\b/.test(q)) return !!a.f5;
+    // NRFI
+    if (t === 'nrfi' || t === 'yrfi' || /\bnrfi\b|\byrfi\b|no run first|yes run first/.test(q)) return !!a.nrfi;
+    // Spreads
+    if (t.indexOf('spread') >= 0 || t === 'run_line') return !!a.spread;
+    // Totals / O/U (full game + period totals, not F5)
+    if (t.indexOf('total') >= 0 || t === 'totals' || /^over|^under|o\/u/.test(q)) return !!a.total;
+    // Moneyline / winner
+    if (t === 'moneyline' || t === 'ml' || t.indexOf('moneyline') >= 0 || t === 'moneyline_1h') return !!a.ml;
+    // props / maps / innings / other
+    if (t.indexOf('player') >= 0 || t.indexOf('prop') >= 0 || t.indexOf('map') >= 0 || t.indexOf('inning') >= 0) return !!a.props;
+    return !!a.props;
+  }
+
   async function placeBet(g, opts) {
     opts = opts || {};
     var st = settings();
@@ -4269,15 +4407,23 @@
       if (!opts.silent) alert('Skipped: edge ' + edge + 'pp < min ' + st.pmAutoMinEdge + 'pp');
       return { ok: false, skipped: true, reason: 'edge' };
     }
-    // Max price check client-side (market as ¢)
-    var mk01 = g.market_probability;
-    if (mk01 != null && mk01 > 1) mk01 = mk01 / 100;
-    var cents = mk01 != null ? mk01 * 100 : null;
+    if (!opts.manual && !gameMatchesAutoMarket(g)) {
+      if (!opts.silent) alert('Skipped: market type not enabled in Auto markets (Settings).');
+      return { ok: false, skipped: true, reason: 'market_type' };
+    }
+    // Live card price for the pick (exact ¢ on card — not a padded bid)
+    var mk01 = resolveLiveCardPrice01(g);
+    var cents = mk01 != null ? Math.round(mk01 * 1000) / 10 : null;
     var maxPx = Number(st.pmAutoMaxPrice);
     if (!(maxPx > 0)) maxPx = 99;
+    if (mk01 == null) {
+      if (!opts.silent) alert('No live market price on this card — re-scan and try again.');
+      try { notifyAutoTrade('declined', g, { mode: mode, reason: 'No live card price' }); } catch (e) {}
+      return { ok: false, skipped: true, reason: 'no_price' };
+    }
     if (!opts.manual && cents != null && cents > maxPx) {
-      if (!opts.silent) alert('Skipped: price ~' + Math.round(cents) + '¢ > max ' + maxPx + '¢ (raise Max price in Settings)');
-      try { notifyAutoTrade('declined', g, { mode: mode, reason: 'Price ~' + Math.round(cents) + '¢ > max ' + maxPx + '¢' }); } catch (e) {}
+      if (!opts.silent) alert('Skipped: card price ' + cents + '¢ > max ' + maxPx + '¢ (raise Max price in Settings)');
+      try { notifyAutoTrade('declined', g, { mode: mode, reason: 'Card price ' + cents + '¢ > max ' + maxPx + '¢' }); } catch (e) {}
       return { ok: false, skipped: true, reason: 'price' };
     }
 
@@ -4288,6 +4434,7 @@
       var mk = cents != null ? Math.round(cents * 10) / 10 : null;
       var tag = mode === 'live' ? '[LIVE]' : mode === 'paper' ? '[PAPER]' : '[DRY RUN]';
       var msg = tag + ' ' + units + 'u ($' + (Math.round(units * unitSize * 100) / 100) + ') on ' + (g.modelPick || '?') +
+        ' @ card ' + (cents != null ? cents + '¢' : '?') +
         '\n' + (g.eventTitle || g.title || '') +
         '\nMkt ~' + (mk != null ? mk + '¢' : '?') + ' · Rank ' + (g.rank || '') +
         '\nMode: ' + mode +
@@ -4320,12 +4467,15 @@
           ticker: g.ticker || g.kalshiTicker || slug,
           rank: g.rank,
           side: g.side || 'YES',
-          market_probability: g.market_probability,
+          market_probability: mk01,
+          limitPrice01: mk01,
+          limitPriceCents: cents,
           model_probability: g.model_probability,
           units: units,
           unitSize: unitSize,
           maxPriceCents: maxPx,
           minEdgePp: st.pmAutoMinEdge,
+          useCardPrice: true,
           apiKey: st.pmApiKey,
           apiSecret: st.pmApiSecret,
           apiPass: st.pmApiPass
@@ -4421,11 +4571,12 @@
       if (mk01 != null && mk01 > 1) mk01 = mk01 / 100;
       var cents = mk01 != null ? mk01 * 100 : null;
       if (cents != null && cents > maxPx) continue;
+      if (!gameMatchesAutoMarket(g)) continue;
       candidates.push(g);
     }
 
     if (!candidates.length) {
-      status('Auto on but 0 candidates (rank/edge/price filters)');
+      status('Auto on but 0 candidates (rank/edge/price/market filters)');
       return;
     }
 
@@ -8135,6 +8286,12 @@ function renderSlate() {
       pmAutoMaxDaily: ($('pm-auto-max-daily') && $('pm-auto-max-daily').value) || '3',
       pmAutoMaxPrice: Number(($('pm-auto-max-price') && $('pm-auto-max-price').value) || 75) || 75,
       pmAutoMinEdge: Number(($('pm-auto-min-edge') && $('pm-auto-min-edge').value) || 3) || 3,
+      pmAutoMktMl: !!($('pm-auto-mkt-ml') && $('pm-auto-mkt-ml').checked),
+      pmAutoMktTotal: !!($('pm-auto-mkt-total') && $('pm-auto-mkt-total').checked),
+      pmAutoMktF5: !!($('pm-auto-mkt-f5') && $('pm-auto-mkt-f5').checked),
+      pmAutoMktSpread: !!($('pm-auto-mkt-spread') && $('pm-auto-mkt-spread').checked),
+      pmAutoMktNrfi: !!($('pm-auto-mkt-nrfi') && $('pm-auto-mkt-nrfi').checked),
+      pmAutoMktProps: !!($('pm-auto-mkt-props') && $('pm-auto-mkt-props').checked),
       pmApiKey: ($('pm-api-key') && $('pm-api-key').value) || '',
       pmApiSecret: ($('pm-api-secret') && $('pm-api-secret').value) || '',
       pmApiPass: ($('pm-api-pass') && $('pm-api-pass').value) || '',
@@ -8189,6 +8346,12 @@ function renderSlate() {
   if ($('pm-auto-max-daily') && st.pmAutoMaxDaily != null) $('pm-auto-max-daily').value = st.pmAutoMaxDaily;
   if ($('pm-auto-max-price') && st.pmAutoMaxPrice != null) $('pm-auto-max-price').value = st.pmAutoMaxPrice;
   if ($('pm-auto-min-edge') && st.pmAutoMinEdge != null) $('pm-auto-min-edge').value = st.pmAutoMinEdge;
+  if ($('pm-auto-mkt-ml')) $('pm-auto-mkt-ml').checked = st.pmAutoMktMl !== false;
+  if ($('pm-auto-mkt-total')) $('pm-auto-mkt-total').checked = st.pmAutoMktTotal !== false;
+  if ($('pm-auto-mkt-f5')) $('pm-auto-mkt-f5').checked = !!st.pmAutoMktF5;
+  if ($('pm-auto-mkt-spread')) $('pm-auto-mkt-spread').checked = !!st.pmAutoMktSpread;
+  if ($('pm-auto-mkt-nrfi')) $('pm-auto-mkt-nrfi').checked = !!st.pmAutoMktNrfi;
+  if ($('pm-auto-mkt-props')) $('pm-auto-mkt-props').checked = !!st.pmAutoMktProps;
 
   if ($('webhook-lost')) $('webhook-lost').value = st.webhookLost || '';
   if ($('openai')) $('openai').value = st.openai || '';
@@ -8201,6 +8364,12 @@ function renderSlate() {
   if ($('pm-auto-max-daily') && st.pmAutoMaxDaily != null) $('pm-auto-max-daily').value = st.pmAutoMaxDaily;
   if ($('pm-auto-max-price') && st.pmAutoMaxPrice != null) $('pm-auto-max-price').value = st.pmAutoMaxPrice;
   if ($('pm-auto-min-edge') && st.pmAutoMinEdge != null) $('pm-auto-min-edge').value = st.pmAutoMinEdge;
+  if ($('pm-auto-mkt-ml')) $('pm-auto-mkt-ml').checked = st.pmAutoMktMl !== false;
+  if ($('pm-auto-mkt-total')) $('pm-auto-mkt-total').checked = st.pmAutoMktTotal !== false;
+  if ($('pm-auto-mkt-f5')) $('pm-auto-mkt-f5').checked = !!st.pmAutoMktF5;
+  if ($('pm-auto-mkt-spread')) $('pm-auto-mkt-spread').checked = !!st.pmAutoMktSpread;
+  if ($('pm-auto-mkt-nrfi')) $('pm-auto-mkt-nrfi').checked = !!st.pmAutoMktNrfi;
+  if ($('pm-auto-mkt-props')) $('pm-auto-mkt-props').checked = !!st.pmAutoMktProps;
   if ($('pm-api-key')) $('pm-api-key').value = st.pmApiKey || '';
   if ($('pm-api-secret')) $('pm-api-secret').value = st.pmApiSecret || '';
   if ($('pm-api-pass')) $('pm-api-pass').value = st.pmApiPass || '';
