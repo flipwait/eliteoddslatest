@@ -38,43 +38,68 @@ function normalizeMode(body) {
   return mode;
 }
 
-function pmPrivateKey(secretRaw) {
-  const secret = String(secretRaw || '').trim();
-  if (!secret) throw new Error('Missing API secret (Ed25519 secret key from polymarket.us/developer)');
+/** Decode Polymarket secret: base64 (std or URL-safe) → 32-byte seed (or first 32 of 64) */
+function decodePmSecretBytes(secretRaw) {
+  let secret = String(secretRaw || '').trim();
+  // strip wrapping quotes / whitespace / newlines from mobile paste
+  secret = secret.replace(/^["']|["']$/g, '').replace(/\s+/g, '');
+  if (!secret) throw new Error('Empty secret key');
 
-  if (secret.includes('BEGIN')) {
-    return crypto.createPrivateKey(secret);
+  function b64(s) {
+    let x = s.replace(/-/g, '+').replace(/_/g, '/');
+    while (x.length % 4) x += '=';
+    return Buffer.from(x, 'base64');
   }
 
-  try {
-    return crypto.createPrivateKey({
-      key: Buffer.from(secret, 'base64'),
-      format: 'der',
-      type: 'pkcs8',
-    });
-  } catch (e1) {}
+  // PEM
+  if (secret.includes('BEGIN')) {
+    return { kind: 'pem', pem: String(secretRaw) };
+  }
 
+  let bytes;
   try {
-    const seed = Buffer.from(secret, 'base64');
-    if (seed.length === 32) {
-      const prefix = Buffer.from('302e020100300506032b657004220420', 'hex');
-      const der = Buffer.concat([prefix, seed]);
-      return crypto.createPrivateKey({ key: der, format: 'der', type: 'pkcs8' });
-    }
-  } catch (e2) {}
+    bytes = b64(secret);
+  } catch (e) {
+    throw new Error('Secret is not valid base64');
+  }
 
-  try {
-    const seed = Buffer.from(secret.replace(/^0x/, ''), 'hex');
-    if (seed.length === 32) {
-      const prefix = Buffer.from('302e020100300506032b657004220420', 'hex');
-      const der = Buffer.concat([prefix, seed]);
-      return crypto.createPrivateKey({ key: der, format: 'der', type: 'pkcs8' });
+  // Official SDK: 64-byte key → use first 32; 32-byte seed as-is
+  if (bytes.length === 64) bytes = bytes.subarray(0, 32);
+  if (bytes.length === 32) return { kind: 'seed', seed: bytes };
+
+  // Sometimes full PKCS8 DER is base64 (dozens of bytes)
+  if (bytes.length > 32) {
+    try {
+      crypto.createPrivateKey({ key: bytes, format: 'der', type: 'pkcs8' });
+      return { kind: 'der', der: bytes };
+    } catch (e) {
+      /* fall through */
     }
-  } catch (e3) {}
+  }
+
+  // Hex seed
+  if (/^[0-9a-fA-F]+$/.test(secret) && (secret.length === 64 || secret.length === 128)) {
+    let seed = Buffer.from(secret.slice(0, 64), 'hex');
+    if (seed.length === 32) return { kind: 'seed', seed: seed };
+  }
 
   throw new Error(
-    'Could not parse Polymarket secret key. Paste the Secret Key from polymarket.us/developer (shown once). Need Key ID + Secret.'
+    'Decoded secret is ' + bytes.length + ' bytes (need 32 or 64). Re-copy Secret Key from polymarket.us/developer — no spaces.'
   );
+}
+
+function pmPrivateKey(secretRaw) {
+  const decoded = decodePmSecretBytes(secretRaw);
+  if (decoded.kind === 'pem') {
+    return crypto.createPrivateKey(decoded.pem);
+  }
+  if (decoded.kind === 'der') {
+    return crypto.createPrivateKey({ key: decoded.der, format: 'der', type: 'pkcs8' });
+  }
+  // PKCS8 envelope for Ed25519 seed (RFC 8410)
+  const prefix = Buffer.from('302e020100300506032b657004220420', 'hex');
+  const der = Buffer.concat([prefix, decoded.seed]);
+  return crypto.createPrivateKey({ key: der, format: 'der', type: 'pkcs8' });
 }
 
 function signPolymarket(method, path, secretRaw) {
