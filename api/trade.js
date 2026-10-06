@@ -146,7 +146,10 @@ module.exports = async function handler(req, res) {
   const rank = body.rank || '';
   const units = Number(body.units) || 1;
   const unitSize = Number(body.unitSize) || 5;
-  const stake = Math.round(units * unitSize * 100) / 100;
+  // Prefer explicit dollar stake from client
+  let stake = body.stake != null ? Number(body.stake) : Math.round(units * unitSize * 100) / 100;
+  if (!(stake > 0)) stake = Math.round(units * unitSize * 100) / 100;
+  if (!(stake > 0)) stake = 5;
   const maxPrice = body.maxPriceCents != null ? Number(body.maxPriceCents) : 99;
   let side = String(body.side || 'YES').toUpperCase();
   const pickLower = String(pick || '').toLowerCase();
@@ -184,7 +187,9 @@ module.exports = async function handler(req, res) {
     });
   }
 
+  // Target ~stake$ at this price (round to nearest share; min 1)
   const qty = Math.max(1, Math.round(stake / Math.max(0.01, price01)));
+  const approxCost = Math.round(qty * price01 * 100) / 100;
 
   const intent = {
     mode, venue, pick, title, slug, ticker, rank, stake, units, qty,
@@ -196,7 +201,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({
       ok: true,
       mode: 'dry-run',
-      message: 'DRY RUN — no order. Would buy ' + pick + ' @ ~' + priceCents + '¢ × ' + qty + ' (~$' + stake + ') slug=' + (slug || ticker || '?'),
+      message: 'DRY RUN — no order. Would buy ' + pick + ' @ ~' + priceCents + '¢ × ' + qty + ' shares (target $' + stake + ', approx $' + approxCost + ') slug=' + (slug || ticker || '?'),
       intent,
     });
   }

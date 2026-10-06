@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.65</title>
+  <title>EliteOdds v3.4.67</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -763,6 +763,122 @@
     @media (min-width: 768px) {
       #mobile-filter-bar { display: none !important; }
     }
+
+    /* —— Mobile filter panel (purple glass) —— */
+    @media (max-width: 767px) {
+      #mobile-filter-bar {
+        margin: 0.35rem 0.5rem 0.5rem;
+        padding: 0.75rem 0.7rem 0.65rem !important;
+        border-radius: 1rem;
+        border: 1px solid rgba(167, 139, 250, 0.35) !important;
+        background:
+          radial-gradient(120% 80% at 0% 0%, rgba(139, 92, 246, 0.28), transparent 55%),
+          radial-gradient(100% 70% at 100% 100%, rgba(99, 102, 241, 0.18), transparent 50%),
+          linear-gradient(165deg, rgba(24, 18, 48, 0.95) 0%, rgba(12, 14, 28, 0.92) 100%) !important;
+        box-shadow:
+          0 0 0 1px rgba(139, 92, 246, 0.12),
+          0 12px 32px rgba(0, 0, 0, 0.35),
+          inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      }
+      #mobile-filter-bar label span {
+        letter-spacing: 0.06em;
+        color: rgba(196, 181, 253, 0.75) !important;
+        font-weight: 600;
+      }
+      #mobile-filter-bar select {
+        background: rgba(15, 10, 30, 0.75) !important;
+        border: 1px solid rgba(167, 139, 250, 0.4) !important;
+        border-radius: 0.65rem !important;
+        color: #f5f3ff !important;
+        font-weight: 500;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      }
+      #mobile-filter-bar select:focus {
+        outline: none;
+        border-color: rgba(192, 132, 252, 0.85) !important;
+        box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
+      }
+      #m-btn-load, #m-btn-auto {
+        border-radius: 0.65rem !important;
+        font-weight: 600 !important;
+        padding: 0.45rem 0.5rem !important;
+      }
+      #m-btn-load {
+        background: rgba(30, 25, 50, 0.9) !important;
+        border-color: rgba(167, 139, 250, 0.35) !important;
+        color: #e9e5ff !important;
+      }
+      #m-btn-auto {
+        background: linear-gradient(135deg, rgba(124, 58, 237, 0.85), rgba(91, 33, 182, 0.9)) !important;
+        border-color: rgba(192, 132, 252, 0.55) !important;
+        color: #fff !important;
+        box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+      }
+      /* Rank / edge filter strip */
+      .eo-filters {
+        margin: 0 0.5rem 0.65rem;
+        padding: 0.7rem 0.65rem !important;
+        border-radius: 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        background:
+          linear-gradient(160deg, rgba(30, 27, 55, 0.9), rgba(15, 18, 32, 0.95));
+        box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem 0.5rem;
+        align-items: center;
+      }
+      .eo-filters label {
+        font-size: 10px !important;
+        color: rgba(196, 181, 253, 0.7) !important;
+      }
+      .eo-filters select,
+      .eo-filters input {
+        background: rgba(12, 10, 24, 0.8) !important;
+        border: 1px solid rgba(139, 92, 246, 0.3) !important;
+        border-radius: 0.55rem !important;
+        color: #fff !important;
+        font-size: 11px !important;
+        padding: 0.35rem 0.45rem !important;
+      }
+      .eo-filters .apply {
+        background: linear-gradient(135deg, #7c3aed, #5b21b6) !important;
+        border: none !important;
+        color: #fff !important;
+        font-weight: 700 !important;
+        border-radius: 0.55rem !important;
+        padding: 0.4rem 0.9rem !important;
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+      }
+      .eo-filters .layout-chip.on {
+        background: rgba(139, 92, 246, 0.35) !important;
+        border-color: rgba(192, 132, 252, 0.65) !important;
+        color: #ede9fe !important;
+      }
+      #meta {
+        width: 100%;
+        text-align: center;
+        font-size: 10px !important;
+        color: rgba(196, 181, 253, 0.85) !important;
+        padding: 0.35rem 0.5rem;
+        margin: 0 0.5rem 0.4rem !important;
+        border-radius: 999px;
+        background: rgba(139, 92, 246, 0.12);
+        border: 1px solid rgba(167, 139, 250, 0.2);
+      }
+      .eo-center > .flex.flex-wrap.gap-2.items-center.mb-2 {
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+      }
+      #market-select {
+        background: rgba(15, 10, 30, 0.85) !important;
+        border: 1px solid rgba(167, 139, 250, 0.4) !important;
+        border-radius: 0.65rem !important;
+        color: #f5f3ff !important;
+        padding: 0.4rem 0.55rem !important;
+        font-size: 11px !important;
+      }
+    }
   </style>
 </head>
 <body class="v3">
@@ -776,7 +892,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.65</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.67</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -893,7 +1009,6 @@
             <span class="text-[10px] text-bb-muted hidden sm:inline">Layout</span>
             <button type="button" data-layout="classic" id="layout-classic" class="layout-chip on text-[11px] px-2.5 py-1 rounded-lg border border-bb-border text-bb-muted">Classic</button>
             <button type="button" data-layout="hub" id="layout-hub" class="layout-chip text-[11px] px-2.5 py-1 rounded-lg border border-bb-border text-bb-muted">By game</button>
-            <button type="button" id="btn-tonight" class="text-[11px] px-2.5 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">Tonight</button>
             <button type="button" id="f-apply" class="apply">Apply</button>
             <button type="button" id="f-reset" class="text-bb-muted border border-bb-border rounded-lg px-2 py-1">Reset</button>
             <button type="button" id="eo-toggle-more" class="text-bb-muted text-[10px] underline">More filters</button>
@@ -1488,24 +1603,32 @@
                     <option value="good">Good + Elite</option>
                   </select>
                 </label>
-                <label class="block text-[10px] text-bb-muted">Stake units
-                  <input id="pm-auto-units" type="number" min="0.25" step="0.25" value="1" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs" />
+                <label class="block text-[10px] text-bb-muted">Stake $ <span class="text-bb-muted font-normal">(target risk per auto bet)</span>
+                  <input id="pm-auto-stake" type="number" min="0.5" step="0.5" value="5" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs" />
                 </label>
-                <label class="block text-[10px] text-bb-muted">Max daily units
+                <label class="block text-[10px] text-bb-muted">Max daily $
                   <select id="pm-auto-max-daily" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3" selected>3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
+                    <option value="5">$5</option>
+                    <option value="10">$10</option>
+                    <option value="15" selected>$15</option>
+                    <option value="25">$25</option>
+                    <option value="50">$50</option>
+                    <option value="100">$100</option>
                     <option value="unlimited">Unlimited</option>
                   </select>
                 </label>
+                <label class="flex items-center gap-2 text-[10px] text-bb-muted col-span-2 sm:col-span-2">
+                  <input type="checkbox" id="pm-auto-kelly" class="rounded" />
+                  Use Kelly (overrides Stake $ when bankroll set)
+                </label>
+                <label class="block text-[10px] text-bb-muted">Kelly fraction
+                  <select id="pm-auto-kelly-frac" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs">
+                    <option value="0.25">Quarter Kelly</option>
+                    <option value="0.5" selected>Half Kelly</option>
+                    <option value="1">Full Kelly</option>
+                  </select>
+                </label>
+                <input type="hidden" id="pm-auto-units" value="1" />
                 <label class="block text-[10px] text-bb-muted">Max price (¢) <span class="text-bb-muted">(-190 ≈ 66¢)</span>
                   <input id="pm-auto-max-price" type="number" min="1" max="99" value="66" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs" />
                 </label>
@@ -1686,7 +1809,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.65</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.67</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -2115,8 +2238,29 @@
   };
 
   
-  var APP_VERSION = '3.4.65';
+  var APP_VERSION = '3.4.67';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.67',
+      date: '2026-10-05',
+      title: 'Auto Stake $ + optional Kelly',
+      items: [
+        'CHANGED — Auto size is Stake $ (not units). Default $5 target risk per auto bet.',
+        'CHANGED — Max daily is now $ (e.g. $15) instead of unit count.',
+        'ADDED — Optional Kelly / half-Kelly using bankroll (capped); off by default.',
+        'CHANGED — Share count ≈ Stake $ ÷ card ¢ so cost tracks your dollar amount.'
+      ]
+    },
+    {
+      version: '3.4.66',
+      date: '2026-10-06',
+      title: 'Mobile filter polish + Refresh fix',
+      items: [
+        'FIXED — Mobile ↻ Refresh calls loadGames directly after any When/Days/Sport/Book change.',
+        'REMOVED — Tonight preset button.',
+        'DESIGN — Mobile filter panel: purple glass card, violet selects, gradient Auto button, status pill.'
+      ]
+    },
     {
       version: '3.4.65',
       date: '2026-10-05',
@@ -3290,6 +3434,7 @@
           sport = btn.getAttribute('data-sport') || 'all';
           marketType = 'all';
           paintSports();
+  if (typeof wireMobileFilters === "function") wireMobileFilters();
           paintCats();
           loadGames();
         };
@@ -3309,8 +3454,8 @@
   }
 
   function wireMobileFilters() {
-    if (wireMobileFilters._done) return;
-    wireMobileFilters._done = true;
+    // Always (re)bind so Refresh works after sport/mode changes
+
     function syncPills() {
       document.querySelectorAll('.mode-btn').forEach(function (b) {
         var on = b.getAttribute('data-mode') === mode;
@@ -3358,14 +3503,30 @@
       };
     }
     if ($('m-btn-load')) {
-      $('m-btn-load').onclick = function () {
-        if ($('btn-load')) $('btn-load').click();
-        else loadGames();
+      $('m-btn-load').onclick = function (ev) {
+        if (ev && ev.preventDefault) ev.preventDefault();
+        try {
+          if ($('m-mode') && $('m-mode').value) mode = $('m-mode').value;
+          if ($('m-day') && $('m-day').value) dayFilter = $('m-day').value;
+          if ($('m-sport') && $('m-sport').value) sport = $('m-sport').value;
+          if ($('m-venue') && $('m-venue').value) venue = $('m-venue').value;
+          if ($('meta')) $('meta').textContent = 'Refreshing…';
+        } catch (e) {}
+        loadGames();
+        return false;
       };
     }
     if ($('m-btn-auto')) {
       $('m-btn-auto').onclick = function () {
-        if ($('btn-scan-auto')) $('btn-scan-auto').click();
+        if ($('btn-scan-auto')) {
+          $('btn-scan-auto').click();
+        } else if (typeof runScanForAuto === 'function') {
+          runScanForAuto();
+        } else {
+          loadGames().then(function () {
+            if (typeof runAutoTradeOnGames === 'function') runAutoTradeOnGames(games || []);
+          });
+        }
       };
     }
   }
@@ -4548,7 +4709,10 @@
       if ($('pm-api-pass') && $('pm-api-pass').value) st.pmApiPass = $('pm-api-pass').value.trim();
       // Kalshi: allow PEM in pass field if secret empty
       if (!st.pmApiSecret && st.pmApiPass) st.pmApiSecret = st.pmApiPass;
+      if ($('pm-auto-stake')) st.pmAutoStake = Number($('pm-auto-stake').value) || st.pmAutoStake;
       if ($('pm-auto-units')) st.pmAutoUnits = Number($('pm-auto-units').value) || st.pmAutoUnits;
+      if ($('pm-auto-kelly')) st.pmAutoKelly = !!$('pm-auto-kelly').checked;
+      if ($('pm-auto-kelly-frac')) st.pmAutoKellyFrac = Number($('pm-auto-kelly-frac').value) || st.pmAutoKellyFrac;
       if ($('pm-auto-max-daily')) st.pmAutoMaxDaily = $('pm-auto-max-daily').value;
       if ($('pm-auto-max-price')) st.pmAutoMaxPrice = Number($('pm-auto-max-price').value);
       if ($('pm-auto-min-edge')) st.pmAutoMinEdge = Number($('pm-auto-min-edge').value);
@@ -4557,16 +4721,41 @@
 
     var mode = st.pmAutoMode || 'dry-run';
     if (opts.forceMode) mode = opts.forceMode;
-    var units = Number(st.pmAutoUnits) || 1;
     var unitSize = Number(st.unitSize) || 5;
     if (!(unitSize > 0)) unitSize = 5;
+    // Primary: fixed dollar stake
+    var stake$ = Number(st.pmAutoStake);
+    if (!(stake$ > 0)) stake$ = Number(st.pmAutoUnits) * unitSize || 5;
+    // Optional Kelly
+    var useKelly = !!(st.pmAutoKelly || ($('pm-auto-kelly') && $('pm-auto-kelly').checked));
+    var bank = Number(st.bankroll) || 0;
+    if (useKelly && bank > 0) {
+      var mkK = g.market_probability;
+      if (mkK != null && mkK > 1) mkK = mkK / 100;
+      var mdK = g.model_probability;
+      if (mdK != null && mdK > 1) mdK = mdK / 100;
+      if (mkK != null && mdK != null && mkK > 0 && mkK < 1) {
+        var edge = mdK - mkK;
+        var b = (1 / mkK) - 1; // net odds decimal - 1
+        var f = b > 0 ? edge / b : 0;
+        if (f < 0) f = 0;
+        if (f > 0.25) f = 0.25; // hard cap 25% bank
+        var frac = Number(st.pmAutoKellyFrac);
+        if (!(frac > 0)) frac = 0.5;
+        if ($('pm-auto-kelly-frac')) frac = Number($('pm-auto-kelly-frac').value) || frac;
+        stake$ = Math.round(bank * f * frac * 100) / 100;
+        if (stake$ < 1) stake$ = Math.min(1, bank * 0.01);
+        if (stake$ > bank * 0.1) stake$ = Math.round(bank * 0.1 * 100) / 100;
+      }
+    }
+    var units = stake$; // daily tracker in $ now
     var maxDailyRaw = st.pmAutoMaxDaily;
     var unlimited = String(maxDailyRaw) === 'unlimited';
-    var maxDaily = unlimited ? Infinity : (Number(maxDailyRaw) || 3);
+    var maxDaily = unlimited ? Infinity : (Number(maxDailyRaw) || 15);
     var used = autoTradeDailyUsed();
-    if (!unlimited && used + units > maxDaily + 1e-9) {
-      if (!opts.silent) alert('Daily unit cap: ' + used + '/' + maxDaily + ' used. Raise max daily or choose Unlimited.');
-      try { notifyAutoTrade('declined', g, { mode: mode, reason: 'Daily unit cap ' + used + '/' + maxDaily }); } catch (e) {}
+    if (!unlimited && used + stake$ > maxDaily + 1e-9) {
+      if (!opts.silent) alert('Daily $ cap: $' + used + ' / $' + maxDaily + ' used. Raise max daily or Unlimited.');
+      try { notifyAutoTrade('declined', g, { mode: mode, reason: 'Daily $ cap $' + used + '/$' + maxDaily }); } catch (e) {}
       return { ok: false, skipped: true, reason: 'daily_cap' };
     }
     var rank = String(g.rank || '').toLowerCase();
@@ -4610,8 +4799,10 @@
     if (needConfirm) {
       var mk = cents != null ? Math.round(cents * 10) / 10 : null;
       var tag = mode === 'live' ? '[LIVE]' : mode === 'paper' ? '[PAPER]' : '[DRY RUN]';
-      var msg = tag + ' ' + units + 'u ($' + (Math.round(units * unitSize * 100) / 100) + ') on ' + (g.modelPick || '?') +
-        ' @ card ' + (cents != null ? cents + '¢' : '?') +
+      var estQty = (mk01 > 0 && stake$ > 0) ? Math.max(1, Math.round(stake$ / mk01)) : 1;
+      var estCost = Math.round(estQty * (cents != null ? cents : 50)) / 100;
+      var msg = tag + ' ~$' + stake$ + (useKelly ? ' (Kelly)' : '') + ' on ' + (g.modelPick || '?') +
+        ' @ card ' + (cents != null ? cents + '¢' : '?') + ' × ~' + estQty + ' (~$' + estCost + ')' +
         '\n' + (g.eventTitle || g.title || '') +
         '\nMkt ~' + (mk != null ? mk + '¢' : '?') + ' · Rank ' + (g.rank || '') +
         '\nMode: ' + mode +
@@ -4648,8 +4839,9 @@
           limitPrice01: mk01,
           limitPriceCents: cents,
           model_probability: g.model_probability,
-          units: units,
-          unitSize: unitSize,
+          units: 1,
+          unitSize: stake$,
+          stake: stake$,
           maxPriceCents: maxPx,
           minEdgePp: st.pmAutoMinEdge,
           useCardPrice: true,
@@ -4664,7 +4856,7 @@
         return { ok: false, reason: 'bad_json' };
       }
       if (d && d.ok) {
-        autoTradeDailyAdd(units);
+        autoTradeDailyAdd(stake$);
         if (mode === 'paper' || mode === 'live') {
           try { logBet(g); } catch (eL) {}
         }
@@ -4672,7 +4864,7 @@
           notifyAutoTrade(mode === 'dry-run' ? 'placed' : 'placed', g, {
             mode: mode,
             pick: g.modelPick,
-            stake: Math.round(units * unitSize * 100) / 100,
+            stake: stake$,
             orderId: d.orderId || (d.order && (d.order.id || d.order.orderId)),
             slug: g.marketSlug || g.slug,
             reason: d.message || 'ok'
@@ -4688,7 +4880,7 @@
         notifyAutoTrade(d && d.skipped ? 'declined' : 'error', g, {
           mode: mode,
           pick: g.modelPick,
-          stake: Math.round(units * unitSize * 100) / 100,
+          stake: stake$,
           slug: g.marketSlug || g.slug,
           reason: err + (d && d.hint ? ' · ' + d.hint : '')
         });
@@ -6354,6 +6546,13 @@
     bindCards(box, list);
   }
   async function loadGames() {
+    // Sync mobile dropdowns → global filters (fixes Refresh after selection)
+    try {
+      if ($('m-mode') && $('m-mode').value) mode = $('m-mode').value;
+      if ($('m-day') && $('m-day').value) dayFilter = $('m-day').value;
+      if ($('m-sport') && $('m-sport').value) sport = $('m-sport').value;
+      if ($('m-venue') && $('m-venue').value) venue = $('m-venue').value;
+    } catch (eSync) {}
     var box = $('games');
     var boxP = $('games-poly');
     var boxK = $('games-kal');
@@ -8465,6 +8664,9 @@ function renderSlate() {
       pmAutoMaxDaily: ($('pm-auto-max-daily') && $('pm-auto-max-daily').value) || '3',
       pmAutoMaxPrice: Number(($('pm-auto-max-price') && $('pm-auto-max-price').value) || 75) || 75,
       pmAutoMinEdge: Number(($('pm-auto-min-edge') && $('pm-auto-min-edge').value) || 3) || 3,
+      pmAutoStake: Number(($('pm-auto-stake') && $('pm-auto-stake').value) || 5) || 5,
+      pmAutoKelly: !!($('pm-auto-kelly') && $('pm-auto-kelly').checked),
+      pmAutoKellyFrac: Number(($('pm-auto-kelly-frac') && $('pm-auto-kelly-frac').value) || 0.5) || 0.5,
       pmAutoMktMl: !!($('pm-auto-mkt-ml') && $('pm-auto-mkt-ml').checked),
       pmAutoMktTotal: !!($('pm-auto-mkt-total') && $('pm-auto-mkt-total').checked),
       pmAutoMktF5: !!($('pm-auto-mkt-f5') && $('pm-auto-mkt-f5').checked),
@@ -8525,6 +8727,9 @@ function renderSlate() {
   if ($('pm-auto-max-daily') && st.pmAutoMaxDaily != null) $('pm-auto-max-daily').value = st.pmAutoMaxDaily;
   if ($('pm-auto-max-price') && st.pmAutoMaxPrice != null) $('pm-auto-max-price').value = st.pmAutoMaxPrice;
   if ($('pm-auto-min-edge') && st.pmAutoMinEdge != null) $('pm-auto-min-edge').value = st.pmAutoMinEdge;
+  if ($('pm-auto-stake') && st.pmAutoStake != null) $('pm-auto-stake').value = st.pmAutoStake;
+  if ($('pm-auto-kelly')) $('pm-auto-kelly').checked = !!st.pmAutoKelly;
+  if ($('pm-auto-kelly-frac') && st.pmAutoKellyFrac != null) $('pm-auto-kelly-frac').value = st.pmAutoKellyFrac;
   if ($('pm-auto-mkt-ml')) $('pm-auto-mkt-ml').checked = st.pmAutoMktMl !== false;
   if ($('pm-auto-mkt-total')) $('pm-auto-mkt-total').checked = st.pmAutoMktTotal !== false;
   if ($('pm-auto-mkt-f5')) $('pm-auto-mkt-f5').checked = !!st.pmAutoMktF5;
@@ -8543,6 +8748,9 @@ function renderSlate() {
   if ($('pm-auto-max-daily') && st.pmAutoMaxDaily != null) $('pm-auto-max-daily').value = st.pmAutoMaxDaily;
   if ($('pm-auto-max-price') && st.pmAutoMaxPrice != null) $('pm-auto-max-price').value = st.pmAutoMaxPrice;
   if ($('pm-auto-min-edge') && st.pmAutoMinEdge != null) $('pm-auto-min-edge').value = st.pmAutoMinEdge;
+  if ($('pm-auto-stake') && st.pmAutoStake != null) $('pm-auto-stake').value = st.pmAutoStake;
+  if ($('pm-auto-kelly')) $('pm-auto-kelly').checked = !!st.pmAutoKelly;
+  if ($('pm-auto-kelly-frac') && st.pmAutoKellyFrac != null) $('pm-auto-kelly-frac').value = st.pmAutoKellyFrac;
   if ($('pm-auto-mkt-ml')) $('pm-auto-mkt-ml').checked = st.pmAutoMktMl !== false;
   if ($('pm-auto-mkt-total')) $('pm-auto-mkt-total').checked = st.pmAutoMktTotal !== false;
   if ($('pm-auto-mkt-f5')) $('pm-auto-mkt-f5').checked = !!st.pmAutoMktF5;
