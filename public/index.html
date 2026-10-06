@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.64</title>
+  <title>EliteOdds v3.4.65</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -748,6 +748,21 @@
       font-size: 11px;
     }
 
+
+    @media (max-width: 767px) {
+      header.eo-top #mode-row,
+      header.eo-top #venue-toggle { display: none !important; }
+      header.eo-top #btn-load,
+      header.eo-top #btn-scan-auto { display: none !important; }
+      #mobile-filter-bar select {
+        max-width: 100%;
+        appearance: auto;
+        -webkit-appearance: menulist;
+      }
+    }
+    @media (min-width: 768px) {
+      #mobile-filter-bar { display: none !important; }
+    }
   </style>
 </head>
 <body class="v3">
@@ -761,7 +776,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.64</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.65</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -788,7 +803,47 @@
         </nav>
       </header>
 
-      <div class="md:hidden px-3 py-2 overflow-x-auto flex gap-1" id="sport-rail-mobile"></div>
+      <!-- Mobile compact filters: mode / day / sport dropdowns -->
+      <div class="md:hidden px-2 pt-1.5 pb-1 space-y-1.5 border-b border-bb-border/40" id="mobile-filter-bar">
+        <div class="grid grid-cols-3 gap-1.5">
+          <label class="block min-w-0">
+            <span class="text-[9px] text-bb-muted uppercase tracking-wide">When</span>
+            <select id="m-mode" class="mt-0.5 w-full bg-bb-bg border border-bb-border rounded-lg px-1.5 py-1.5 text-[11px] text-white">
+              <option value="pregame">Pregame</option>
+              <option value="live">Live</option>
+              <option value="both" selected>Live + Pregame</option>
+            </select>
+          </label>
+          <label class="block min-w-0">
+            <span class="text-[9px] text-bb-muted uppercase tracking-wide">Days</span>
+            <select id="m-day" class="mt-0.5 w-full bg-bb-bg border border-bb-border rounded-lg px-1.5 py-1.5 text-[11px] text-white">
+              <option value="next3" selected>Next 3 days</option>
+              <option value="today">Today</option>
+              <option value="tomorrow">Tomorrow</option>
+              <option value="all">All days</option>
+            </select>
+          </label>
+          <label class="block min-w-0">
+            <span class="text-[9px] text-bb-muted uppercase tracking-wide">Sport</span>
+            <select id="m-sport" class="mt-0.5 w-full bg-bb-bg border border-bb-border rounded-lg px-1.5 py-1.5 text-[11px] text-white"></select>
+          </label>
+        </div>
+        <div class="grid grid-cols-2 gap-1.5">
+          <label class="block min-w-0">
+            <span class="text-[9px] text-bb-muted uppercase tracking-wide">Book</span>
+            <select id="m-venue" class="mt-0.5 w-full bg-bb-bg border border-bb-border rounded-lg px-1.5 py-1.5 text-[11px] text-white">
+              <option value="polymarket" selected>Polymarket</option>
+              <option value="kalshi">Kalshi</option>
+              <option value="both">Both</option>
+            </select>
+          </label>
+          <div class="flex items-end gap-1">
+            <button type="button" id="m-btn-load" class="flex-1 px-2 py-1.5 rounded-lg border border-bb-border text-[11px] text-bb-muted">↻ Refresh</button>
+            <button type="button" id="m-btn-auto" class="flex-1 px-2 py-1.5 rounded-lg border border-violet-400/50 text-[11px] text-violet-200">Auto</button>
+          </div>
+        </div>
+      </div>
+      <div class="hidden" id="sport-rail-mobile"></div>
 
       <div class="eo-main-wrap">
         <div class="eo-center">
@@ -1631,7 +1686,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.64</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.65</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -2060,8 +2115,18 @@
   };
 
   
-  var APP_VERSION = '3.4.64';
+  var APP_VERSION = '3.4.65';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.65',
+      date: '2026-10-05',
+      title: 'Mobile: mode / day / sport as compact dropdowns',
+      items: [
+        'CHANGED — Phone: When (pregame/live), Days (today/next3/all), Sport, and Book are dropdowns under the header.',
+        'CHANGED — Desktop keeps pill buttons; mobile hides the long chip rows.',
+        'ADDED — Mobile Refresh + Auto next to Book dropdown.'
+      ]
+    },
     {
       version: '3.4.64',
       date: '2026-10-05',
@@ -3220,38 +3285,89 @@
         var ico = ICO[s.id] || '•';
         return '<button type="button" data-sport="' + s.id + '" class="sport-btn ' + on + '" title="' + s.label + '"><span style="font-size:16px;line-height:1">' + ico + '</span><span>' + String(s.label||s.id).slice(0,4) + '</span></button>';
       }).join('');
+      $('sport-rail').querySelectorAll('button[data-sport]').forEach(function (btn) {
+        btn.onclick = function () {
+          sport = btn.getAttribute('data-sport') || 'all';
+          marketType = 'all';
+          paintSports();
+          paintCats();
+          loadGames();
+        };
+      });
     }
-    // Mobile: single sport dropdown (cleaner)
-    var mob = $('sport-rail-mobile');
-    if (mob) {
-      mob.innerHTML = '<label class="text-[10px] text-bb-muted flex items-center gap-1.5 w-full">Sport <select id="sport-select" class="flex-1 bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-white text-xs">' +
-        SPORTS.map(function (s) {
-          return '<option value="' + s.id + '"' + (s.id === sport ? ' selected' : '') + '>' + s.label + '</option>';
-        }).join('') + '</select></label>';
-      var ss = $('sport-select');
-      if (ss) ss.onchange = function () {
-        sport = ss.value || 'mlb';
-        marketType = 'all';
-        paintSports();
-  try { renderChangelog(); } catch (e0) {}
-        paintCats();
-        try { renderChangelog(); } catch (eCl2) {}
-  try { maybeShowWhatsNew(); } catch (eWn) {}
-  try { updateWeeklyReport(); if ($('elite-streak')) $('elite-streak').innerHTML = eliteStreakHtml(); } catch (eSt) {}
-  loadGames();
-  /* version-sync-boot */
-  setTimeout(function () { try { renderChangelog(); } catch (e3) {} }, 50);
+    // Mobile sport dropdown (compact)
+    var ms = $('m-sport');
+    if (ms) {
+      ms.innerHTML = SPORTS.map(function (s) {
+        return '<option value="' + s.id + '"' + (s.id === sport ? ' selected' : '') + '>' + s.label + '</option>';
+      }).join('');
+    }
+    // Sync mobile mode/day/venue selects
+    if ($('m-mode')) $('m-mode').value = mode || 'both';
+    if ($('m-day')) $('m-day').value = dayFilter || 'next3';
+    if ($('m-venue')) $('m-venue').value = venue || 'polymarket';
+  }
+
+  function wireMobileFilters() {
+    if (wireMobileFilters._done) return;
+    wireMobileFilters._done = true;
+    function syncPills() {
+      document.querySelectorAll('.mode-btn').forEach(function (b) {
+        var on = b.getAttribute('data-mode') === mode;
+        b.classList.toggle('pill-on', on);
+        b.classList.toggle('text-bb-muted', !on);
+      });
+      document.querySelectorAll('.day-btn').forEach(function (b) {
+        var on = b.getAttribute('data-day') === dayFilter;
+        b.classList.toggle('pill-on', on);
+        b.classList.toggle('text-bb-muted', !on);
+      });
+      document.querySelectorAll('.venue-btn').forEach(function (b) {
+        var on = b.getAttribute('data-venue') === venue;
+        b.classList.toggle('pill-on', on);
+      });
+    }
+    if ($('m-mode')) {
+      $('m-mode').onchange = function () {
+        mode = $('m-mode').value || 'both';
+        syncPills();
+        loadGames();
       };
     }
-    document.querySelectorAll('#sport-rail .sport-btn').forEach(function (btn) {
-      btn.onclick = function () {
-        sport = btn.getAttribute('data-sport');
+    if ($('m-day')) {
+      $('m-day').onchange = function () {
+        dayFilter = $('m-day').value || 'next3';
+        syncPills();
+        loadGames();
+      };
+    }
+    if ($('m-sport')) {
+      $('m-sport').onchange = function () {
+        sport = $('m-sport').value || 'all';
         marketType = 'all';
         paintSports();
         paintCats();
         loadGames();
       };
-    });
+    }
+    if ($('m-venue')) {
+      $('m-venue').onchange = function () {
+        venue = $('m-venue').value || 'polymarket';
+        syncPills();
+        loadGames();
+      };
+    }
+    if ($('m-btn-load')) {
+      $('m-btn-load').onclick = function () {
+        if ($('btn-load')) $('btn-load').click();
+        else loadGames();
+      };
+    }
+    if ($('m-btn-auto')) {
+      $('m-btn-auto').onclick = function () {
+        if ($('btn-scan-auto')) $('btn-scan-auto').click();
+      };
+    }
   }
 
   function paintCats() {
@@ -8108,6 +8224,7 @@ function renderSlate() {
   document.querySelectorAll('.mode-btn').forEach(function (btn) {
     btn.onclick = function () {
       mode = btn.getAttribute('data-mode') || 'both';
+      if ($('m-mode')) $('m-mode').value = mode;
       document.querySelectorAll('.mode-btn').forEach(function (b) {
         b.classList.remove('pill-on');
         b.classList.add('text-bb-muted');
@@ -8199,6 +8316,7 @@ function renderSlate() {
   document.querySelectorAll('.venue-btn').forEach(function (btn) {
     btn.onclick = function () {
       venue = btn.getAttribute('data-venue') || 'polymarket';
+      if ($('m-venue')) $('m-venue').value = venue;
       document.querySelectorAll('.venue-btn').forEach(function (b) {
         var on = b.getAttribute('data-venue') === venue;
         b.classList.toggle('pill-on', on);
