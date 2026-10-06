@@ -21,8 +21,15 @@ module.exports = async function handler(req, res) {
     if (action === 'logo') {
       return require('../lib/handlers/logo')(req, res);
     }
+    if (action === 'openai' || action === 'coach' || action === 'ai') {
+      return require('./ai')(req, res);
+    }
     // default: if POST body looks like odds consensus
     if (req.method === 'POST') {
+      const b = req.body || {};
+      if (b.action === 'openai' || b.prompt || b.openaiKey || b.apiKey) {
+        return require('./ai')(req, res);
+      }
       return require('../lib/handlers/oddsConsensus')(req, res);
     }
     return require('../lib/handlers/smartMoney')(req, res);

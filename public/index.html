@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.67</title>
+  <title>EliteOdds v3.4.71</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -802,7 +802,13 @@
         border-radius: 0.65rem !important;
         font-weight: 600 !important;
         padding: 0.45rem 0.5rem !important;
+        pointer-events: auto !important;
+        position: relative;
+        z-index: 6;
+        cursor: pointer;
+        -webkit-tap-highlight-color: rgba(167,139,250,0.35);
       }
+      #mobile-filter-bar { pointer-events: auto !important; position: relative; z-index: 5; }
       #m-btn-load {
         background: rgba(30, 25, 50, 0.9) !important;
         border-color: rgba(167, 139, 250, 0.35) !important;
@@ -879,7 +885,144 @@
         font-size: 11px !important;
       }
     }
-  </style>
+
+    .auto-settings-fields label { display: block; width: 100%; }
+    .auto-settings-fields select,
+    .auto-settings-fields input[type="number"] {
+      display: block; width: 100%; min-height: 2.25rem;
+    }
+  
+    /* —— Premium game cards (purple glass) —— */
+    #games article.glass, article.game-card {
+      position: relative;
+      border-radius: 1.15rem !important;
+      border: 1px solid rgba(167, 139, 250, 0.32) !important;
+      background:
+        radial-gradient(120% 90% at 0% 0%, rgba(124, 58, 237, 0.24), transparent 52%),
+        radial-gradient(90% 70% at 100% 100%, rgba(91, 33, 182, 0.2), transparent 48%),
+        linear-gradient(165deg, rgba(22, 18, 42, 0.96) 0%, rgba(12, 14, 28, 0.94) 100%) !important;
+      box-shadow:
+        0 12px 36px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+        0 1px 0 rgba(196, 181, 253, 0.1) inset !important;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      overflow: hidden;
+    }
+    #games article.glass::before, article.game-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(196, 181, 253, 0.6), transparent);
+      pointer-events: none;
+      z-index: 1;
+    }
+    article.kalshi-card {
+      border-color: rgba(52, 211, 153, 0.42) !important;
+      background:
+        radial-gradient(120% 90% at 0% 0%, rgba(16, 185, 129, 0.22), transparent 52%),
+        radial-gradient(90% 70% at 100% 100%, rgba(6, 95, 70, 0.28), transparent 48%),
+        linear-gradient(165deg, rgba(10, 28, 22, 0.96) 0%, rgba(8, 16, 14, 0.95) 100%) !important;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(52, 211, 153, 0.12) inset !important;
+    }
+    article.kalshi-card::before {
+      background: linear-gradient(90deg, transparent, rgba(110, 231, 183, 0.55), transparent);
+    }
+    body.v3 .v3-metrics > div {
+      background: rgba(15, 12, 32, 0.6) !important;
+      border: 1px solid rgba(139, 92, 246, 0.3) !important;
+      border-radius: 0.8rem !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    article.kalshi-card .v3-metrics > div {
+      border-color: rgba(52, 211, 153, 0.32) !important;
+      background: rgba(6, 24, 18, 0.6) !important;
+    }
+
+    /* —— Kalshi premium cards (match Poly glass quality) —— */
+    #games article.glass.kalshi-card,
+    #games-kal article.glass,
+    #games-pm article.kalshi-card,
+    article.game-card.kalshi-card,
+    body.theme-kalshi #games article.glass,
+    body.theme-kalshi article.game-card {
+      position: relative !important;
+      border-radius: 1.15rem !important;
+      border: 1px solid rgba(52, 211, 153, 0.45) !important;
+      background:
+        radial-gradient(120% 90% at 0% 0%, rgba(16, 185, 129, 0.28), transparent 52%),
+        radial-gradient(90% 70% at 100% 100%, rgba(6, 95, 70, 0.32), transparent 48%),
+        linear-gradient(165deg, rgba(10, 32, 24, 0.97) 0%, rgba(6, 18, 14, 0.96) 100%) !important;
+      box-shadow:
+        0 12px 36px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(52, 211, 153, 0.14) inset,
+        0 1px 0 rgba(110, 231, 183, 0.12) inset !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      overflow: hidden !important;
+    }
+    #games article.glass.kalshi-card::before,
+    body.theme-kalshi #games article.glass::before,
+    article.game-card.kalshi-card::before {
+      content: '' !important;
+      position: absolute !important;
+      top: 0 !important; left: 10% !important; right: 10% !important;
+      height: 1px !important;
+      background: linear-gradient(90deg, transparent, rgba(110, 231, 183, 0.65), transparent) !important;
+      pointer-events: none !important;
+      z-index: 1 !important;
+    }
+    body.theme-kalshi .v3-metrics > div,
+    article.kalshi-card .v3-metrics > div {
+      background: rgba(6, 28, 20, 0.65) !important;
+      border: 1px solid rgba(52, 211, 153, 0.35) !important;
+      border-radius: 0.8rem !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05) !important;
+    }
+    body.theme-kalshi .v3-actions {
+      border-top-color: rgba(52, 211, 153, 0.22) !important;
+    }
+    body.theme-kalshi .v3-actions button,
+    body.theme-kalshi .v3-actions a,
+    article.kalshi-card .v3-actions button,
+    article.kalshi-card .v3-actions a {
+      border: 1px solid rgba(52, 211, 153, 0.38) !important;
+      background: rgba(6, 28, 22, 0.85) !important;
+      color: #d1fae5 !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04) !important;
+    }
+    body.theme-kalshi .v3-actions .btn-focus,
+    article.kalshi-card .v3-actions .btn-focus {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.55), rgba(6, 95, 70, 0.45)) !important;
+      border-color: rgba(110, 231, 183, 0.65) !important;
+      color: #ecfdf5 !important;
+    }
+    body.theme-kalshi .v3-actions .btn-place,
+    article.kalshi-card .v3-actions .btn-place {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.45), rgba(22, 101, 52, 0.4)) !important;
+      border-color: rgba(74, 222, 128, 0.6) !important;
+      color: #dcfce7 !important;
+    }
+    body.theme-kalshi .v3-actions .btn-verdict,
+    article.kalshi-card .v3-actions .btn-verdict {
+      border-color: rgba(45, 212, 191, 0.45) !important;
+      color: #99f6e4 !important;
+    }
+    /* Mobile filter bar in Kalshi theme */
+    body.theme-kalshi #mobile-filter-bar {
+      border-color: rgba(52, 211, 153, 0.4) !important;
+      background:
+        radial-gradient(120% 100% at 50% 0%, rgba(16, 185, 129, 0.28), transparent 55%),
+        linear-gradient(165deg, rgba(10, 32, 24, 0.95), rgba(6, 18, 14, 0.92)) !important;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.35), 0 0 0 1px rgba(52, 211, 153, 0.12) inset !important;
+    }
+    body.theme-kalshi #m-btn-auto {
+      background: linear-gradient(135deg, #10b981, #059669) !important;
+      border-color: rgba(110, 231, 183, 0.5) !important;
+      color: #fff !important;
+    }
+</style>
 </head>
 <body class="v3">
   <div class="flex min-h-screen">
@@ -892,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.67</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.71</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1013,7 +1156,7 @@
             <button type="button" id="f-reset" class="text-bb-muted border border-bb-border rounded-lg px-2 py-1">Reset</button>
             <button type="button" id="eo-toggle-more" class="text-bb-muted text-[10px] underline">More filters</button>
           </div>
-          <div id="weekly-report" class="glass p-3 mb-2 week-report hidden">
+          <div id="weekly-report" class="glass p-3 mb-2 week-report">
             <div class="flex justify-between items-center mb-1 gap-2 flex-wrap">
               <h3 class="text-xs font-semibold text-white m-0">Weekly Elite paper</h3>
               <div class="flex items-center gap-2">
@@ -1595,18 +1738,18 @@
                 <input type="checkbox" id="pm-auto-confirm" class="rounded" checked />
                 Require confirm before each order
               </label>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <label class="block text-[10px] text-bb-muted">Min rank
+              <div class="grid grid-cols-1 gap-2.5 auto-settings-fields">
+                <label class="block text-[11px] text-violet-200/90 font-medium">Min rank
                   <select id="pm-auto-min-rank" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs">
                     <option value="elite">Elite + Super Elite</option>
                     <option value="super">Super Elite only</option>
                     <option value="good">Good + Elite</option>
                   </select>
                 </label>
-                <label class="block text-[10px] text-bb-muted">Stake $ <span class="text-bb-muted font-normal">(target risk per auto bet)</span>
+                <label class="block text-[11px] text-violet-200/90 font-medium">Stake $ <span class="text-bb-muted font-normal text-[10px]">(per auto bet)</span>
                   <input id="pm-auto-stake" type="number" min="0.5" step="0.5" value="5" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs" />
                 </label>
-                <label class="block text-[10px] text-bb-muted">Max daily $
+                <label class="block text-[11px] text-violet-200/90 font-medium">Max daily $
                   <select id="pm-auto-max-daily" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs">
                     <option value="5">$5</option>
                     <option value="10">$10</option>
@@ -1621,7 +1764,7 @@
                   <input type="checkbox" id="pm-auto-kelly" class="rounded" />
                   Use Kelly (overrides Stake $ when bankroll set)
                 </label>
-                <label class="block text-[10px] text-bb-muted">Kelly fraction
+                <label class="block text-[11px] text-violet-200/90 font-medium">Kelly fraction
                   <select id="pm-auto-kelly-frac" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs">
                     <option value="0.25">Quarter Kelly</option>
                     <option value="0.5" selected>Half Kelly</option>
@@ -1629,10 +1772,10 @@
                   </select>
                 </label>
                 <input type="hidden" id="pm-auto-units" value="1" />
-                <label class="block text-[10px] text-bb-muted">Max price (¢) <span class="text-bb-muted">(-190 ≈ 66¢)</span>
+                <label class="block text-[11px] text-violet-200/90 font-medium">Max price (¢) <span class="text-bb-muted font-normal text-[10px]">(-190 ≈ 66¢)</span>
                   <input id="pm-auto-max-price" type="number" min="1" max="99" value="66" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs" />
                 </label>
-                <label class="block text-[10px] text-bb-muted">Min edge (pp)
+                <label class="block text-[11px] text-violet-200/90 font-medium">Min edge (pp)
                   <input id="pm-auto-min-edge" type="number" min="0" step="0.5" value="3" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs" />
                 </label>
               </div>
@@ -1809,7 +1952,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.67</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.71</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -2238,8 +2381,49 @@
   };
 
   
-  var APP_VERSION = '3.4.67';
+  var APP_VERSION = '3.4.71';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.71',
+      date: '2026-10-06',
+      title: 'Kalshi premium glass cards',
+      items: [
+        'DESIGN — Kalshi cards use full emerald glass (same structure as Polymarket purple).',
+        'DESIGN — Kalshi theme filter bar + Focus/Place buttons match green premium style.',
+        'FIXED — theme-kalshi no longer flattens game cards to plain green panels.'
+      ]
+    },
+    {
+      version: '3.4.70',
+      date: '2026-10-06',
+      title: 'Premium purple-glass game cards',
+      items: [
+        'DESIGN — Cards match mobile filter purple glass (gradient, glow edge, soft highlight).',
+        'DESIGN — Kalshi cards use emerald glass variant.',
+        'DESIGN — Action buttons unified grid: Focus/Place highlighted; cleaner spacing on mobile.'
+      ]
+    },
+    {
+      version: '3.4.69',
+      date: '2026-10-06',
+      title: 'Slip date · Auto settings layout · AI coach key · Weekly Elite back',
+      items: [
+        'ADDED — Parlay/slip rows show game date & time.',
+        'FIXED — Auto-trade settings stack cleanly on mobile (labels no longer overlap).',
+        'FIXED — AI coach uses OpenAI key via /api/ai (was wrongly hitting Odds API).',
+        'FIXED — Weekly Elite paper visible on Scan again (Hide remembers preference).'
+      ]
+    },
+    {
+      version: '3.4.68',
+      date: '2026-10-06',
+      title: 'Mobile Refresh + Auto actually wired',
+      items: [
+        'FIXED — wireMobileFilters was not run on boot (handlers never attached).',
+        'FIXED — Refresh / Auto use event delegation on the mobile filter bar (always works).',
+        'FIXED — Auto runs scan + auto pipeline directly (does not depend on hidden desktop Auto button).'
+      ]
+    },
     {
       version: '3.4.67',
       date: '2026-10-05',
@@ -3044,7 +3228,7 @@
 
   function hubCardHtml(group) {
     var g = group.primary;
-    var isKalshi = g.venue === 'kalshi' || g.source === 'kalshi';
+    var isKalshi = String(g.venue || g.source || '').toLowerCase().indexOf('kalshi') >= 0;
     var title = String(g.eventTitle || g.title || '').replace(/</g, '');
     var lines = group.lines || [];
     var show = lines.slice(0, 6);
@@ -3434,7 +3618,6 @@
           sport = btn.getAttribute('data-sport') || 'all';
           marketType = 'all';
           paintSports();
-  if (typeof wireMobileFilters === "function") wireMobileFilters();
           paintCats();
           loadGames();
         };
@@ -3454,8 +3637,27 @@
   }
 
   function wireMobileFilters() {
-    // Always (re)bind so Refresh works after sport/mode changes
+    // Idempotent: bind once via delegation on the mobile filter bar
+    var bar = $('mobile-filter-bar');
+    if (!bar) return;
+    if (bar.getAttribute('data-wired') === '1') {
+      // still refresh select values
+      if ($('m-mode')) $('m-mode').value = mode || 'both';
+      if ($('m-day')) $('m-day').value = dayFilter || 'next3';
+      if ($('m-venue')) $('m-venue').value = venue || 'polymarket';
+      if ($('m-sport') && !$('m-sport').options.length) paintSports();
+      return;
+    }
+    bar.setAttribute('data-wired', '1');
 
+    function syncFromMobile() {
+      try {
+        if ($('m-mode') && $('m-mode').value) mode = $('m-mode').value;
+        if ($('m-day') && $('m-day').value) dayFilter = $('m-day').value;
+        if ($('m-sport') && $('m-sport').value) sport = $('m-sport').value;
+        if ($('m-venue') && $('m-venue').value) venue = $('m-venue').value;
+      } catch (e) {}
+    }
     function syncPills() {
       document.querySelectorAll('.mode-btn').forEach(function (b) {
         var on = b.getAttribute('data-mode') === mode;
@@ -3472,62 +3674,77 @@
         b.classList.toggle('pill-on', on);
       });
     }
-    if ($('m-mode')) {
-      $('m-mode').onchange = function () {
-        mode = $('m-mode').value || 'both';
+
+    bar.addEventListener('change', function (e) {
+      var t = e.target;
+      if (!t || !t.id) return;
+      if (t.id === 'm-mode') {
+        mode = t.value || 'both';
         syncPills();
         loadGames();
-      };
-    }
-    if ($('m-day')) {
-      $('m-day').onchange = function () {
-        dayFilter = $('m-day').value || 'next3';
+      } else if (t.id === 'm-day') {
+        dayFilter = t.value || 'next3';
         syncPills();
         loadGames();
-      };
-    }
-    if ($('m-sport')) {
-      $('m-sport').onchange = function () {
-        sport = $('m-sport').value || 'all';
+      } else if (t.id === 'm-sport') {
+        sport = t.value || 'all';
         marketType = 'all';
         paintSports();
         paintCats();
         loadGames();
-      };
-    }
-    if ($('m-venue')) {
-      $('m-venue').onchange = function () {
-        venue = $('m-venue').value || 'polymarket';
+      } else if (t.id === 'm-venue') {
+        venue = t.value || 'polymarket';
         syncPills();
         loadGames();
-      };
-    }
-    if ($('m-btn-load')) {
-      $('m-btn-load').onclick = function (ev) {
-        if (ev && ev.preventDefault) ev.preventDefault();
-        try {
-          if ($('m-mode') && $('m-mode').value) mode = $('m-mode').value;
-          if ($('m-day') && $('m-day').value) dayFilter = $('m-day').value;
-          if ($('m-sport') && $('m-sport').value) sport = $('m-sport').value;
-          if ($('m-venue') && $('m-venue').value) venue = $('m-venue').value;
-          if ($('meta')) $('meta').textContent = 'Refreshing…';
-        } catch (e) {}
+      }
+    });
+
+    bar.addEventListener('click', function (e) {
+      var t = e.target;
+      if (!t) return;
+      // climb to button
+      var btn = t.closest ? t.closest('button') : t;
+      if (!btn || !btn.id) return;
+      if (btn.id === 'm-btn-load') {
+        e.preventDefault();
+        e.stopPropagation();
+        syncFromMobile();
+        syncPills();
+        try { if ($('meta')) $('meta').textContent = 'Refreshing…'; } catch (e2) {}
         loadGames();
-        return false;
-      };
-    }
-    if ($('m-btn-auto')) {
-      $('m-btn-auto').onclick = function () {
-        if ($('btn-scan-auto')) {
-          $('btn-scan-auto').click();
-        } else if (typeof runScanForAuto === 'function') {
-          runScanForAuto();
-        } else {
-          loadGames().then(function () {
-            if (typeof runAutoTradeOnGames === 'function') runAutoTradeOnGames(games || []);
-          });
-        }
-      };
+        return;
+      }
+      if (btn.id === 'm-btn-auto') {
+        e.preventDefault();
+        e.stopPropagation();
+        syncFromMobile();
+        syncPills();
+        runMobileAuto();
+        return;
+      }
+    });
+  }
+
+  async function runMobileAuto() {
+    try {
+      var st = settings();
+      try {
+        if ($('pm-auto-enabled')) st.pmAutoEnabled = !!$('pm-auto-enabled').checked;
+        if ($('pm-auto-mode')) st.pmAutoMode = $('pm-auto-mode').value || st.pmAutoMode;
+      } catch (e0) {}
+      if (!st.pmAutoEnabled) {
+        alert('Turn on “Enable auto pipeline” in Settings → Auto-trade, then Save.');
+        return;
+      }
+      if ($('meta')) $('meta').textContent = 'Scan for Auto…';
+      await loadGames();
+      if (typeof runAutoTradeOnGames === 'function') {
+        await runAutoTradeOnGames(games || []);
+      } else {
+        alert('Auto engine not loaded — hard refresh the page.');
+      }
+    } catch (e) {
+      alert('Auto: ' + (e.message || e));
     }
   }
 
@@ -3882,8 +4099,8 @@
     var epp = eppRaw != null ? ((Number(eppRaw) >= 0 ? '+' : '') + Number(eppRaw) + 'pp') : '—';
     var form = (g.evaluate && g.evaluate.matchup && g.evaluate.matchup.detail) ? String(g.evaluate.matchup.detail).replace(/</g, '') : '';
 
-    var isKalshi = g.venue === 'kalshi' || g.source === 'kalshi';
-    return '<article class="glass p-3 space-y-2.5 min-w-0 overflow-hidden' + (isKalshi ? ' kalshi-card' : '') + '">' +
+    var isKalshi = String(g.venue || g.source || '').toLowerCase().indexOf('kalshi') >= 0;
+    return '<article class="glass game-card p-3.5 space-y-2.5 min-w-0 overflow-hidden' + (isKalshi ? ' kalshi-card' : '') + '">' +
       '<div class="flex justify-between gap-2">' +
         '<div class="min-w-0"><p class="text-[9px] uppercase tracking-wide mb-0.5 ' + (isKalshi ? 'text-bb-green' : 'text-violet-300') + '">' + (isKalshi ? 'Kalshi' : 'Polymarket') + '</p>' +'<p class="font-medium text-sm leading-snug">' + title + '</p>' +
         '<p class="text-[10px] text-bb-muted mt-0.5">' + String(g.league || '').toUpperCase() +
@@ -3966,16 +4183,15 @@
             '<span>Dec <strong class="text-white">' + (dec != null ? dec : '—') + '</strong></span></div>' +
           sizingBlock(g) +
         '</div></details>' +
-      '<div class="v3-actions pt-1 border-t border-bb-border/80" style="grid-template-columns:repeat(4,minmax(0,1fr))">' +
-        '<button type="button" class="btn-focus">Focus</button><button type="button" class="btn-place text-[11px] px-2.5 py-1 rounded-lg border border-bb-green/40 text-bb-green">Place</button>' +
+      '<div class="v3-actions v3-actions-primary">' +
+        '<button type="button" class="btn-focus">Focus</button>' +
+        '<button type="button" class="btn-place">Place</button>' +
         '<button type="button" class="btn-verdict">Verdict</button>' +
         '<button type="button" class="btn-log">Log</button>' +
         '<a class="btn-trade" href="' + tradeHrefFor(g) + '" target="_blank" rel="noopener">Trade</a>' +
-      '</div>' +
-      '<div class="v3-actions mt-1.5" style="grid-template-columns:repeat(5,minmax(0,1fr))">' +
         '<button type="button" class="btn-books">Books</button>' +
         '<button type="button" class="btn-ticket">Ticket</button>' +
-        '<button type="button" class="btn-share" title="Share pick (text / Messages / copy — no Discord needed)">Share</button>' +
+        '<button type="button" class="btn-share" title="Share pick">Share</button>' +
         '<button type="button" class="btn-discord">Discord</button>' +
         '<button type="button" class="btn-discord2">Disc 2</button>' +
       '</div>' +
@@ -7687,6 +7903,15 @@ function renderSlate() {
       else if (mkt != null) mkt = Math.round(Number(mkt) * 10) / 10;
       var isK = String(g.venue || g.source || '').toLowerCase() === 'kalshi';
       var mktShow = mkt != null ? (isK ? Math.round(mkt) + '¢' : mkt + '%') : '—';
+      var when = '';
+      try {
+        if (typeof formatGameWhen === 'function' && g.startTime) {
+          when = formatGameWhen(g.startTime, !!g.live, !!g.ended);
+        } else if (g.startTime) {
+          var dd = new Date(g.startTime);
+          if (!isNaN(dd.getTime())) when = dd.toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+        }
+      } catch (eW) {}
       return '<div class="glass px-3 py-2.5 flex flex-wrap items-center gap-2 justify-between" data-slate-i="' + i + '">' +
         '<div class="min-w-0 flex-1">' +
           '<div class="flex items-center gap-1.5 flex-wrap">' +
@@ -7698,6 +7923,7 @@ function renderSlate() {
             (mod != null ? ' · Model ' + mod + '%' : '') +
             (mkt != null ? ' · Mkt ' + mktShow : '') +
           '</div>' +
+          (when ? '<div class="text-[10px] text-violet-300/90 mt-0.5">' + String(when).replace(/</g,'') + '</div>' : '') +
         '</div>' +
         '<button type="button" class="slate-add text-[11px] px-2.5 py-1 rounded-lg border border-bb-green/40 text-bb-green shrink-0" data-i="' + i + '">+ Slip</button>' +
       '</div>';
@@ -7773,11 +7999,26 @@ function renderSlate() {
     if (!box) return;
     if (!ticket.length) { box.innerHTML = '<p class="text-bb-muted p-2">Empty</p>'; return; }
     box.innerHTML = ticket.map(function (x, i) {
+      var when = '';
+      try {
+        if (typeof formatGameWhen === 'function' && (x.startTime || x.at)) {
+          when = formatGameWhen(x.startTime || x.at, !!x.live, !!x.ended);
+        } else if (x.startTime) {
+          var dd = new Date(x.startTime);
+          if (!isNaN(dd.getTime())) when = dd.toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+        }
+      } catch (eW) {}
       return '<div class="rounded-lg border border-bb-border p-2 bg-bb-elev/40">' +
-        '<div class="flex justify-between"><span class="text-white">' + String(x.pick || '').replace(/</g,'') +
-        '</span><button type="button" data-rm="' + i + '" class="text-bb-red">✕</button></div>' +
-        '<div class="text-bb-muted truncate">' + String(x.title || '').replace(/</g,'') + '</div>' +
-        '<div>' + x.units + 'u</div></div>';
+        '<div class="flex justify-between gap-2"><span class="text-white font-medium">' + String(x.pick || '').replace(/</g,'') +
+        '</span><button type="button" data-rm="' + i + '" class="text-bb-red shrink-0">✕</button></div>' +
+        '<div class="text-bb-muted truncate text-[10px]">' + String(x.title || '').replace(/</g,'') + '</div>' +
+        (when ? '<div class="text-[10px] text-violet-300/90 mt-0.5">' + String(when).replace(/</g,'') + '</div>' : '') +
+        '<div class="text-[10px] text-bb-muted mt-0.5">' +
+          (x.rank ? String(x.rank).toUpperCase() + ' · ' : '') +
+          (x.model_probability != null ? ('Model ' + (Number(x.model_probability) > 1 ? Number(x.model_probability) : Math.round(Number(x.model_probability)*1000)/10) + '% · ') : '') +
+          (x.market_probability != null ? ('Mkt ' + (Number(x.market_probability) > 1 ? Number(x.market_probability) : Math.round(Number(x.market_probability)*1000)/10) + '% · ') : '') +
+          (x.units != null ? x.units + 'u' : '') +
+        '</div></div>';
     }).join('');
     box.querySelectorAll('[data-rm]').forEach(function (b) {
       b.onclick = function () {
@@ -8561,11 +8802,17 @@ function renderSlate() {
   if ($('wr-toggle')) $('wr-toggle').onclick = function () {
     var body = $('weekly-report');
     if (!body) return;
-    var hide = body.classList.toggle('opacity-60');
-    // collapse detail
-    var d = $('wr-detail');
-    if (d) d.classList.toggle('hidden');
+    var hid = body.classList.toggle('hidden');
+    try { localStorage.setItem('bb_wr_hidden', hid ? '1' : '0'); } catch (e) {}
+    $('wr-toggle').textContent = hid ? 'Show weekly' : 'Hide';
   };
+  // restore weekly visibility preference
+  try {
+    if (localStorage.getItem('bb_wr_hidden') === '1' && $('weekly-report')) {
+      $('weekly-report').classList.add('hidden');
+      if ($('wr-toggle')) $('wr-toggle').textContent = 'Show weekly';
+    }
+  } catch (eWr) {}
 
   if ($('btn-test-live')) $('btn-test-live').onclick = async function () {
     var out = $('live-test-out');
@@ -8778,7 +9025,9 @@ function renderSlate() {
   if ($('max-units')) $('max-units').value = st.maxUnits != null ? st.maxUnits : '1';
   if ($('f-rank') && !$('f-rank').dataset.init) { $('f-rank').value = ''; $('f-rank').dataset.init = '1'; }
   paintSports();
+  if (typeof wireMobileFilters === 'function') wireMobileFilters();
   paintCats();
+  try { if (typeof updateWeeklyReport === 'function') updateWeeklyReport(); } catch (eW) {}
   renderTicket();
   renderJournal();
   var jr = document.getElementById('journal-refresh');

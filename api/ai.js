@@ -13,7 +13,7 @@ module.exports = async function handler(req, res) {
   const q = req.query || {};
   const action = String(body.action || q.action || 'verdict').toLowerCase();
 
-  const apiKey = body.apiKey || process.env.OPENAI_API_KEY;
+  const apiKey = body.apiKey || body.openaiKey || body.openAiKey || process.env.OPENAI_API_KEY;
   const model = body.model || process.env.OPENAI_MODEL || 'gpt-4o';
   const game = body.game || {};
 
@@ -24,7 +24,10 @@ module.exports = async function handler(req, res) {
   let system;
   let userContent;
 
-  if (action === 'research' || action === 'deep' || action === 'deep-research') {
+  if (action === 'coach' || action === 'openai' || action === 'free' || body.prompt) {
+    system = body.system || 'You are a sports betting model coach. Short, honest bullets. Do not invent stats.';
+    userContent = body.prompt || body.message || JSON.stringify(game);
+  } else if (action === 'research' || action === 'deep' || action === 'deep-research') {
     system = `Deep Research — Bet Validation & Thesis
 
 You are performing deep research on a betting opportunity.
@@ -120,7 +123,7 @@ No "lock" / "guaranteed". No EV sales language.`;
       body: JSON.stringify({
         model,
         temperature: action === 'research' ? 0.35 : 0.25,
-        max_tokens: action === 'research' ? 1400 : 900,
+        max_tokens: body.max_tokens || (action === 'research' ? 1400 : 900),
         messages: [
           { role: 'system', content: system },
           { role: 'user', content: userContent },
