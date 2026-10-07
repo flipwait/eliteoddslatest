@@ -187,13 +187,24 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  // Target ~stake$ at this price (round to nearest share; min 1)
-  const qty = Math.max(1, Math.round(stake / Math.max(0.01, price01)));
-  const approxCost = Math.round(qty * price01 * 100) / 100;
+  // App-style: user picks Cost $; we size contracts so cost ≈ stake
+  // quantity can be fractional (PM US allows decimals)
+  const px = Math.max(0.01, Math.min(0.99, price01));
+  let qty = stake / px;
+  // min ~$0.50 notional or 0.01 contract
+  if (qty < 0.01) qty = 0.01;
+  qty = Math.round(qty * 10000) / 10000; // 4dp
+  const approxCost = Math.round(qty * px * 100) / 100;
+  const toWin = Math.round(qty * 100) / 100; // settles ~$1/contract if yes
+  const orderType = String(body.orderType || body.pmOrderType || 'market').toLowerCase() === 'limit'
+    ? 'ORDER_TYPE_LIMIT'
+    : 'ORDER_TYPE_MARKET';
+  const isMarket = orderType === 'ORDER_TYPE_MARKET';
 
   const intent = {
     mode, venue, pick, title, slug, ticker, rank, stake, units, qty,
     priceCents, modelProb, marketProb: price01, side,
+    approxCost, toWin, orderType,
     at: new Date().toISOString(),
   };
 
@@ -201,7 +212,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({
       ok: true,
       mode: 'dry-run',
-      message: 'DRY RUN — no order. Would buy ' + pick + ' @ ~' + priceCents + '¢ × ' + qty + ' shares (target $' + stake + ', approx $' + approxCost + ') slug=' + (slug || ticker || '?'),
+      message: 'DRY RUN — Cost ~$' + approxCost + ' on ' + pick + ' @ ' + priceCents + '¢ → to win ~$' + toWin + ' (' + (isMarket ? 'MARKET' : 'LIMIT') + '). No order sent.',
       intent,
     });
   }
@@ -211,7 +222,7 @@ module.exports = async function handler(req, res) {
       ok: true,
       mode: 'paper',
       paper: true,
-      message: 'PAPER FILL — ' + units + 'u on ' + pick + ' @ ~' + priceCents + '¢ ($' + stake + ' paper). No exchange order.',
+      message: 'PAPER — Cost $' + stake + ' on ' + pick + ' @ ' + priceCents + '¢ → to win ~$' + toWin + '. No real order.',
       intent,
       fill: { status: 'paper_filled', pick, units, stake, priceCents, venue, qty },
     });
@@ -297,15 +308,23 @@ module.exports = async function handler(req, res) {
   try {
     const base = process.env.POLYMARKET_US_API || 'https://api.polymarket.us';
     const path = previewOnly ? '/v1/order/preview' : '/v1/orders';
+    // Match polymarket.us app: MARKET + dollar cost (qty = cost/odds)
     const orderBody = {
       marketSlug: slug,
-      type: 'ORDER_TYPE_LIMIT',
-      price: { value: price01.toFixed(3), currency: 'USD' },
+      type: orderType,
       quantity: qty,
-      tif: 'TIME_IN_FORCE_GOOD_TILL_CANCEL',
+      tif: isMarket ? 'TIME_IN_FORCE_IMMEDIATE_OR_CANCEL' : 'TIME_IN_FORCE_GOOD_TILL_CANCEL',
       intent: side === 'NO' ? 'ORDER_INTENT_BUY_SHORT' : 'ORDER_INTENT_BUY_LONG',
       manualOrderIndicator: 'MANUAL_ORDER_INDICATOR_MANUAL',
     };
+    // Limit needs price; market IOC uses best available (optional protective price)
+    if (!isMarket) {
+      orderBody.price = { value: price01.toFixed(3), currency: 'USD' };
+    } else {
+      // Soft ceiling so we don't chase past maxPrice if exchange requires a price
+      const cap = Math.min(0.99, Math.max(price01, (Number(body.maxPriceCents) || 99) / 100));
+      orderBody.price = { value: cap.toFixed(3), currency: 'USD' };
+    }
 
     let signed;
     try {
@@ -352,7 +371,7 @@ module.exports = async function handler(req, res) {
     const orderId = (data && (data.id || data.orderId || (data.order && data.order.id))) || null;
     return res.status(200).json({
       ok: true, mode: 'live', live: true,
-      message: (previewOnly ? 'PREVIEW OK — ' : 'LIVE order submitted — ') + pick + ' @ ' + priceCents + '¢ × ' + qty + (orderId ? ' · id ' + orderId : ''),
+      message: (previewOnly ? 'PREVIEW — ' : 'PLACED — ') + 'Cost ~$' + approxCost + ' on ' + pick + ' @ ' + priceCents + '¢ → win ~$' + toWin + (isMarket ? ' (MARKET)' : ' (LIMIT)') + (orderId ? ' · id ' + orderId : ''),
       intent, order: data, orderId,
     });
   } catch (e) {

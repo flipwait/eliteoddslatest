@@ -98,12 +98,16 @@ function classifyMarket(m) {
       return 'team_total_fg';
     }
 
-    // Game totals by period
+    // Game totals by period (incl. hockey periods)
     if (/total/.test(rawType)) {
       if (/first_quarter|1st_quarter/.test(rawType)) return 'total_q1';
       if (/second_quarter|2nd_quarter/.test(rawType)) return 'total_q2';
       if (/third_quarter|3rd_quarter/.test(rawType)) return 'total_q3';
       if (/fourth_quarter|4th_quarter/.test(rawType)) return 'total_q4';
+      // NHL / hockey periods (before generic 1h)
+      if (/first_period|1st_period|period_1|\bp1\b/.test(rawType)) return 'total_1h';
+      if (/second_period|2nd_period|period_2|\bp2\b/.test(rawType)) return 'total_p2';
+      if (/third_period|3rd_period|period_3|\bp3\b/.test(rawType)) return 'total_p3';
       if (/first_half|1st_half/.test(rawType)) return 'total_1h';
       if (/second_half|2nd_half/.test(rawType)) return 'total_2h';
       if (/first.?5|first.?five|f5|five_inning/.test(rawType)) return 'f5_total';
@@ -182,12 +186,18 @@ function classifyMarket(m) {
     return 'spread';
   }
 
-  const isTotal = /total|over|under|o\/u|combined score|more than \d/.test(blob);
+  const isP1 = /1st period|first period|period 1|\bp1\b/.test(blob);
+  const isP2 = /2nd period|second period|period 2|\bp2\b/.test(blob);
+  const isP3 = /3rd period|third period|period 3|\bp3\b/.test(blob);
+  const isTotal = /total|over|under|o\/u|combined score|more than \d|goals?/.test(blob);
   if (isTotal) {
     if (isQ1) return 'total_q1';
     if (isQ2) return 'total_q2';
     if (isQ3) return 'total_q3';
     if (isQ4) return 'total_q4';
+    if (isP1) return 'total_1h';
+    if (isP2) return 'total_p2';
+    if (isP3) return 'total_p3';
     if (is1H) return 'total_1h';
     if (is2H) return 'total_2h';
     return 'total';
@@ -701,7 +711,7 @@ module.exports = async function handler(req, res) {
       await Promise.all(jobs);
     } catch (e) {}
 
-const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1','inning_2','inning_3','inning_4','inning_5','inning_6','inning_7','inning_8','inning_9','inning_winner','inning_scorer','nrfi','yrfi','f5','f5_spread','f5_total','total','totals','spread','spreads','spread_fg','spread_1h','spread_2h','spread_q1','spread_q2','spread_q3','spread_q4','total_fg','total_1h','total_2h','total_q1','total_q2','total_q3','total_q4','team_totals','team_total_fg','team_total_1h','team_total_2h','prop','f5','nrfi','yrfi','f5_spread','f5_total','player_props','team_props','game_props','innings','player_hr','player_k','player_hits','player_tb','player_hrr','pitcher_outs','pitcher_er','pitcher_ha','pitcher_bb','inning_winner'];
+const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1','inning_2','inning_3','inning_4','inning_5','inning_6','inning_7','inning_8','inning_9','inning_winner','inning_scorer','nrfi','yrfi','f5','f5_spread','f5_total','total','totals','spread','spreads','spread_fg','spread_1h','spread_2h','spread_q1','spread_q2','spread_q3','spread_q4','total_fg','total_1h','total_2h','total_q1','total_q2','total_q3','total_q4','total_p2','total_p3','team_totals','team_total_fg','team_total_1h','team_total_2h','prop','f5','nrfi','yrfi','f5_spread','f5_total','player_props','team_props','game_props','innings','player_hr','player_k','player_hits','player_tb','player_hrr','pitcher_outs','pitcher_er','pitcher_ha','pitcher_bb','inning_winner'];
 
     // Flat market cards (each Polymarket market = one card)
     // marketType=all → expand ML, spreads, totals, F5, NRFI, 1H, props, etc.

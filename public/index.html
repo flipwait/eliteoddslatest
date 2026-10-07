@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.71</title>
+  <title>EliteOdds v3.4.76</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.71</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.76</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1096,17 +1096,22 @@
               <option value="both">Both</option>
             </select>
           </label>
-          <div class="flex items-end gap-1">
-            <button type="button" id="m-btn-load" class="flex-1 px-2 py-1.5 rounded-lg border border-bb-border text-[11px] text-bb-muted">↻ Refresh</button>
-            <button type="button" id="m-btn-auto" class="flex-1 px-2 py-1.5 rounded-lg border border-violet-400/50 text-[11px] text-violet-200">Auto</button>
-          </div>
+          <label class="block min-w-0">
+            <span class="text-[9px] text-bb-muted uppercase tracking-wide">Market</span>
+            <select id="m-market" class="mt-0.5 w-full bg-bb-bg border border-bb-border rounded-lg px-1.5 py-1.5 text-[11px] text-white"></select>
+          </label>
+        </div>
+        <div class="flex gap-1.5">
+          <button type="button" id="m-btn-load" class="flex-1 px-2 py-1.5 rounded-lg border border-bb-border text-[11px] text-bb-muted">↻ Refresh</button>
+          <button type="button" id="m-btn-auto" class="flex-1 px-2 py-1.5 rounded-lg border border-violet-400/50 text-[11px] text-violet-200 font-semibold">Auto</button>
+          <button type="button" id="m-btn-scan-elites" class="flex-1 px-2 py-1.5 rounded-lg border border-amber-400/40 text-[11px] text-amber-200 font-semibold" title="Scan all sports for Elite paper">Elites</button>
         </div>
       </div>
       <div class="hidden" id="sport-rail-mobile"></div>
 
       <div class="eo-main-wrap">
         <div class="eo-center">
-          <div class="flex flex-wrap gap-2 items-center mb-2">
+          <div class="hidden md:flex flex-wrap gap-2 items-center mb-2">
             <label class="text-[10px] text-bb-muted flex items-center gap-1.5">Market
               <select id="market-select"></select>
             </label>
@@ -1162,9 +1167,11 @@
               <div class="flex items-center gap-2">
                 <button type="button" id="wr-reset-week" class="text-[10px] text-amber-300/90 underline" title="Clear last 7 days Elite paper only">Reset week</button>
                 <button type="button" id="wr-reset-all-elite" class="text-[10px] text-red-300/90 underline" title="Erase ALL Elite paper history (Poly + Kalshi)">Clear all Elite</button>
+                <button type="button" id="btn-scan-elites" class="text-[10px] px-2 py-0.5 rounded-md border border-violet-400/50 text-violet-200 bg-violet-500/15 font-semibold">Scan elites</button>
                 <button type="button" id="wr-toggle" class="text-[10px] text-bb-muted underline">Hide</button>
               </div>
             </div>
+            <p id="elite-scan-status" class="text-[10px] text-bb-muted mb-1.5 hidden"></p>
             <div class="wr-grid">
               <div>Offered<strong id="wr-offered">0</strong></div>
               <div>Settled<strong id="wr-settled">0</strong></div>
@@ -1725,6 +1732,12 @@
                   <option value="live">Live auto (real orders)</option>
                 </select>
               </label>
+              <label class="block text-[10px] text-bb-muted">Order type <span class="text-bb-muted font-normal">(like the app)</span>
+                <select id="pm-auto-order-type" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs">
+                  <option value="market" selected>Market (fill now @ best)</option>
+                  <option value="limit">Limit (rest at card ¢)</option>
+                </select>
+              </label>
               <label class="flex items-center gap-2 text-xs cursor-pointer">
                 <input type="checkbox" id="pm-auto-enabled" class="rounded" />
                 Enable auto pipeline (required for Scan for Auto)
@@ -1734,6 +1747,13 @@
                 Also run auto after regular Scan (optional)
               </label>
               <p class="text-[10px] text-bb-muted">Prefer the purple <strong class="text-white">Auto</strong> button next to refresh — keeps normal Scan clean.</p>
+              <label class="flex items-center gap-2 text-xs cursor-pointer">
+                <input type="checkbox" id="pm-auto-on-elite-scan" class="rounded" />
+                Also run auto after <strong class="text-white">Scan elites</strong>
+              </label>
+              <label class="block text-[10px] text-bb-muted">Elite scan delay (ms between sports)
+                <input id="elite-scan-gap" type="number" min="0" max="8000" step="100" value="1200" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs" />
+              </label>
               <label class="flex items-center gap-2 text-xs cursor-pointer">
                 <input type="checkbox" id="pm-auto-confirm" class="rounded" checked />
                 Require confirm before each order
@@ -1952,7 +1972,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.71</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.76</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -2165,6 +2185,8 @@
       { id: 'spread', label: 'Puck line' },
       { id: 'total', label: 'Full game O/U' },
       { id: 'total_1h', label: '1st period O/U' },
+      { id: 'total_p2', label: '2nd period O/U' },
+      { id: 'total_p3', label: '3rd period O/U' },
       { id: 'moneyline_1h', label: '1st period winner' },
       { id: 'team_total_fg', label: 'Team total' },
       { id: 'player_props', label: 'Player props' }
@@ -2381,8 +2403,56 @@
   };
 
   
-  var APP_VERSION = '3.4.71';
+  var APP_VERSION = '3.4.76';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.76',
+      date: '2026-10-06',
+      title: 'Correct totals labels (NHL periods vs full game)',
+      items: [
+        'FIXED — 1st/2nd/3rd period O/U classified and labeled (not “Full game Over 1.5”).',
+        'FIXED — NHL low lines (≤2.5) no longer forced to “Full game” without full-game wording.',
+        'ADDED — NHL market menu: 2nd / 3rd period O/U.'
+      ]
+    },
+    {
+      version: '3.4.75',
+      date: '2026-10-06',
+      title: 'Auto like Polymarket app: Cost $ + Market order',
+      items: [
+        'CHANGED — Default order type is MARKET (IOC), not resting limit.',
+        'CHANGED — Stake $ → Cost $; confirm shows Odds + to win (app style).',
+        'CHANGED — Contract qty is derived as cost÷odds (fractional OK).'
+      ]
+    },
+    {
+      version: '3.4.74',
+      date: '2026-10-06',
+      title: 'Auto = spend $ (not “buy shares” UX)',
+      items: [
+        'CHANGED — Confirms and messages talk in dollars only: risk $X @ Y¢ ≈ $cost.',
+        'CHANGED — Size is still contracts under the hood (how Polymarket works) but you only set Stake $.'
+      ]
+    },
+    {
+      version: '3.4.73',
+      date: '2026-10-06',
+      title: 'Scan elites button',
+      items: [
+        'ADDED — Scan elites walks main sports (MLB/NFL/NBA/…) with delay between calls.',
+        'ADDED — New elites go to Elite paper + Weekly; optional auto after scan.',
+        'ADDED — Settings: elite scan delay (ms) + “run auto after Scan elites”.'
+      ]
+    },
+    {
+      version: '3.4.72',
+      date: '2026-10-06',
+      title: 'Market inside mobile filter bar',
+      items: [
+        'DESIGN — Market dropdown sits in the purple glass filter bar with When / Days / Sport / Book.',
+        'FIXED — Mobile no longer shows a separate plain Market row under the bar.'
+      ]
+    },
     {
       version: '3.4.71',
       date: '2026-10-06',
@@ -3694,8 +3764,15 @@
         loadGames();
       } else if (t.id === 'm-venue') {
         venue = t.value || 'polymarket';
+        try {
+          document.body.classList.toggle('theme-kalshi', venue === 'kalshi');
+          document.body.classList.toggle('theme-polymarket', venue === 'polymarket');
+          document.body.classList.toggle('theme-both', venue === 'both');
+        } catch (eT) {}
         syncPills();
         loadGames();
+      } else if (t.id === 'm-market') {
+        applyMarketType(t.value || 'all');
       }
     });
 
@@ -3731,6 +3808,7 @@
       try {
         if ($('pm-auto-enabled')) st.pmAutoEnabled = !!$('pm-auto-enabled').checked;
         if ($('pm-auto-mode')) st.pmAutoMode = $('pm-auto-mode').value || st.pmAutoMode;
+      if ($('pm-auto-order-type')) st.pmOrderType = $('pm-auto-order-type').value || st.pmOrderType || 'market';
       } catch (e0) {}
       if (!st.pmAutoEnabled) {
         alert('Turn on “Enable auto pipeline” in Settings → Auto-trade, then Save.');
@@ -3748,30 +3826,39 @@
     }
   }
 
+  function applyMarketType(val) {
+    marketType = val || 'all';
+    if (typeof isSpecialMarket === 'function' && isSpecialMarket(marketType) && $('f-rank')) {
+      $('f-rank').value = '';
+    }
+    var tip = $('market-process-tip');
+    if (tip) {
+      var h = (typeof SPECIAL_MARKET_HINT !== 'undefined' && SPECIAL_MARKET_HINT[marketType]) ? SPECIAL_MARKET_HINT[marketType] : '';
+      tip.textContent = h || 'Scan loads this market type from the book, scores each market, then ranks Pass / Good / Elite.';
+      tip.classList.toggle('hidden', !h && marketType === 'all');
+    }
+    // keep desktop + mobile selects in sync
+    if ($('market-select') && $('market-select').value !== marketType) $('market-select').value = marketType;
+    if ($('m-market') && $('m-market').value !== marketType) $('m-market').value = marketType;
+    loadGames();
+  }
   function paintCats() {
     var cats = CATS[sport] || CATS._default;
     var ids = {};
     cats.forEach(function (c) { ids[c.id] = true; });
     if (!ids[marketType]) marketType = 'all';
+    var opts = cats.map(function (c) {
+      return '<option value="' + c.id + '"' + (c.id === marketType ? ' selected' : '') + '>' + c.label + '</option>';
+    }).join('');
     var sel = $('market-select');
     if (sel) {
-      sel.innerHTML = cats.map(function (c) {
-        return '<option value="' + c.id + '"' + (c.id === marketType ? ' selected' : '') + '>' + c.label + '</option>';
-      }).join('');
-      sel.onchange = function () {
-        marketType = sel.value || 'all';
-        // O/U, NRFI, F5, innings rarely hit Elite — show all ranks so cards appear
-        if (typeof isSpecialMarket === 'function' && isSpecialMarket(marketType) && $('f-rank')) {
-          $('f-rank').value = '';
-        }
-        var tip = $('market-process-tip');
-        if (tip) {
-          var h = (typeof SPECIAL_MARKET_HINT !== 'undefined' && SPECIAL_MARKET_HINT[marketType]) ? SPECIAL_MARKET_HINT[marketType] : '';
-          tip.textContent = h || 'Scan loads this market type from the book, scores each market, then ranks Pass / Good / Elite.';
-          tip.classList.toggle('hidden', !h && marketType === 'all');
-        }
-        loadGames();
-      };
+      sel.innerHTML = opts;
+      sel.onchange = function () { applyMarketType(sel.value); };
+    }
+    var mm = $('m-market');
+    if (mm) {
+      mm.innerHTML = opts;
+      mm.onchange = function () { applyMarketType(mm.value); };
     }
     var box = $('cat-chips');
     if (box) {
@@ -4920,6 +5007,7 @@
     // Always re-read live form fields if present (so Save is not required mid-session)
     try {
       if ($('pm-auto-mode')) st.pmAutoMode = $('pm-auto-mode').value || st.pmAutoMode;
+      if ($('pm-auto-order-type')) st.pmOrderType = $('pm-auto-order-type').value || st.pmOrderType || 'market';
       if ($('pm-api-key') && $('pm-api-key').value) st.pmApiKey = $('pm-api-key').value.trim();
       if ($('pm-api-secret') && $('pm-api-secret').value) st.pmApiSecret = $('pm-api-secret').value.trim();
       if ($('pm-api-pass') && $('pm-api-pass').value) st.pmApiPass = $('pm-api-pass').value.trim();
@@ -5015,10 +5103,16 @@
     if (needConfirm) {
       var mk = cents != null ? Math.round(cents * 10) / 10 : null;
       var tag = mode === 'live' ? '[LIVE]' : mode === 'paper' ? '[PAPER]' : '[DRY RUN]';
-      var estQty = (mk01 > 0 && stake$ > 0) ? Math.max(1, Math.round(stake$ / mk01)) : 1;
+      var estQty = (mk01 > 0 && stake$ > 0) ? Math.round((stake$ / mk01) * 10000) / 10000 : 1;
       var estCost = Math.round(estQty * (cents != null ? cents : 50)) / 100;
-      var msg = tag + ' ~$' + stake$ + (useKelly ? ' (Kelly)' : '') + ' on ' + (g.modelPick || '?') +
-        ' @ card ' + (cents != null ? cents + '¢' : '?') + ' × ~' + estQty + ' (~$' + estCost + ')' +
+      var toWin = Math.round(estQty * 100) / 100;
+      var otype = (st.pmOrderType || ($('pm-auto-order-type') && $('pm-auto-order-type').value) || 'market');
+      // App-style confirm: Cost $ · Odds · To win
+      var msg = tag + ' Cost $' + stake$ + (useKelly ? ' (Kelly)' : '') +
+        '\n' + (g.modelPick || '?') +
+        '\nOdds ' + (cents != null ? cents + '¢' : '?') +
+        ' → to win ~$' + toWin +
+        '\nType: ' + String(otype).toUpperCase() +
         '\n' + (g.eventTitle || g.title || '') +
         '\nMkt ~' + (mk != null ? mk + '¢' : '?') + ' · Rank ' + (g.rank || '') +
         '\nMode: ' + mode +
@@ -5061,6 +5155,7 @@
           maxPriceCents: maxPx,
           minEdgePp: st.pmAutoMinEdge,
           useCardPrice: true,
+          orderType: st.pmOrderType || ($('pm-auto-order-type') && $('pm-auto-order-type').value) || 'market',
           apiKey: st.pmApiKey,
           apiSecret: st.pmApiSecret,
           apiPass: st.pmApiPass
@@ -5081,6 +5176,7 @@
             mode: mode,
             pick: g.modelPick,
             stake: stake$,
+            cost: (d.intent && d.intent.approxCost) || stake$,
             orderId: d.orderId || (d.order && (d.order.id || d.order.orderId)),
             slug: g.marketSlug || g.slug,
             reason: d.message || 'ok'
@@ -5120,6 +5216,7 @@
     try {
       if ($('pm-auto-enabled')) st.pmAutoEnabled = !!$('pm-auto-enabled').checked;
       if ($('pm-auto-mode')) st.pmAutoMode = $('pm-auto-mode').value || st.pmAutoMode;
+      if ($('pm-auto-order-type')) st.pmOrderType = $('pm-auto-order-type').value || st.pmOrderType || 'market';
       if ($('pm-auto-confirm')) st.pmAutoConfirm = !!$('pm-auto-confirm').checked;
       if ($('pm-auto-min-rank')) st.pmAutoMinRank = $('pm-auto-min-rank').value || st.pmAutoMinRank;
       if ($('pm-auto-max-price')) st.pmAutoMaxPrice = Number($('pm-auto-max-price').value) || st.pmAutoMaxPrice;
@@ -6500,6 +6597,9 @@
         if (marketType === 'spread' || marketType === 'spread_fg') return tt === 'spread';
         if (marketType === 'f5_spread') return tt === 'f5_spread';
         if (marketType === 'total' || marketType === 'total_fg') return tt === 'total';
+        if (marketType === 'total_1h') return tt === 'total_1h' || /1st period|first period/.test(q);
+        if (marketType === 'total_p2') return tt === 'total_p2' || /2nd period|second period/.test(q);
+        if (marketType === 'total_p3') return tt === 'total_p3' || /3rd period|third period/.test(q);
         if (marketType === 'f5_total') return tt === 'f5_total' || (tt.indexOf('f5') >= 0 && /over|under|total/.test(q));
         if (marketType === 'f5') return tt === 'f5';
         if (marketType === 'moneyline' || marketType === 'ml') return tt === 'moneyline' || tt === 'moneyline_1h' || !tt;
@@ -6761,6 +6861,106 @@
       }
     bindCards(box, list);
   }
+
+  function eliteScanSleep(ms) {
+    return new Promise(function (resolve) { setTimeout(resolve, ms); });
+  }
+
+  async function scanAllElites(opts) {
+    opts = opts || {};
+    if (window.__eliteScanBusy) {
+      alert('Elite scan already running.');
+      return;
+    }
+    window.__eliteScanBusy = true;
+    var st = settings();
+    var gap = Number(st.eliteScanGapMs);
+    if (!(gap >= 0)) gap = 1200; // delay between requests
+    if (gap > 8000) gap = 8000;
+    var dayKeep = dayFilter;
+    if (!dayKeep || dayKeep === 'all') dayFilter = 'next3';
+    var sportsList = ['mlb', 'nfl', 'nba', 'nhl', 'cfb', 'cbb', 'wnba', 'soccer', 'ufc', 'esports'];
+    var venues = [];
+    var v0 = opts.venue || venue || 'polymarket';
+    if (v0 === 'both') venues = ['polymarket', 'kalshi'];
+    else venues = [v0];
+    var status = $('elite-scan-status');
+    if (status) { status.classList.remove('hidden'); status.textContent = 'Scanning elites…'; }
+    if ($('meta')) $('meta').textContent = 'Elite scan starting…';
+    var allFound = [];
+    var seen = {};
+    var errors = [];
+    var steps = 0;
+    var totalSteps = sportsList.length * venues.length;
+    try {
+      for (var vi = 0; vi < venues.length; vi++) {
+        var ven = venues[vi];
+        for (var si = 0; si < sportsList.length; si++) {
+          var lg = sportsList[si];
+          steps++;
+          var msg = 'Elite scan ' + steps + '/' + totalSteps + ' · ' + ven + ' · ' + lg.toUpperCase();
+          if (status) status.textContent = msg;
+          if ($('meta')) $('meta').textContent = msg;
+          try {
+            var data = null;
+            var sportKeep = sport;
+            sport = lg; // kalQuery / polyQuery use league helpers
+            try {
+              if (ven === 'kalshi') {
+                data = await fetchJsonTimeout(kalQuery('all', '0', true), 20000);
+              } else {
+                data = await fetchJsonTimeout(polyQuery('all', 'elite', 0, 0, 0, '0', true, lg), 22000);
+              }
+            } finally {
+              sport = sportKeep;
+            }
+            var list = (data && data.games) ? data.games : [];
+            list = filterGamesClient(dedupeGameCards(list));
+            list.forEach(function (g) {
+              g.venue = ven;
+              g.source = ven;
+              g.league = g.league || lg;
+              var r = String(g.rank || '').toLowerCase();
+              if (r !== 'elite' && r.indexOf('super') < 0) return;
+              var k = eliteKey(g);
+              if (!k || seen[k]) return;
+              seen[k] = true;
+              allFound.push(g);
+            });
+          } catch (eOne) {
+            errors.push(ven + '/' + lg + ': ' + (eOne.message || eOne));
+          }
+          if (gap > 0 && !(vi === venues.length - 1 && si === sportsList.length - 1)) {
+            await eliteScanSleep(gap);
+          }
+        }
+      }
+      var added = trackElitePicks(allFound);
+      try { maybeAutoDiscordElite(allFound); } catch (eD) {}
+      try { updateWeeklyReport(); renderEliteReview(); } catch (eW) {}
+      // optional: feed auto on elites only
+      if (opts.runAuto || (st.pmAutoEnabled && st.pmAutoOnEliteScan)) {
+        try { await runAutoTradeOnGames(allFound); } catch (eA) {}
+      }
+      var done = 'Elite scan done · ' + allFound.length + ' elite on board · ' + added + ' new paper' +
+        (errors.length ? (' · ' + errors.length + ' errors') : '');
+      if (status) status.textContent = done;
+      if ($('meta')) $('meta').textContent = done;
+      // show elites on main board for review
+      games = allFound.slice();
+      var box = $('games');
+      if (box) renderGameList(box, games);
+      try { renderSlate(); updateDeskStats(); } catch (eS) {}
+    } catch (e) {
+      if (status) status.textContent = 'Elite scan error: ' + (e.message || e);
+      if ($('meta')) $('meta').textContent = 'Elite scan error';
+      alert('Elite scan: ' + (e.message || e));
+    } finally {
+      dayFilter = dayKeep;
+      window.__eliteScanBusy = false;
+    }
+  }
+
   async function loadGames() {
     // Sync mobile dropdowns → global filters (fixes Refresh after selection)
     try {
@@ -8799,6 +8999,14 @@ function renderSlate() {
   var btnTonight = $('btn-tonight');
   if (btnTonight) btnTonight.onclick = function () { applyTonightPreset(); };
   if ($('f-sort')) $('f-sort').onchange = function () { loadGames(); };
+  if ($('btn-scan-elites')) $('btn-scan-elites').onclick = function () {
+    if (!confirm('Scan elites across main sports for this book (next-3 day window preferred)?\nAdds to Elite paper with ~1.2s delay between calls to reduce rate limits.\nDoes not place live orders unless auto is already enabled for elite scan.')) return;
+    scanAllElites({});
+  };
+  if ($('m-btn-scan-elites')) $('m-btn-scan-elites').onclick = function () {
+    if (!confirm('Scan elites (all main sports) for paper + optional auto?')) return;
+    scanAllElites({});
+  };
   if ($('wr-toggle')) $('wr-toggle').onclick = function () {
     var body = $('weekly-report');
     if (!body) return;
@@ -8830,6 +9038,7 @@ function renderSlate() {
       var st = settings();
       st.pmApiKey = key; st.pmApiSecret = secret;
       if ($('pm-auto-mode')) st.pmAutoMode = $('pm-auto-mode').value || st.pmAutoMode;
+      if ($('pm-auto-order-type')) st.pmOrderType = $('pm-auto-order-type').value || st.pmOrderType || 'market';
       localStorage.setItem('bb_settings', JSON.stringify(st));
       var r = await fetch('/api/trade', {
         method: 'POST',
@@ -8903,8 +9112,11 @@ function renderSlate() {
       webhookLost: ($('webhook-lost') && $('webhook-lost').value) || '',
       openai: $('openai').value || '',
       pmAutoMode: ($('pm-auto-mode') && $('pm-auto-mode').value) || 'dry-run',
+      pmOrderType: ($('pm-auto-order-type') && $('pm-auto-order-type').value) || 'market',
       pmAutoEnabled: !!($('pm-auto-enabled') && $('pm-auto-enabled').checked),
       pmAutoOnRegular: !!($('pm-auto-on-regular') && $('pm-auto-on-regular').checked),
+      pmAutoOnEliteScan: !!($('pm-auto-on-elite-scan') && $('pm-auto-on-elite-scan').checked),
+      eliteScanGapMs: Number(($('elite-scan-gap') && $('elite-scan-gap').value) || 1200) || 1200,
       pmAutoConfirm: !($('pm-auto-confirm') && !$('pm-auto-confirm').checked),
       pmAutoMinRank: ($('pm-auto-min-rank') && $('pm-auto-min-rank').value) || 'elite',
       pmAutoUnits: Number(($('pm-auto-units') && $('pm-auto-units').value) || 1) || 1,
@@ -8987,8 +9199,11 @@ function renderSlate() {
   if ($('webhook-lost')) $('webhook-lost').value = st.webhookLost || '';
   if ($('openai')) $('openai').value = st.openai || '';
   if ($('pm-auto-mode')) $('pm-auto-mode').value = st.pmAutoMode || (st.pmAutoDry === false ? 'live' : 'dry-run');
+  if ($('pm-auto-order-type')) $('pm-auto-order-type').value = st.pmOrderType || 'market';
   if ($('pm-auto-enabled')) $('pm-auto-enabled').checked = !!st.pmAutoEnabled;
   if ($('pm-auto-on-regular')) $('pm-auto-on-regular').checked = !!st.pmAutoOnRegular;
+  if ($('pm-auto-on-elite-scan')) $('pm-auto-on-elite-scan').checked = !!st.pmAutoOnEliteScan;
+  if ($('elite-scan-gap') && st.eliteScanGapMs != null) $('elite-scan-gap').value = st.eliteScanGapMs;
   if ($('pm-auto-confirm')) $('pm-auto-confirm').checked = st.pmAutoConfirm !== false;
   if ($('pm-auto-min-rank') && st.pmAutoMinRank) $('pm-auto-min-rank').value = st.pmAutoMinRank;
   if ($('pm-auto-units') && st.pmAutoUnits != null) $('pm-auto-units').value = st.pmAutoUnits;
