@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.76</title>
+  <title>EliteOdds v3.4.77</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.76</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.77</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1972,7 +1972,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.76</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.77</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -2403,8 +2403,19 @@
   };
 
   
-  var APP_VERSION = '3.4.76';
+  var APP_VERSION = '3.4.77';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.77',
+      date: '2026-10-12',
+      title: 'Totals prices match Polymarket pick side',
+      items: [
+        'FIXED — Under cards use No/Under ¢ (not Over %). Odds + Market % match PM for the pick.',
+        'FIXED — NHL period totals labeled 1st period (never 1H).',
+        'FIXED — NFL 1H totals with absurd lines (<12) demoted; low FG lines flagged.',
+        'FIXED — Card priceDisplay / impliedPct from pick-side price.'
+      ]
+    },
     {
       version: '3.4.76',
       date: '2026-10-06',
@@ -4153,18 +4164,37 @@
     var pickName = String(g.modelPick || '').toLowerCase();
     var pickSidePct = null;
     var otherPct = null;
+    var wantUnder = /\bunder\b/.test(pickName);
+    var wantOver = /\bover\b/.test(pickName);
     if (g.sides && g.sides.length) {
       for (var si = 0; si < g.sides.length; si++) {
         var sn = String(g.sides[si].name || '').toLowerCase();
-        if (pickName && sn && (sn.indexOf(pickName.slice(0, 6)) >= 0 || pickName.indexOf(sn.slice(0, 6)) >= 0)) {
+        var role = String(g.sides[si].role || '').toLowerCase();
+        var isUnderSide = /under/.test(sn) || role === 'under';
+        var isOverSide = /over/.test(sn) || role === 'over';
+        if (wantUnder && isUnderSide && g.sides[si].pct != null) pickSidePct = g.sides[si].pct;
+        else if (wantOver && isOverSide && g.sides[si].pct != null) pickSidePct = g.sides[si].pct;
+        else if (!wantUnder && !wantOver && pickName && sn && (pickName.indexOf(sn.slice(0, 8)) >= 0 || sn.indexOf(pickName.slice(0, 8)) >= 0)) {
           if (g.sides[si].pct != null) pickSidePct = g.sides[si].pct;
-        } else if (g.sides[si].pct != null && otherPct == null) {
-          otherPct = g.sides[si].pct;
+        } else if (g.sides[si].pct != null) {
+          if (wantUnder && isOverSide) otherPct = g.sides[si].pct;
+          else if (wantOver && isUnderSide) otherPct = g.sides[si].pct;
+          else if (otherPct == null) otherPct = g.sides[si].pct;
         }
       }
-      if (pickSidePct == null && g.sides[0] && g.sides[0].pct != null) pickSidePct = g.sides[0].pct;
     }
-    var mkt = asPct(g.market_probability != null ? g.market_probability : (g.marketPriceCents != null ? g.marketPriceCents : (g.impliedPct != null ? g.impliedPct : (re.market_probability != null ? re.market_probability : pickSidePct))));
+    // Prefer API yes/no by side when pick is Over/Under
+    if (pickSidePct == null && (wantUnder || wantOver)) {
+      var yp = g.yesPrice != null ? Number(g.yesPrice) : null;
+      var np = g.noPrice != null ? Number(g.noPrice) : null;
+      if (yp != null && yp > 1) yp = yp / 100;
+      if (np != null && np > 1) np = np / 100;
+      if (np == null && yp != null) np = 1 - yp;
+      if (wantUnder && np != null) pickSidePct = np * 100;
+      if (wantOver && yp != null) pickSidePct = yp * 100;
+    }
+    // Prefer scored market_probability, then pick-side pct — NEVER default Over when pick is Under
+    var mkt = asPct(g.market_probability != null ? g.market_probability : (g.impliedPct != null ? g.impliedPct : (g.marketPriceCents != null ? g.marketPriceCents : (re.market_probability != null ? re.market_probability : pickSidePct))));
     var mod = asPct(g.model_probability != null ? g.model_probability : (g.fairProbability != null ? g.fairProbability : (g.modelFairPct != null ? g.modelFairPct : re.model_probability)));
     var nv = asPct(g.no_vig_probability != null ? g.no_vig_probability : re.no_vig_probability);
     if (nv == null && mkt != null) {
@@ -4220,8 +4250,16 @@
           else if (/over/.test(pl)) side = 'Over';
           else if (/^u\b/.test(pl)) side = 'Under';
           else if (/^o\b/.test(pl)) side = 'Over';
+          // Prefer server pickName when it already has scope (1st period / Full game / 1H)
+          if (/\b(full game|1st period|2nd period|3rd period|1h|2h|f5|q[1-4]|team total)\b/i.test(pick)) {
+            return String(pick).replace(/</g, '');
+          }
+          var lg = String(g.league || '').toLowerCase();
           var scope = 'Full game';
           if (/f5|first\s*5/.test(mt) || /f5/.test(mt)) scope = 'F5';
+          else if (lg === 'nhl' && (/_1h|1h|period|p1/.test(mt) || (line != null && Number(line) <= 2.5))) scope = '1st period';
+          else if (lg === 'nhl' && /p2|2nd period/.test(mt)) scope = '2nd period';
+          else if (lg === 'nhl' && /p3|3rd period/.test(mt)) scope = '3rd period';
           else if (/_1h|1h/.test(mt)) scope = '1H';
           else if (/_2h|2h/.test(mt)) scope = '2H';
           else if (/q1/.test(mt)) scope = 'Q1';

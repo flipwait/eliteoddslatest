@@ -61,6 +61,31 @@ function formatCents(p) {
   return cents + '¢' + amStr;
 }
 
+/** 0–1 price for the MODEL PICK side (Under uses No, not Yes) */
+function pickSidePrice01(sc, m) {
+  let yes = m && m.yesPrice != null ? Number(m.yesPrice) : null;
+  if (yes != null && yes > 1) yes = yes / 100;
+  let no = m && m.noPrice != null ? Number(m.noPrice) : null;
+  if (no != null && no > 1) no = no / 100;
+  if (no == null && yes != null) no = 1 - yes;
+  // Prefer scored market_probability (already pick-side) when 0–1 or 0–100
+  if (sc && sc.market_probability != null) {
+    let mp = Number(sc.market_probability);
+    if (mp > 1) mp = mp / 100;
+    if (mp > 0 && mp < 1) return mp;
+  }
+  const pick = String((sc && (sc.pickName || sc.modelPick)) || '').toLowerCase();
+  const side = String((sc && sc.side) || 'YES').toUpperCase();
+  if (/\bunder\b/.test(pick) || side === 'NO') {
+    if (no != null && no > 0 && no < 1) return no;
+  }
+  if (/\bover\b/.test(pick) || side === 'YES') {
+    if (yes != null && yes > 0 && yes < 1) return yes;
+  }
+  if (side === 'NO' && no != null) return no;
+  return yes;
+}
+
 function classifyMarket(m) {
   // Prefer Polymarket US sportsMarketType (authoritative)
   const rawType = String(m.sportsMarketType || m.marketType || m.sportsMarketTypeV2 || '').toLowerCase();
@@ -844,10 +869,19 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
             betScore: sc ? sc.betScore : 0,
             confidence: sc ? sc.confidence : 0,
             fairProbability: sc ? sc.fairProbability : null,
-            marketPriceCents: sc ? sc.marketPriceCents : null,
-            impliedPct: sc ? sc.marketPriceCents : Math.round(m.yesPrice * 1000) / 10,
+            marketPriceCents: (function () {
+              const px = pickSidePrice01(sc, m);
+              return px != null ? Math.round(px * 1000) / 10 : (sc ? sc.marketPriceCents : null);
+            })(),
+            impliedPct: (function () {
+              const px = pickSidePrice01(sc, m);
+              return px != null ? Math.round(px * 1000) / 10 : (sc && sc.marketPriceCents != null ? sc.marketPriceCents : Math.round(Number(m.yesPrice) * 1000) / 10);
+            })(),
             modelFairPct: sc ? sc.fairProbability : null,
-            priceDisplay: formatCents(m.yesPrice),
+            priceDisplay: formatCents(pickSidePrice01(sc, m) != null ? pickSidePrice01(sc, m) : m.yesPrice),
+            sides: (sd && sd.sides) ? sd.sides : null,
+            yesPrice: m.yesPrice,
+            noPrice: m.noPrice != null ? m.noPrice : (m.yesPrice != null ? 1 - Number(m.yesPrice) : null),
             evaluate: sc ? sc.evaluate : null,
             lmBadge: sc ? sc.lmBadge : null,
             matchupDetail: sc && sc.evaluate && sc.evaluate.matchup ? sc.evaluate.matchup.detail : null,
