@@ -873,18 +873,32 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
             marketUrl: (m.slug || m.marketSlug)
               ? ('https://polymarket.us/market/' + (m.slug || m.marketSlug))
               : (m.marketUrl || null),
+            eventSlug: ev.slug || null,
             url: (function () {
-              const ms = m.slug || m.marketSlug || '';
-              const isLineMkt = /total|spread|nrfi|yrfi|f5|period|ou|over|under/i.test(String(type || '') + ' ' + String(m.sportsMarketType || '') + ' ' + ms);
-              // Totals / spreads / period lines → exact market page (e.g. …-p1-1pt5)
-              if (isLineMkt && ms) return 'https://polymarket.us/market/' + ms;
+              // Trade primary target = GAME event page (reliable for the matchup on the card)
               if (ev.slug) return 'https://polymarket.us/event/' + ev.slug;
               if (ev.url && /\/event\//i.test(String(ev.url))) return ev.url;
+              const ms = m.slug || m.marketSlug || '';
               const dm = String(ms).match(/^(.*?\d{4}-\d{2}-\d{2})/);
-              if (dm) return 'https://polymarket.us/event/' + dm[1];
+              if (dm) {
+                // market slug prefix through date → event slug family (cfb-x-y-date)
+                // PM event slugs are like cfb-kenest-msrst-2026-10-14 (no tsc-/asc- prefix)
+                var core = dm[1].replace(/^(tsc|asc|tsc-cfb|asc-cfb)-/i, '').replace(/^(tsc|asc)-/i, '');
+                // if still has sport prefix noise, try strip leading product code
+                core = core.replace(/^(tsc|asc)-/i, '');
+                if (/^(nba|nhl|nfl|cfb|cbb|mlb|wnba)-/i.test(dm[1])) return 'https://polymarket.us/event/' + dm[1].replace(/^(tsc|asc)-[a-z]+-/i, function(){ return ''; });
+                // Better: from ms like tsc-cfb-kenest-msrst-2026-10-14-total-43pt5 → cfb-kenest-msrst-2026-10-14
+                var em = String(ms).match(/((?:nba|nhl|nfl|cfb|cbb|mlb|wnba|ufc)-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2})/i);
+                if (em) return 'https://polymarket.us/event/' + em[1];
+                return 'https://polymarket.us/event/' + dm[1];
+              }
               if (ms) return 'https://polymarket.us/market/' + ms;
               return 'https://polymarket.us';
             })(),
+            // Exact line (optional deep link)
+            marketUrl: (m.slug || m.marketSlug)
+              ? ('https://polymarket.us/market/' + (m.slug || m.marketSlug))
+              : (m.marketUrl || null),
             slug: ev.slug || m.slug || m.marketSlug || null,
             sides,
             modelPick: (function () {
