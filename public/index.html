@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.78</title>
+  <title>EliteOdds v3.4.79</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.78</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.79</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1972,7 +1972,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.78</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.79</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
@@ -2403,8 +2403,19 @@
   };
 
   
-  var APP_VERSION = '3.4.78';
+  var APP_VERSION = '3.4.79';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.79',
+      date: '2026-10-12',
+      title: 'Live quote ¢ + Trade opens exact total line',
+      items: [
+        'FIXED — Yes/No use side.quote.value (live) not stale side.price (was 50¢ vs app 57¢).',
+        'FIXED — BBO refresh helper was missing (call was no-op); restored longQuote/bestAsk.',
+        'FIXED — NHL first/second/third period totals classified correctly.',
+        'FIXED — Trade on totals/spreads opens polymarket.us/market/{slug} for that exact line.'
+      ]
+    },
     {
       version: '3.4.78',
       date: '2026-10-12',
@@ -3246,29 +3257,35 @@
       if (g.url && /kalshi\.com/i.test(String(g.url))) return g.url;
       return g.url || 'https://kalshi.com/browse/sports';
     }
-    // Polymarket US — open the GAME (event) page, not a market-only path that 404s / redirects randomly
+    // Polymarket: totals/spreads/period → exact /market/{slug}; ML → event page
+    var mt = String(g.marketType || '').toLowerCase();
+    var rawSlug = String(g.marketSlug || g.slug || '').replace(/^https?:\/\/[^/]+\/market\//i, '').split('?')[0];
+    var isLine =
+      /total|spread|nrfi|yrfi|f5|period|team_total|map_/.test(mt) ||
+      /pt\d|p1-|p2-|p3-|1h-|2h-|neg-|pos-|over|under|ou-/.test(rawSlug);
+    if (isLine && rawSlug && rawSlug.indexOf(' ') < 0) {
+      return 'https://polymarket.us/market/' + rawSlug;
+    }
+    if (g.marketUrl && /\/market\//i.test(String(g.marketUrl)) && isLine) return g.marketUrl;
+    if (g.url && /\/market\//i.test(String(g.url)) && isLine) return g.url;
     function eventSlugFromAny(s) {
       s = String(s || '');
       if (!s) return '';
-      // strip path if full URL
       var path = s.replace(/^https?:\/\/[^/]+/i, '').replace(/^\//, '');
       if (path.indexOf('event/') === 0) path = path.slice(6);
       if (path.indexOf('market/') === 0) path = path.slice(7);
       path = path.split('?')[0].split('/')[0];
-      // Market slugs often append after date: ...-2026-10-04-1h-neg-3pt5 → event ends at date
       var dm = path.match(/^(.*?\d{4}-\d{2}-\d{2})/);
       return dm ? dm[1] : path;
     }
     var es = g.eventSlug || '';
-    if (!es && g.url) {
-      var u = String(g.url);
-      if (/\/event\//i.test(u)) {
-        var m1 = u.match(/\/event\/([^/?#]+)/i);
-        if (m1) es = m1[1];
-      }
+    if (!es && g.url && /\/event\//i.test(String(g.url))) {
+      var m1 = String(g.url).match(/\/event\/([^/?#]+)/i);
+      if (m1) es = m1[1];
     }
     if (!es) es = eventSlugFromAny(g.eventSlug || g.slug || g.marketSlug || g.url || '');
-    if (es) return 'https://polymarket.us/event/' + es.replace(/^\//, '');
+    if (es) return 'https://polymarket.us/event/' + String(es).replace(/^\//, '');
+    if (rawSlug) return 'https://polymarket.us/market/' + rawSlug;
     if (g.url && /polymarket\.(us|com)/i.test(String(g.url))) return g.url;
     return 'https://polymarket.us';
   }

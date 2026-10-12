@@ -18,6 +18,60 @@ try {
   console.error('mlb module optional', e.message);
 }
 
+
+/** Live Yes/No from gateway BBO — list `price` is often stale (0.50 vs app 57¢) */
+async function refreshMarketBbo(m) {
+  const slug = m && (m.slug || m.marketSlug);
+  if (!slug) return m;
+  try {
+    const r = await fetch(
+      'https://gateway.polymarket.us/v1/markets/' + encodeURIComponent(slug) + '/bbo',
+      { headers: { Accept: 'application/json' } }
+    );
+    if (!r.ok) return m;
+    const data = await r.json();
+    const md = data.marketData || data || {};
+    const amt = (x) => {
+      if (x == null) return null;
+      let v = typeof x === 'object' && x.value != null ? Number(x.value) : Number(x);
+      if (!Number.isFinite(v) || v < 0) return null;
+      if (v > 1 && v <= 100) v = v / 100;
+      if (v <= 0 || v >= 1) return null;
+      return v;
+    };
+    // Over/Yes = longQuote or bestAsk (what you pay to buy Yes)
+    const longPx =
+      amt(md.longQuote) ||
+      amt(md.bestAsk) ||
+      amt(md.lastPriceSample && md.lastPriceSample.longPx) ||
+      amt(md.currentPx);
+    // Under/No = shortQuote
+    const shortPx =
+      amt(md.shortQuote) ||
+      amt(md.lastPriceSample && md.lastPriceSample.shortPx);
+    if (longPx != null) m.yesPrice = longPx;
+    if (shortPx != null) m.noPrice = shortPx;
+    else if (longPx != null) m.noPrice = Math.round((1 - longPx) * 1000) / 1000;
+    if (m.yesPrice != null && m.noPrice != null && Math.abs(m.yesPrice - m.noPrice) < 0.02) {
+      m.noPrice = Math.round((1 - m.yesPrice) * 1000) / 1000;
+    }
+    m._bbo = true;
+  } catch (e) {}
+  return m;
+}
+
+async function refreshBboBatch(markets, limit) {
+  const list = (markets || []).filter((m) => m && (m.slug || m.marketSlug));
+  const cap = Math.min(list.length, limit != null ? limit : 32);
+  const chunk = list.slice(0, cap);
+  // parallel but capped
+  const size = 8;
+  for (let i = 0; i < chunk.length; i += size) {
+    await Promise.all(chunk.slice(i, i + size).map((m) => refreshMarketBbo(m)));
+  }
+  return markets;
+}
+
 async function fetchBookForSlug(slug) {
   if (!slug) return null;
   try {
@@ -95,6 +149,14 @@ function classifyMarket(m) {
 
   // --- Explicit PM type maps (NFL / CFB football_* and similar) ---
   if (rawType) {
+    // NHL period totals (must before generic total)
+    if (/first_period_total|period_1_total|p1_total/.test(rawType)) return 'total_1h';
+    if (/second_period_total|period_2_total|p2_total/.test(rawType)) return 'total_p2';
+    if (/third_period_total|period_3_total|p3_total/.test(rawType)) return 'total_p3';
+    if (/full_game_total|game_total/.test(rawType) && /hockey|nhl/.test(rawType + ' ' + blob)) return 'total';
+    if (/first_period_spread/.test(rawType)) return 'spread_1h';
+    if (/second_period_spread/.test(rawType)) return 'spread_2h';
+    if (/third_period_spread/.test(rawType)) return 'spread_p3';
     // Winner / ML
     if (/full_game_winner|moneyline|match_winner|game_winner/.test(rawType) && !/spread|total/.test(rawType))
       return 'moneyline';
@@ -812,13 +874,14 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
               ? ('https://polymarket.us/market/' + (m.slug || m.marketSlug))
               : (m.marketUrl || null),
             url: (function () {
+              const ms = m.slug || m.marketSlug || '';
+              const isLineMkt = /total|spread|nrfi|yrfi|f5|period|ou|over|under/i.test(String(type || '') + ' ' + String(m.sportsMarketType || '') + ' ' + ms);
+              // Totals / spreads / period lines → exact market page (e.g. …-p1-1pt5)
+              if (isLineMkt && ms) return 'https://polymarket.us/market/' + ms;
               if (ev.slug) return 'https://polymarket.us/event/' + ev.slug;
               if (ev.url && /\/event\//i.test(String(ev.url))) return ev.url;
-              // Derive event slug from market slug (strip suffixes after YYYY-MM-DD)
-              const ms = m.slug || m.marketSlug || '';
               const dm = String(ms).match(/^(.*?\d{4}-\d{2}-\d{2})/);
               if (dm) return 'https://polymarket.us/event/' + dm[1];
-              if (m.url && /\/event\//i.test(String(m.url))) return m.url;
               if (ms) return 'https://polymarket.us/market/' + ms;
               return 'https://polymarket.us';
             })(),
