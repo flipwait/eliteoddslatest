@@ -61,27 +61,28 @@ function formatCents(p) {
   return cents + '¢' + amStr;
 }
 
-/** 0–1 price for the MODEL PICK side (Under uses No, not Yes) */
+/** 0–1 price for the MODEL PICK side (Over→Yes/long, Under→No/short) */
 function pickSidePrice01(sc, m) {
   let yes = m && m.yesPrice != null ? Number(m.yesPrice) : null;
   if (yes != null && yes > 1) yes = yes / 100;
   let no = m && m.noPrice != null ? Number(m.noPrice) : null;
   if (no != null && no > 1) no = no / 100;
-  if (no == null && yes != null) no = 1 - yes;
-  // Prefer scored market_probability (already pick-side) when 0–1 or 0–100
+  if (no == null && yes != null) no = Math.round((1 - yes) * 1000) / 1000;
+  const pick = String((sc && (sc.pickName || sc.modelPick)) || '').toLowerCase();
+  // Authority: label Over/Under always maps to Yes/No prices on PM totals
+  if (/\bunder\b/.test(pick)) {
+    if (no != null && no > 0 && no < 1) return no;
+  }
+  if (/\bover\b/.test(pick)) {
+    if (yes != null && yes > 0 && yes < 1) return yes;
+  }
+  // Fallback scored market_probability
   if (sc && sc.market_probability != null) {
     let mp = Number(sc.market_probability);
     if (mp > 1) mp = mp / 100;
     if (mp > 0 && mp < 1) return mp;
   }
-  const pick = String((sc && (sc.pickName || sc.modelPick)) || '').toLowerCase();
   const side = String((sc && sc.side) || 'YES').toUpperCase();
-  if (/\bunder\b/.test(pick) || side === 'NO') {
-    if (no != null && no > 0 && no < 1) return no;
-  }
-  if (/\bover\b/.test(pick) || side === 'YES') {
-    if (yes != null && yes > 0 && yes < 1) return yes;
-  }
   if (side === 'NO' && no != null) return no;
   return yes;
 }
@@ -742,6 +743,17 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
     // marketType=all → expand ML, spreads, totals, F5, NRFI, 1H, props, etc.
     if (marketType === 'all' || flattenTypes.includes(marketType)) {
       const flat = [];
+      // Refresh live Yes/No from BBO for totals (list prices often stale → wrong 50¢ vs 96¢)
+      try {
+        const needBbo = [];
+        for (const ev of events) {
+          for (const m of ev.markets || []) {
+            const t = classifyMarket(m);
+            if (/total|nrfi|yrfi|spread/.test(String(t)) && (m.slug || m.marketSlug)) needBbo.push(m);
+          }
+        }
+        await refreshBboBatch(needBbo, 28);
+      } catch (eBbo) {}
       // Prefer a stable order of market families so board is scannable
       const typePriority = {
         moneyline: 1, moneyline_1h: 2,
@@ -853,7 +865,11 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
             netEdge: sc ? sc.netEdge : 0,
             probability_edge: sc ? sc.probability_edge : null,
             decimal_odds: sc ? sc.decimal_odds : null,
-            market_probability: sc ? sc.market_probability : null,
+            market_probability: (function () {
+              const px = pickSidePrice01(sc, m);
+              if (px != null) return Math.round(px * 1000) / 10; // 0–100 for UI
+              return sc ? sc.market_probability : null;
+            })(),
             no_vig_probability: sc ? sc.no_vig_probability : null,
             model_probability: sc ? sc.model_probability : null,
             fairSource: sc ? sc.fairSource : null,
