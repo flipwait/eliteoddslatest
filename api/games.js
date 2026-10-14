@@ -347,6 +347,21 @@ function scoreOne(m, ev, matchup, rankOpts, yesIsHome) {
     const will = String(m.question || '').match(/will\s+(?:the\s+)?(.+?)\s+(?:win|cover|beat)/i);
     if (will && will[1]) yesName = yesName || will[1].trim();
   } catch (eLab) {}
+  // Prefer long-side description as line hint (e.g. "+5.50")
+  let lineFromSide = null;
+  try {
+    const sides = m.marketSides || [];
+    const longS = sides.find((x) => x.long) || sides[0];
+    if (longS && longS.description) {
+      const dm = String(longS.description).match(/([+-]?\d+\.?\d*)/);
+      if (dm) lineFromSide = Number(dm[1]);
+    }
+  } catch (eL) {}
+  const lineVal =
+    m.line != null && !isNaN(Number(m.line))
+      ? Number(m.line)
+      : lineFromSide;
+
   return buildSignal({
     id,
     question: m.question || ev.title,
@@ -369,6 +384,7 @@ function scoreOne(m, ev, matchup, rankOpts, yesIsHome) {
     league: (ev && ev.league) || (matchup && matchup.league) || null,
     live: !!(ev && ev.live),
     eventTitle: (ev && (ev.title || ev.name)) || null,
+    line: lineVal,
   }, rankOpts || {});
 }
 
