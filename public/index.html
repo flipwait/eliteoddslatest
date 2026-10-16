@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.81</title>
+  <title>EliteOdds v3.4.82</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -596,7 +596,7 @@
     }
 
   
-    /* Super Elite: desktop rail only on wide screens; mobile only on Desk tab */
+    /* Pick of the Day: desktop rail only on wide screens; mobile only on Desk tab */
     .se-mobile-only { display: none; }
     @media (max-width: 1099px) {
       .se-mobile-only { display: block; }
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.81</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.82</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1206,11 +1206,11 @@
           <div class="se-box se-mobile-only" id="super-elite-box-scan" data-se-root="1">
 
             <div class="flex items-center justify-between gap-2 mb-1">
-              <h3 class="!mb-0">★ Super Elite</h3>
+              <h3 class="!mb-0">★ Pick of the Day</h3>
               <button type="button" class="se-min-btn se-toggle-min" aria-label="Minimize">Minimize</button>
             </div>
             <div class="se-body">
-              <p class="text-[10px] text-bb-muted mb-1">Form-first · role L10 · no forced picks</p>
+              <p class="text-[10px] text-bb-muted mb-1">Form + Odds API + AI · 0–3 picks · history tracked</p>
               <div class="se-grid-2">
                 <label>Venue
                   <select class="se-venue">
@@ -1316,16 +1316,23 @@
                 <input type="checkbox" class="se-ml-only" /> Moneyline only (ignore totals/spreads)
               </label>
               <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-same-game" checked /> Max 1 Super per game
+                <input type="checkbox" class="se-same-game" checked /> Max 1 POTD per game
               </label>
               <label class="flex items-center gap-1.5 mt-1" style="display:flex">
                 <input type="checkbox" class="se-rest-ok" /> Prefer rested pick (skip B2B when known)
               </label>
               <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-ai" /> AI stress-test
+                <input type="checkbox" class="se-ai" checked /> AI + Odds in determination
               </label>
-              <button type="button" class="se-run se-run-btn">Run Super Elite scan</button>
+              <button type="button" class="se-run se-run-btn">Run Pick of the Day</button>
               <div class="se-results mt-2 text-[11px] text-bb-muted">Run to find 0–3 picks</div>
+              <div class="se-history mt-2 p-2 rounded-lg border border-bb-border/60 bg-black/20">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="text-[10px] font-semibold text-amber-200/90 tracking-wide">POTD HISTORY · last 14</span>
+                  <button type="button" class="se-hist-refresh text-[9px] px-1.5 py-0.5 rounded border border-bb-border text-bb-muted">Refresh</button>
+                </div>
+                <div class="se-hist-body text-[10px] text-bb-muted">No POTD logged yet. Run a scan and Log picks to track W/L + ROI.</div>
+              </div>
             </div>
 
           </div>
@@ -1400,11 +1407,11 @@
           <div class="se-box se-mobile-only" id="super-elite-box-mobile" data-se-root="1">
 
             <div class="flex items-center justify-between gap-2 mb-1">
-              <h3 class="!mb-0">★ Super Elite</h3>
+              <h3 class="!mb-0">★ Pick of the Day</h3>
               <button type="button" class="se-min-btn se-toggle-min" aria-label="Minimize">Minimize</button>
             </div>
             <div class="se-body">
-              <p class="text-[10px] text-bb-muted mb-1">Form-first · role L10 · no forced picks</p>
+              <p class="text-[10px] text-bb-muted mb-1">Form + Odds API + AI · 0–3 picks · history tracked</p>
               <div class="se-grid-2">
                 <label>Venue
                   <select class="se-venue">
@@ -1509,16 +1516,23 @@
                 <input type="checkbox" class="se-ml-only" /> Moneyline only (ignore totals/spreads)
               </label>
               <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-same-game" checked /> Max 1 Super per game
+                <input type="checkbox" class="se-same-game" checked /> Max 1 POTD per game
               </label>
               <label class="flex items-center gap-1.5 mt-1" style="display:flex">
                 <input type="checkbox" class="se-rest-ok" /> Prefer rested pick (skip B2B when known)
               </label>
               <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-ai" /> AI stress-test
+                <input type="checkbox" class="se-ai" checked /> AI + Odds in determination
               </label>
-              <button type="button" class="se-run se-run-btn">Run Super Elite scan</button>
+              <button type="button" class="se-run se-run-btn">Run Pick of the Day</button>
               <div class="se-results mt-2 text-[11px] text-bb-muted">Run to find 0–3 picks</div>
+              <div class="se-history mt-2 p-2 rounded-lg border border-bb-border/60 bg-black/20">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="text-[10px] font-semibold text-amber-200/90 tracking-wide">POTD HISTORY · last 14</span>
+                  <button type="button" class="se-hist-refresh text-[9px] px-1.5 py-0.5 rounded border border-bb-border text-bb-muted">Refresh</button>
+                </div>
+                <div class="se-hist-body text-[10px] text-bb-muted">No POTD logged yet. Run a scan and Log picks to track W/L + ROI.</div>
+              </div>
             </div>
 
           </div>
@@ -1700,8 +1714,8 @@
               <input id="webhook-2" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="Kalshi channel only — required for Kalshi Elite auto" />
               <p class="text-[10px] text-bb-green mt-0.5">Kalshi Elite auto-send uses this webhook only (never Discord 1).</p>
             </label>
-            <label class="block text-xs">Discord · <span class="text-amber-300">Super Elite</span>
-              <input id="webhook-super" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="Super Elite picks only (optional)" />
+            <label class="block text-xs">Discord · <span class="text-amber-300">Pick of the Day</span>
+              <input id="webhook-super" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="Pick of the Day only (optional)" />
             </label>
             <label class="block text-xs">Discord · <span class="text-bb-orange">Placed bets</span>
               <input id="webhook-placed" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="When someone logs / takes a bet" />
@@ -1761,8 +1775,8 @@
               <div class="grid grid-cols-1 gap-2.5 auto-settings-fields">
                 <label class="block text-[11px] text-violet-200/90 font-medium">Min rank
                   <select id="pm-auto-min-rank" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs">
-                    <option value="elite">Elite + Super Elite</option>
-                    <option value="super">Super Elite only</option>
+                    <option value="elite">Elite + Pick of the Day</option>
+                    <option value="super">Pick of the Day only</option>
                     <option value="good">Good + Elite</option>
                   </select>
                 </label>
@@ -1972,10 +1986,10 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.81</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.82</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
-            <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Super Elite, Live Edge, and paper tracking.</p>
+            <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
           </div>
           <details open class="group rounded-lg border border-bb-border bg-bb-bg/80 open:shadow-sm">
             <summary class="cursor-pointer list-none px-3 py-2 text-xs font-semibold text-white flex items-center justify-between">
@@ -1997,11 +2011,11 @@
           <div class="se-box" id="super-elite-box" data-se-root="1">
 
             <div class="flex items-center justify-between gap-2 mb-1">
-              <h3 class="!mb-0">★ Super Elite</h3>
+              <h3 class="!mb-0">★ Pick of the Day</h3>
               <button type="button" class="se-min-btn se-toggle-min" aria-label="Minimize">Minimize</button>
             </div>
             <div class="se-body">
-              <p class="text-[10px] text-bb-muted mb-1">Form-first · role L10 · no forced picks</p>
+              <p class="text-[10px] text-bb-muted mb-1">Form + Odds API + AI · 0–3 picks · history tracked</p>
               <div class="se-grid-2">
                 <label>Venue
                   <select class="se-venue">
@@ -2106,16 +2120,23 @@
                 <input type="checkbox" class="se-ml-only" /> Moneyline only (ignore totals/spreads)
               </label>
               <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-same-game" checked /> Max 1 Super per game
+                <input type="checkbox" class="se-same-game" checked /> Max 1 POTD per game
               </label>
               <label class="flex items-center gap-1.5 mt-1" style="display:flex">
                 <input type="checkbox" class="se-rest-ok" /> Prefer rested pick (skip B2B when known)
               </label>
               <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-ai" /> AI stress-test
+                <input type="checkbox" class="se-ai" checked /> AI + Odds in determination
               </label>
-              <button type="button" class="se-run se-run-btn">Run Super Elite scan</button>
+              <button type="button" class="se-run se-run-btn">Run Pick of the Day</button>
               <div class="se-results mt-2 text-[11px] text-bb-muted">Run to find 0–3 picks</div>
+              <div class="se-history mt-2 p-2 rounded-lg border border-bb-border/60 bg-black/20">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="text-[10px] font-semibold text-amber-200/90 tracking-wide">POTD HISTORY · last 14</span>
+                  <button type="button" class="se-hist-refresh text-[9px] px-1.5 py-0.5 rounded border border-bb-border text-bb-muted">Refresh</button>
+                </div>
+                <div class="se-hist-body text-[10px] text-bb-muted">No POTD logged yet. Run a scan and Log picks to track W/L + ROI.</div>
+              </div>
             </div>
 
           </div>
@@ -2403,8 +2424,19 @@
   };
 
   
-  var APP_VERSION = '3.4.81';
+  var APP_VERSION = '3.4.82';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.82',
+      date: '2026-10-16',
+      title: 'Pick of the Day (ex Super Elite) · Odds + AI · history',
+      items: [
+        'RENAMED — Super Elite → Pick of the Day (POTD) across UI and Discord.',
+        'CHANGED — POTD determination uses form + Odds API consensus + AI (default on).',
+        'ADDED — POTD score 0–100 with consensus align/diverge adjustment.',
+        'ADDED — POTD History strip (last 14): W/L/P buttons, win% and flat ROI.'
+      ]
+    },
     {
       version: '3.4.81',
       date: '2026-10-13',
@@ -7454,6 +7486,100 @@
       (f.pickWR != null ? ' · pick WR ' + Math.round(f.pickWR * 100) + '%' : '') +
       (f.gap != null ? ' · gap ' + (f.gap >= 0 ? '+' : '') + Math.round(f.gap * 100) + 'pp' : '');
   }
+
+  var POTD_HIST_KEY = 'eliteodds_potd_history_v1';
+  function potdHistoryLoad() {
+    try { return JSON.parse(localStorage.getItem(POTD_HIST_KEY) || '[]'); } catch (e) { return []; }
+  }
+  function potdHistorySave(arr) {
+    try { localStorage.setItem(POTD_HIST_KEY, JSON.stringify((arr || []).slice(0, 40))); } catch (e) {}
+  }
+  function potdHistoryKey(g) {
+    return [String(g.eventTitle || g.title || ''), String(g.modelPick || ''), String(g.marketType || ''), String(g.startTime || g.commenceTime || '').slice(0, 10)].join('|').toLowerCase();
+  }
+  function potdHistoryAdd(g, venue) {
+    var list = potdHistoryLoad();
+    var k = potdHistoryKey(g);
+    if (list.some(function (x) { return x.key === k; })) return;
+    list.unshift({
+      key: k,
+      at: new Date().toISOString(),
+      venue: venue || 'polymarket',
+      pick: g.modelPick,
+      event: g.eventTitle || g.title,
+      marketType: g.marketType,
+      league: g.league || g.sport,
+      startTime: g.startTime || g.commenceTime || null,
+      potdScore: g._potdScore,
+      modelPct: modelPctOf(g),
+      edge: g.netEdge,
+      result: 'open',
+      logged: false
+    });
+    potdHistorySave(list);
+  }
+  function potdHistoryMarkLogged(g) {
+    var list = potdHistoryLoad();
+    var k = potdHistoryKey(g);
+    list.forEach(function (x) { if (x.key === k) x.logged = true; });
+    potdHistorySave(list);
+    potdHistoryRender();
+  }
+  function potdHistorySetResult(key, result) {
+    var list = potdHistoryLoad();
+    list.forEach(function (x) { if (x.key === key) x.result = result; });
+    potdHistorySave(list);
+    potdHistoryRender();
+  }
+  function potdHistoryStats(list) {
+    var closed = (list || []).filter(function (x) { return x.result === 'win' || x.result === 'loss' || x.result === 'push'; });
+    var w = closed.filter(function (x) { return x.result === 'win'; }).length;
+    var l = closed.filter(function (x) { return x.result === 'loss'; }).length;
+    var p = closed.filter(function (x) { return x.result === 'push'; }).length;
+    var n = w + l;
+    var winPct = n ? Math.round((w / n) * 1000) / 10 : null;
+    // flat 1u risk: win +1u approx at -110 style not exact; use +1 / -1 for simple ROI
+    var roi = n ? Math.round(((w - l) / n) * 1000) / 10 : null;
+    return { w: w, l: l, p: p, n: n, winPct: winPct, roi: roi, open: (list || []).filter(function (x) { return x.result === 'open'; }).length };
+  }
+  function potdHistoryRender() {
+    var list = potdHistoryLoad().slice(0, 14);
+    var st = potdHistoryStats(potdHistoryLoad());
+    var head = '<div class="mb-1 text-[10px]">';
+    if (st.n) {
+      head += '<span class="text-white font-medium">' + st.w + '–' + st.l + (st.p ? '–' + st.p : '') + '</span>';
+      head += ' <span class="text-bb-muted">(' + st.winPct + '%)</span>';
+      if (st.roi != null) head += ' · ROI <span class="' + (st.roi >= 0 ? 'text-emerald-300' : 'text-rose-300') + '">' + (st.roi >= 0 ? '+' : '') + st.roi + '%</span>';
+    } else {
+      head += '<span class="text-bb-muted">No settled POTDs yet</span>';
+    }
+    head += ' · <span class="text-bb-muted">' + st.open + ' open</span></div>';
+    var rows = list.map(function (x) {
+      var res = String(x.result || 'open');
+      var resCls = res === 'win' ? 'text-emerald-300' : (res === 'loss' ? 'text-rose-300' : (res === 'push' ? 'text-bb-muted' : 'text-amber-200/80'));
+      var btns = res === 'open'
+        ? ('<button type="button" data-pk="' + encodeURIComponent(x.key) + '" data-r="win" class="se-hist-res text-[9px] px-1 rounded border border-emerald-500/40 text-emerald-300">W</button> ' +
+           '<button type="button" data-pk="' + encodeURIComponent(x.key) + '" data-r="loss" class="se-hist-res text-[9px] px-1 rounded border border-rose-500/40 text-rose-300">L</button> ' +
+           '<button type="button" data-pk="' + encodeURIComponent(x.key) + '" data-r="push" class="se-hist-res text-[9px] px-1 rounded border border-bb-border text-bb-muted">P</button>')
+        : ('<button type="button" data-pk="' + encodeURIComponent(x.key) + '" data-r="open" class="se-hist-res text-[9px] px-1 rounded border border-bb-border text-bb-muted">undo</button>');
+      return '<div class="flex items-start justify-between gap-2 py-1 border-t border-bb-border/30">' +
+        '<div class="min-w-0"><div class="text-white/90 truncate">' + String(x.pick || '—').replace(/</g,'') + '</div>' +
+        '<div class="text-[9px] text-bb-muted truncate">' + String(x.event || '').replace(/</g,'').slice(0, 36) +
+        (x.potdScore != null ? ' · ' + x.potdScore : '') + '</div></div>' +
+        '<div class="text-right shrink-0"><div class="' + resCls + ' text-[9px] font-semibold uppercase">' + res + '</div>' +
+        '<div class="mt-0.5">' + btns + '</div></div></div>';
+    }).join('');
+    var body = head + (rows || '<div class="text-bb-muted">Empty — run POTD and results appear here.</div>');
+    document.querySelectorAll('.se-hist-body').forEach(function (el) { el.innerHTML = body; });
+    document.querySelectorAll('.se-hist-res').forEach(function (btn) {
+      btn.onclick = function () {
+        var k = decodeURIComponent(btn.getAttribute('data-pk') || '');
+        var r = btn.getAttribute('data-r') || 'open';
+        potdHistorySetResult(k, r);
+      };
+    });
+  }
+
   async function runSuperEliteScan(fromRoot) {
     var root = fromRoot || seActiveRoot();
     var venue = seVal(root, 'se-venue') || 'polymarket';
@@ -7476,7 +7602,7 @@
         if (out) out.innerHTML = html;
       });
     }
-    setMsg('<span class="text-bb-muted">Scanning…</span>');
+    setMsg('<span class="text-bb-muted">POTD scanning (form · odds · AI)…</span>');
     try {
       function venueOf(g) {
         return String(g.venue || g.source || 'polymarket').toLowerCase() === 'kalshi' ? 'kalshi' : 'polymarket';
@@ -7612,23 +7738,95 @@
         seen[k] = true;
         uniq.push(g);
       });
-      // SuperScore sort: form gap + model + edge
-      uniq.sort(function (a, b) {
-        var fa = a._seForm && a._seForm.gap != null ? a._seForm.gap : 0;
-        var fb = b._seForm && b._seForm.gap != null ? b._seForm.gap : 0;
-        var ma = modelPctOf(a) || 0, mb = modelPctOf(b) || 0;
-        var ea = a.netEdge != null ? Number(a.netEdge) : 0;
-        var eb = b.netEdge != null ? Number(b.netEdge) : 0;
-        var sa = fa * 40 + ma * 0.35 + ea * 0.25;
-        var sb = fb * 40 + mb * 0.35 + eb * 0.25;
-        return sb - sa;
-      });
-      var top = uniq.slice(0, maxPicks);
-      if (useAi && top.length) {
-        try { top = await seAiFilter(top); } catch (e) { console.warn('SE AI', e); }
+      // POTD score: form + model + edge (pre-odds)
+      function potdBaseScore(g) {
+        var fa = g._seForm && g._seForm.gap != null ? Number(g._seForm.gap) : 0;
+        var ma = modelPctOf(g) || 0;
+        var ea = g.netEdge != null ? Number(g.netEdge) : 0;
+        if (!Number.isFinite(ea)) ea = 0;
+        return fa * 40 + ma * 0.35 + ea * 2.5;
       }
+      uniq.sort(function (a, b) { return potdBaseScore(b) - potdBaseScore(a); });
+
+      // Odds API consensus on top survivors (determination layer)
+      var oddsKey = (($('odds-key') && $('odds-key').value) || (settings().oddsKey || '')).trim();
+      var preOdds = uniq.slice(0, Math.min(8, Math.max(maxPicks * 3, 4)));
+      if (oddsKey && preOdds.length) {
+        setMsg('<span class="text-bb-muted">POTD · checking Odds API consensus…</span>');
+        for (var oi = 0; oi < preOdds.length; oi++) {
+          var og = preOdds[oi];
+          try {
+            var orr = await fetch('/api/tools', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'odds-consensus',
+                apiKey: oddsKey,
+                game: {
+                  eventTitle: og.eventTitle || og.title,
+                  homeName: og.homeName,
+                  awayName: og.awayName,
+                  league: og.league || og.sport,
+                  marketType: og.marketType,
+                  modelPick: og.modelPick,
+                  commenceTime: og.startTime || og.commenceTime
+                }
+              })
+            });
+            var od = await orr.json().catch(function () { return {}; });
+            var cons = od.consensus || od;
+            var cPct = null;
+            if (cons && cons.implied != null) cPct = Number(cons.implied);
+            else if (cons && cons.probability != null) cPct = Number(cons.probability);
+            else if (cons && cons.yes != null) cPct = Number(cons.yes);
+            if (cPct != null && cPct > 1) cPct = cPct / 100;
+            og._potdConsensus = cPct;
+            og._potdConsensusNote = cons && (cons.note || cons.summary) ? String(cons.note || cons.summary).slice(0, 80) : '';
+            // Agreement boost / disagreement penalty vs model
+            var mp01 = (modelPctOf(og) || 50) / 100;
+            if (cPct != null && Number.isFinite(cPct)) {
+              var diff = Math.abs(mp01 - cPct);
+              if (diff <= 0.06) og._potdOddsBoost = 8;
+              else if (diff <= 0.12) og._potdOddsBoost = 3;
+              else if (diff >= 0.22) og._potdOddsBoost = -12; // trap risk
+              else og._potdOddsBoost = 0;
+              og._potdConsensusLine = 'Consensus ~' + Math.round(cPct * 1000) / 10 + '%' +
+                (og._potdOddsBoost >= 8 ? ' · aligned' : (og._potdOddsBoost < 0 ? ' · diverges from model' : ''));
+            } else {
+              og._potdOddsBoost = 0;
+              og._potdConsensusLine = 'Consensus unavailable';
+            }
+          } catch (eOdds) {
+            og._potdOddsBoost = 0;
+            og._potdConsensusLine = 'Odds API error';
+          }
+        }
+      } else {
+        preOdds.forEach(function (g) {
+          g._potdOddsBoost = 0;
+          g._potdConsensusLine = oddsKey ? '' : 'Add Odds API key in Settings for consensus';
+        });
+      }
+
+      // Final POTD score including odds boost
+      uniq.forEach(function (g) {
+        g._potdScore = Math.round(Math.max(0, Math.min(100, potdBaseScore(g) + (g._potdOddsBoost || 0))));
+      });
+      uniq.sort(function (a, b) { return (b._potdScore || 0) - (a._potdScore || 0); });
+
+      var top = uniq.slice(0, maxPicks);
+      // AI is part of determination when checked (default on)
+      if (useAi && top.length) {
+        setMsg('<span class="text-bb-muted">POTD · AI determination…</span>');
+        try { top = await seAiFilter(top); } catch (e) { console.warn('POTD AI', e); }
+      }
+      // Drop AI vetoes already handled; also drop hard odds divergence if still present without AI confirm
+      top = top.filter(function (g) {
+        if ((g._potdOddsBoost || 0) < -10 && !(g._seAi && String(g._seAi).indexOf('CONFIRM') >= 0)) return false;
+        return true;
+      });
       if (!top.length) {
-        setMsg('<p class="text-bb-muted">No Super Elite for this filter.<br><span class="text-[10px]">Pool ' + diag.pool + ' · sport ' + diag.sport + ' · market ' + diag.market + ' · rank ' + diag.rank + ' · model≥' + modelMin + ' ' + diag.model + ' · edge≥' + edgeMin + ' ' + diag.edge + ' · final ' + diag.pass + '</span><br><span class="text-[10px]">Tip: set Market to <b>All markets</b> or <b>Full game O/U</b> if your Elites are totals. Load Scan for that venue first.</span></p>');
+        setMsg('<p class="text-bb-muted">No Pick of the Day for this filter.<br><span class="text-[10px]">Pool ' + diag.pool + ' · sport ' + diag.sport + ' · market ' + diag.market + ' · rank ' + diag.rank + ' · model≥' + modelMin + ' ' + diag.model + ' · edge≥' + edgeMin + ' ' + diag.edge + ' · final ' + diag.pass + '</span><br><span class="text-[10px]">Tip: set Market to <b>All markets</b> or <b>Full game O/U</b> if your Elites are totals. Load Scan for that venue first.</span></p>');
         return;
       }
       setMsg(top.map(function (g, i) {
@@ -7639,19 +7837,26 @@
         var px = mkt != null ? (isK ? Math.round(mkt) + '¢' : (Math.round(mkt * 10) / 10 + '%')) : '—';
         var edge = g.netEdge != null ? ((g.netEdge >= 0 ? '+' : '') + g.netEdge + 'pp') : '—';
         return '<div class="se-card" data-se="' + i + '">' +
-          '<div class="tag">SUPER ' + (i + 1) + ' · ' + (isK ? 'KALSHI' : 'PM') + '</div>' +
+          '<div class="tag">POTD ' + (i + 1) + ' · ' + (isK ? 'KALSHI' : 'PM') + '</div>' +
           '<div class="text-white text-xs font-medium mt-0.5">' + String(g.modelPick || '—').replace(/</g,'') + '</div>' +
           '<div class="text-[10px] text-bb-muted">' + String(g.eventTitle || g.title || '').replace(/</g,'').slice(0, 42) + '</div>' +
-          '<div class="flex gap-3 mt-1 text-[10px]"><span>Model <b class="text-white">' + (mp != null ? Math.round(mp * 10) / 10 : '—') + '%</b></span>' +
+          '<div class="flex gap-3 mt-1 text-[10px] flex-wrap"><span>POTD <b class="text-amber-200">' + (g._potdScore != null ? g._potdScore : '—') + '</b></span>' +
+          '<span>Model <b class="text-white">' + (mp != null ? Math.round(mp * 10) / 10 : '—') + '%</b></span>' +
           '<span>Mkt <b class="text-white">' + px + '</b></span><span>Edge <b class="text-white">' + edge + '</b></span></div>' +
           (g._seFormLine ? '<div class="text-[10px] text-violet-200/90 mt-1">' + String(g._seFormLine).replace(/</g,'') + '</div>' : '') +
-          (g._seAi ? '<div class="text-[10px] text-amber-200/90 mt-1">' + String(g._seAi).replace(/</g,'').slice(0, 160) + '</div>' : '') +
+          (g._potdConsensusLine ? '<div class="text-[10px] text-sky-200/90 mt-0.5">Odds · ' + String(g._potdConsensusLine).replace(/</g,'') + '</div>' : '') +
+          (g._seAi ? '<div class="text-[10px] text-amber-200/90 mt-1">AI · ' + String(g._seAi).replace(/</g,'').slice(0, 160) + '</div>' : '') +
           '<div class="flex gap-1.5 mt-1.5">' +
           '<button type="button" class="se-log text-[10px] px-2 py-1 rounded border border-bb-border text-bb-muted">Log</button>' +
-          '<button type="button" class="se-disc text-[10px] px-2 py-1 rounded border border-amber-400/40 text-amber-200">Discord SE</button>' +
+          '<button type="button" class="se-disc text-[10px] px-2 py-1 rounded border border-amber-400/40 text-amber-200">Discord POTD</button>' +
           '<a class="text-[10px] px-2 py-1 rounded border border-bb-border text-bb-muted" href="' + (g.url || '#') + '" target="_blank" rel="noopener">Trade</a>' +
           '</div></div>';
       }).join(''));
+      // Persist POTD shortlist to history (open until settled)
+      try {
+        top.forEach(function (g) { potdHistoryAdd(g, venue); });
+        potdHistoryRender();
+      } catch (eH) {}
       seRoots().forEach(function (r) {
         var out = r.querySelector('.se-results');
         if (!out) return;
@@ -7660,7 +7865,7 @@
           if (!g) return;
           var lg = card.querySelector('.se-log');
           var ds = card.querySelector('.se-disc');
-          if (lg) lg.onclick = function () { logBet(g); };
+          if (lg) lg.onclick = function () { logBet(g); potdHistoryMarkLogged(g); };
           if (ds) ds.onclick = function () { sendDiscordSuper(g); };
         });
       });
@@ -7701,18 +7906,18 @@
   async function sendDiscordSuper(g) {
     var st = liveSettings();
     var wh = st.webhookSuper || (($('webhook-super') && $('webhook-super').value) || '').trim();
-    if (!wh) return alert('Add Super Elite Discord webhook in Settings');
+    if (!wh) return alert('Add Pick of the Day Discord webhook in Settings');
     var venue = resolveVenue(g);
     var mp = modelPctOf(g);
     var embed = {
-      title: '★ SUPER ELITE · ' + (venue === 'kalshi' ? 'Kalshi' : 'Polymarket'),
+      title: '★ PICK OF THE DAY · ' + (venue === 'kalshi' ? 'Kalshi' : 'Polymarket'),
       color: 0xf59e0b,
       description: '**' + String(g.modelPick || '—') + '**\n' + String(g.eventTitle || g.title || ''),
       fields: [
         { name: 'Model', value: mp != null ? (Math.round(mp * 10) / 10 + '%') : '—', inline: true },
         { name: 'Edge', value: g.netEdge != null ? (String(g.netEdge) + 'pp') : '—', inline: true }
       ],
-      footer: { text: 'EliteOdds Super Elite · form + Elite only' },
+      footer: { text: 'EliteOdds Pick of the Day · form + Odds + AI' },
       timestamp: new Date().toISOString()
     };
     if (g.url) embed.fields.push({ name: 'Trade', value: '[Open →](' + g.url + ')', inline: false });
@@ -7721,7 +7926,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ webhookUrl: wh, embeds: [embed] })
     });
-    alert(r.ok ? 'Sent Super Elite → Discord ✓' : 'Discord failed');
+    alert(r.ok ? 'Sent Pick of the Day → Discord ✓' : 'Discord failed');
   }
   function eliteDayStart(day) {
     var now = new Date();
