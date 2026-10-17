@@ -27,7 +27,19 @@ module.exports = async function handler(req, res) {
   if (action === 'coach' || action === 'openai' || action === 'free' || body.prompt) {
     system = body.system || 'You are a sports betting model coach. Short, honest bullets. Do not invent stats.';
     userContent = body.prompt || body.message || JSON.stringify(game);
+  } else if (action === 'potd-analyze' || action === 'potd') {
+    system = body.system || `Independent third-party sports betting analyst. You are NOT the numeric model. Do not rubber-stamp or auto-oppose. Unbiased. No invented injuries/lineups/weather. H2H is context only. Output exactly:
+CONVICTION: HIGH|MEDIUM|LOW
+SIGNAL: YAY|LEAN_YAY|NEUTRAL|LEAN_NAY|NAY
+AGREE: one line
+PUSHBACK: one line
+H2H: one line
+GAPS: unknowns
+THESIS: 3-5 neutral sentences
+BOTTOM: one line (optional read, not a veto)`;
+    userContent = JSON.stringify(game, null, 0);
   } else if (action === 'research' || action === 'deep' || action === 'deep-research') {
+
     system = `Deep Research — Bet Validation & Thesis
 
 You are performing deep research on a betting opportunity.

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.82</title>
+  <title>EliteOdds v3.4.85</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.82</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.85</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1210,7 +1210,11 @@
               <button type="button" class="se-min-btn se-toggle-min" aria-label="Minimize">Minimize</button>
             </div>
             <div class="se-body">
-              <p class="text-[10px] text-bb-muted mb-1">Form + Odds API + AI · 0–3 picks · history tracked</p>
+              <p class="text-[10px] text-bb-muted mb-1.5 leading-relaxed">
+                <span class="text-amber-200/90 font-medium">Hit-rate model</span> · not Elite.
+                Form (incl. H2H context) + <b class="text-white/80">pick price</b> + Odds consensus.
+                AI analyzer optional (third-party conviction — not auto-veto). Empty day OK.
+              </p>
               <div class="se-grid-2">
                 <label>Venue
                   <select class="se-venue">
@@ -1218,120 +1222,53 @@
                     <option value="kalshi">Kalshi</option>
                   </select>
                 </label>
-                <label>Sport
-                  <select class="se-sport">
-                    <option value="all">All</option>
-                    <option value="mlb">MLB</option>
-                    <option value="nfl">NFL</option>
-                    <option value="nba">NBA</option>
-                    <option value="nhl">NHL</option>
-                    <option value="cfb">CFB</option>
-                    <option value="cbb">CBB</option>
-                    <option value="soccer">Soccer (all leagues)</option>
-                    <option value="esports">Esports</option>
+                <label>Window
+                  <select class="se-window">
+                    <option value="today">Today</option>
+                    <option value="next3" selected>Next 3 days</option>
                   </select>
                 </label>
               </div>
-              <label>Market
-                <select class="se-market"></select>
+              <label class="mt-1 block">Sport focus
+                <select class="se-sport">
+                  <option value="all">All sports</option>
+                  <option value="mlb">MLB</option>
+                  <option value="nfl">NFL</option>
+                  <option value="nba">NBA</option>
+                  <option value="nhl">NHL</option>
+                  <option value="cfb">CFB</option>
+                  <option value="cbb">CBB</option>
+                </select>
               </label>
-              <div class="se-grid-2">
-                <label>Model % min
-                  <select class="se-model-min">
-                    <option value="70">70%</option>
-                    <option value="75" selected>75%</option>
-                    <option value="78">78%</option>
-                    <option value="80">80%</option>
-                    <option value="82">82%</option>
-                    <option value="85">85%</option>
-                    <option value="88">88%</option>
-                    <option value="90">90%</option>
-                    <option value="92">92%</option>
-                    <option value="95">95%</option>
-                  </select>
-                </label>
-                <label>Min edge (pp)
-                  <select class="se-edge-min">
-                    <option value="0">0</option>
-                    <option value="3" selected>3</option>
-                    <option value="5">5</option>
-                    <option value="8">8</option>
-                    <option value="10">10</option>
-                    <option value="12">12</option>
-                  </select>
-                </label>
-              </div>
-              <div class="se-grid-2">
-                <label>Max picks
+              <p class="text-[9px] text-bb-muted mt-2 mb-1">House rules (locked)</p>
+              <ul class="text-[9px] text-bb-muted space-y-0.5 mb-2 list-disc pl-3">
+                <li>Pregame · price 28–72¢ · min +5pp edge · main-line bias</li>
+                <li>H2H weights form confidence — never auto-vetoes</li>
+                <li>No Pass/Good/Elite required</li>
+                <li>Odds API required · AI analyzer optional (High/Med/Low)</li>
+              </ul>
+              <div class="se-grid-2 mt-1">
+                <label>Max POTDs
                   <select class="se-max">
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3" selected>3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
                   </select>
                 </label>
-                <label>Game time
-                  <select class="se-live">
-                    <option value="pregame">Pregame only</option>
-                    <option value="both">Pregame + live</option>
-                  </select>
-                </label>
-              </div>
-              <div class="se-grid-2">
-                <label>Min score /10
-                  <select class="se-score-min">
-                    <option value="0" selected>Off</option>
-                    <option value="8">8+</option>
-                    <option value="9">9+</option>
-                    <option value="10">10</option>
-                  </select>
-                </label>
-                <label>Rank
-                  <select class="se-rank">
-                    <option value="good" selected>Good + Elite</option>
-                    <option value="elite">Elite only</option>
-                  </select>
+                <label class="flex items-center gap-1.5 mt-4 text-[10px]" style="display:flex">
+                  <input type="checkbox" class="se-ai-analyze" /> Auto-run AI analyzer
                 </label>
               </div>
-              <p class="text-[10px] text-violet-300/90 mt-2 mb-0.5">Form gates (role L10)</p>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-req-role" checked /> Require role L10 (home@H / away@A)
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-role-min" checked /> Pick role WR ≥ 55% (6-4 in 10)
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-form-gap" checked /> Form gap ≥ +10 pp vs opponent
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-form-agree" checked /> Model side agrees with form
-              </label>
-              <p class="text-[10px] text-violet-300/90 mt-2 mb-0.5">Extra filters</p>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-h2h-veto" checked /> Veto if H2H lopsided against pick
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-no-extreme" checked /> Skip extreme prices (&lt;18% or &gt;85%)
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-ml-only" /> Moneyline only (ignore totals/spreads)
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-same-game" checked /> Max 1 POTD per game
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-rest-ok" /> Prefer rested pick (skip B2B when known)
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-ai" checked /> AI + Odds in determination
-              </label>
-              <button type="button" class="se-run se-run-btn">Run Pick of the Day</button>
-              <div class="se-results mt-2 text-[11px] text-bb-muted">Run to find 0–3 picks</div>
+              <div class="flex gap-2 mt-1"><button type="button" class="se-run se-run-btn flex-1">Run Pick of the Day</button><button type="button" class="se-refresh-btn text-[10px] px-2 py-2 rounded-lg border border-bb-border text-bb-muted">Refresh prices</button></div>
+              <div class="se-results mt-2 text-[11px] text-bb-muted">Run for 0–3 high-confidence picks</div>
               <div class="se-history mt-2 p-2 rounded-lg border border-bb-border/60 bg-black/20">
                 <div class="flex items-center justify-between gap-2 mb-1">
                   <span class="text-[10px] font-semibold text-amber-200/90 tracking-wide">POTD HISTORY · last 14</span>
                   <button type="button" class="se-hist-refresh text-[9px] px-1.5 py-0.5 rounded border border-bb-border text-bb-muted">Refresh</button>
                 </div>
-                <div class="se-hist-body text-[10px] text-bb-muted">No POTD logged yet. Run a scan and Log picks to track W/L + ROI.</div>
+                <div class="se-hist-body text-[10px] text-bb-muted">No POTD yet. Hits tracked here — aim for quality over volume.</div>
               </div>
             </div>
 
@@ -1411,7 +1348,11 @@
               <button type="button" class="se-min-btn se-toggle-min" aria-label="Minimize">Minimize</button>
             </div>
             <div class="se-body">
-              <p class="text-[10px] text-bb-muted mb-1">Form + Odds API + AI · 0–3 picks · history tracked</p>
+              <p class="text-[10px] text-bb-muted mb-1.5 leading-relaxed">
+                <span class="text-amber-200/90 font-medium">Hit-rate model</span> · not Elite.
+                Form (incl. H2H context) + <b class="text-white/80">pick price</b> + Odds consensus.
+                AI analyzer optional (third-party conviction — not auto-veto). Empty day OK.
+              </p>
               <div class="se-grid-2">
                 <label>Venue
                   <select class="se-venue">
@@ -1419,119 +1360,53 @@
                     <option value="kalshi">Kalshi</option>
                   </select>
                 </label>
-                <label>Sport
-                  <select class="se-sport">
-                    <option value="all">All</option>
-                    <option value="mlb">MLB</option>
-                    <option value="nfl">NFL</option>
-                    <option value="nba">NBA</option>
-                    <option value="nhl">NHL</option>
-                    <option value="cfb">CFB</option>
-                    <option value="cbb">CBB</option>
-                    <option value="esports">Esports</option>
+                <label>Window
+                  <select class="se-window">
+                    <option value="today">Today</option>
+                    <option value="next3" selected>Next 3 days</option>
                   </select>
                 </label>
               </div>
-              <label>Market
-                <select class="se-market"></select>
+              <label class="mt-1 block">Sport focus
+                <select class="se-sport">
+                  <option value="all">All sports</option>
+                  <option value="mlb">MLB</option>
+                  <option value="nfl">NFL</option>
+                  <option value="nba">NBA</option>
+                  <option value="nhl">NHL</option>
+                  <option value="cfb">CFB</option>
+                  <option value="cbb">CBB</option>
+                </select>
               </label>
-              <div class="se-grid-2">
-                <label>Model % min
-                  <select class="se-model-min">
-                    <option value="70">70%</option>
-                    <option value="75" selected>75%</option>
-                    <option value="78">78%</option>
-                    <option value="80">80%</option>
-                    <option value="82">82%</option>
-                    <option value="85">85%</option>
-                    <option value="88">88%</option>
-                    <option value="90">90%</option>
-                    <option value="92">92%</option>
-                    <option value="95">95%</option>
-                  </select>
-                </label>
-                <label>Min edge (pp)
-                  <select class="se-edge-min">
-                    <option value="0">0</option>
-                    <option value="3" selected>3</option>
-                    <option value="5">5</option>
-                    <option value="8">8</option>
-                    <option value="10">10</option>
-                    <option value="12">12</option>
-                  </select>
-                </label>
-              </div>
-              <div class="se-grid-2">
-                <label>Max picks
+              <p class="text-[9px] text-bb-muted mt-2 mb-1">House rules (locked)</p>
+              <ul class="text-[9px] text-bb-muted space-y-0.5 mb-2 list-disc pl-3">
+                <li>Pregame · price 28–72¢ · min +5pp edge · main-line bias</li>
+                <li>H2H weights form confidence — never auto-vetoes</li>
+                <li>No Pass/Good/Elite required</li>
+                <li>Odds API required · AI analyzer optional (High/Med/Low)</li>
+              </ul>
+              <div class="se-grid-2 mt-1">
+                <label>Max POTDs
                   <select class="se-max">
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3" selected>3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
                   </select>
                 </label>
-                <label>Game time
-                  <select class="se-live">
-                    <option value="pregame">Pregame only</option>
-                    <option value="both">Pregame + live</option>
-                  </select>
-                </label>
-              </div>
-              <div class="se-grid-2">
-                <label>Min score /10
-                  <select class="se-score-min">
-                    <option value="0" selected>Off</option>
-                    <option value="8">8+</option>
-                    <option value="9">9+</option>
-                    <option value="10">10</option>
-                  </select>
-                </label>
-                <label>Rank
-                  <select class="se-rank">
-                    <option value="good" selected>Good + Elite</option>
-                    <option value="elite">Elite only</option>
-                  </select>
+                <label class="flex items-center gap-1.5 mt-4 text-[10px]" style="display:flex">
+                  <input type="checkbox" class="se-ai-analyze" /> Auto-run AI analyzer
                 </label>
               </div>
-              <p class="text-[10px] text-violet-300/90 mt-2 mb-0.5">Form gates (role L10)</p>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-req-role" checked /> Require role L10 (home@H / away@A)
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-role-min" checked /> Pick role WR ≥ 55% (6-4 in 10)
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-form-gap" checked /> Form gap ≥ +10 pp vs opponent
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-form-agree" checked /> Model side agrees with form
-              </label>
-              <p class="text-[10px] text-violet-300/90 mt-2 mb-0.5">Extra filters</p>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-h2h-veto" checked /> Veto if H2H lopsided against pick
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-no-extreme" checked /> Skip extreme prices (&lt;18% or &gt;85%)
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-ml-only" /> Moneyline only (ignore totals/spreads)
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-same-game" checked /> Max 1 POTD per game
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-rest-ok" /> Prefer rested pick (skip B2B when known)
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-ai" checked /> AI + Odds in determination
-              </label>
-              <button type="button" class="se-run se-run-btn">Run Pick of the Day</button>
-              <div class="se-results mt-2 text-[11px] text-bb-muted">Run to find 0–3 picks</div>
+              <div class="flex gap-2 mt-1"><button type="button" class="se-run se-run-btn flex-1">Run Pick of the Day</button><button type="button" class="se-refresh-btn text-[10px] px-2 py-2 rounded-lg border border-bb-border text-bb-muted">Refresh prices</button></div>
+              <div class="se-results mt-2 text-[11px] text-bb-muted">Run for 0–3 high-confidence picks</div>
               <div class="se-history mt-2 p-2 rounded-lg border border-bb-border/60 bg-black/20">
                 <div class="flex items-center justify-between gap-2 mb-1">
                   <span class="text-[10px] font-semibold text-amber-200/90 tracking-wide">POTD HISTORY · last 14</span>
                   <button type="button" class="se-hist-refresh text-[9px] px-1.5 py-0.5 rounded border border-bb-border text-bb-muted">Refresh</button>
                 </div>
-                <div class="se-hist-body text-[10px] text-bb-muted">No POTD logged yet. Run a scan and Log picks to track W/L + ROI.</div>
+                <div class="se-hist-body text-[10px] text-bb-muted">No POTD yet. Hits tracked here — aim for quality over volume.</div>
               </div>
             </div>
 
@@ -1715,7 +1590,7 @@
               <p class="text-[10px] text-bb-green mt-0.5">Kalshi Elite auto-send uses this webhook only (never Discord 1).</p>
             </label>
             <label class="block text-xs">Discord · <span class="text-amber-300">Pick of the Day</span>
-              <input id="webhook-super" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="Pick of the Day only (optional)" />
+              <input id="webhook-super" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="https://discord.com/api/webhooks/... (POTD track)" />
             </label>
             <label class="block text-xs">Discord · <span class="text-bb-orange">Placed bets</span>
               <input id="webhook-placed" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="When someone logs / takes a bet" />
@@ -1986,7 +1861,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.82</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.85</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2015,7 +1890,11 @@
               <button type="button" class="se-min-btn se-toggle-min" aria-label="Minimize">Minimize</button>
             </div>
             <div class="se-body">
-              <p class="text-[10px] text-bb-muted mb-1">Form + Odds API + AI · 0–3 picks · history tracked</p>
+              <p class="text-[10px] text-bb-muted mb-1.5 leading-relaxed">
+                <span class="text-amber-200/90 font-medium">Hit-rate model</span> · not Elite.
+                Form (incl. H2H context) + <b class="text-white/80">pick price</b> + Odds consensus.
+                AI analyzer optional (third-party conviction — not auto-veto). Empty day OK.
+              </p>
               <div class="se-grid-2">
                 <label>Venue
                   <select class="se-venue">
@@ -2023,119 +1902,53 @@
                     <option value="kalshi">Kalshi</option>
                   </select>
                 </label>
-                <label>Sport
-                  <select class="se-sport">
-                    <option value="all">All</option>
-                    <option value="mlb">MLB</option>
-                    <option value="nfl">NFL</option>
-                    <option value="nba">NBA</option>
-                    <option value="nhl">NHL</option>
-                    <option value="cfb">CFB</option>
-                    <option value="cbb">CBB</option>
-                    <option value="esports">Esports</option>
+                <label>Window
+                  <select class="se-window">
+                    <option value="today">Today</option>
+                    <option value="next3" selected>Next 3 days</option>
                   </select>
                 </label>
               </div>
-              <label>Market
-                <select class="se-market"></select>
+              <label class="mt-1 block">Sport focus
+                <select class="se-sport">
+                  <option value="all">All sports</option>
+                  <option value="mlb">MLB</option>
+                  <option value="nfl">NFL</option>
+                  <option value="nba">NBA</option>
+                  <option value="nhl">NHL</option>
+                  <option value="cfb">CFB</option>
+                  <option value="cbb">CBB</option>
+                </select>
               </label>
-              <div class="se-grid-2">
-                <label>Model % min
-                  <select class="se-model-min">
-                    <option value="70">70%</option>
-                    <option value="75" selected>75%</option>
-                    <option value="78">78%</option>
-                    <option value="80">80%</option>
-                    <option value="82">82%</option>
-                    <option value="85">85%</option>
-                    <option value="88">88%</option>
-                    <option value="90">90%</option>
-                    <option value="92">92%</option>
-                    <option value="95">95%</option>
-                  </select>
-                </label>
-                <label>Min edge (pp)
-                  <select class="se-edge-min">
-                    <option value="0">0</option>
-                    <option value="3" selected>3</option>
-                    <option value="5">5</option>
-                    <option value="8">8</option>
-                    <option value="10">10</option>
-                    <option value="12">12</option>
-                  </select>
-                </label>
-              </div>
-              <div class="se-grid-2">
-                <label>Max picks
+              <p class="text-[9px] text-bb-muted mt-2 mb-1">House rules (locked)</p>
+              <ul class="text-[9px] text-bb-muted space-y-0.5 mb-2 list-disc pl-3">
+                <li>Pregame · price 28–72¢ · min +5pp edge · main-line bias</li>
+                <li>H2H weights form confidence — never auto-vetoes</li>
+                <li>No Pass/Good/Elite required</li>
+                <li>Odds API required · AI analyzer optional (High/Med/Low)</li>
+              </ul>
+              <div class="se-grid-2 mt-1">
+                <label>Max POTDs
                   <select class="se-max">
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3" selected>3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
                   </select>
                 </label>
-                <label>Game time
-                  <select class="se-live">
-                    <option value="pregame">Pregame only</option>
-                    <option value="both">Pregame + live</option>
-                  </select>
-                </label>
-              </div>
-              <div class="se-grid-2">
-                <label>Min score /10
-                  <select class="se-score-min">
-                    <option value="0" selected>Off</option>
-                    <option value="8">8+</option>
-                    <option value="9">9+</option>
-                    <option value="10">10</option>
-                  </select>
-                </label>
-                <label>Rank
-                  <select class="se-rank">
-                    <option value="good" selected>Good + Elite</option>
-                    <option value="elite">Elite only</option>
-                  </select>
+                <label class="flex items-center gap-1.5 mt-4 text-[10px]" style="display:flex">
+                  <input type="checkbox" class="se-ai-analyze" /> Auto-run AI analyzer
                 </label>
               </div>
-              <p class="text-[10px] text-violet-300/90 mt-2 mb-0.5">Form gates (role L10)</p>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-req-role" checked /> Require role L10 (home@H / away@A)
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-role-min" checked /> Pick role WR ≥ 55% (6-4 in 10)
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-form-gap" checked /> Form gap ≥ +10 pp vs opponent
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-form-agree" checked /> Model side agrees with form
-              </label>
-              <p class="text-[10px] text-violet-300/90 mt-2 mb-0.5">Extra filters</p>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-h2h-veto" checked /> Veto if H2H lopsided against pick
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-no-extreme" checked /> Skip extreme prices (&lt;18% or &gt;85%)
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-ml-only" /> Moneyline only (ignore totals/spreads)
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-same-game" checked /> Max 1 POTD per game
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-rest-ok" /> Prefer rested pick (skip B2B when known)
-              </label>
-              <label class="flex items-center gap-1.5 mt-1" style="display:flex">
-                <input type="checkbox" class="se-ai" checked /> AI + Odds in determination
-              </label>
-              <button type="button" class="se-run se-run-btn">Run Pick of the Day</button>
-              <div class="se-results mt-2 text-[11px] text-bb-muted">Run to find 0–3 picks</div>
+              <div class="flex gap-2 mt-1"><button type="button" class="se-run se-run-btn flex-1">Run Pick of the Day</button><button type="button" class="se-refresh-btn text-[10px] px-2 py-2 rounded-lg border border-bb-border text-bb-muted">Refresh prices</button></div>
+              <div class="se-results mt-2 text-[11px] text-bb-muted">Run for 0–3 high-confidence picks</div>
               <div class="se-history mt-2 p-2 rounded-lg border border-bb-border/60 bg-black/20">
                 <div class="flex items-center justify-between gap-2 mb-1">
                   <span class="text-[10px] font-semibold text-amber-200/90 tracking-wide">POTD HISTORY · last 14</span>
                   <button type="button" class="se-hist-refresh text-[9px] px-1.5 py-0.5 rounded border border-bb-border text-bb-muted">Refresh</button>
                 </div>
-                <div class="se-hist-body text-[10px] text-bb-muted">No POTD logged yet. Run a scan and Log picks to track W/L + ROI.</div>
+                <div class="se-hist-body text-[10px] text-bb-muted">No POTD yet. Hits tracked here — aim for quality over volume.</div>
               </div>
             </div>
 
@@ -2424,8 +2237,44 @@
   };
 
   
-  var APP_VERSION = '3.4.82';
+  var APP_VERSION = '3.4.85';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.85',
+      date: '2026-10-16',
+      title: 'POTD: H2H form weight · optional AI analyzer · max 1–5 · Discord',
+      items: [
+        'CHANGED — H2H no longer vetoes; soft weight on POTD score + form line.',
+        'CHANGED — AI is optional third-party analyzer (HIGH/MED/LOW · YAY–NAY), not auto-veto.',
+        'ADDED — Max POTDs 1–5 (never forced). Multiple legs per game allowed.',
+        'ADDED — AI Analyze button per card; Discord webhook for POTD tracking.',
+        'ADDED — AI/analyze log stored for future train-to-improve loop.'
+      ]
+    },
+    {
+      version: '3.4.84',
+      date: '2026-10-16',
+      title: 'POTD hit-rate polish — keys, as-of price, near misses, vs Elite',
+      items: [
+        'ADDED — POTD requires Odds API + OpenAI keys (hit-rate path).',
+        'ADDED — Price as-of timestamp on each POTD card.',
+        'ADDED — Refresh prices button re-runs POTD.',
+        'ADDED — Near-miss log when nothing clears the bar.',
+        'ADDED — History compares POTD record vs Elite paper W/L.'
+      ]
+    },
+    {
+      version: '3.4.83',
+      date: '2026-10-16',
+      title: 'POTD hit-rate model — fixed rules, not Elite',
+      items: [
+        'CHANGED — Pick of the Day uses a locked hit-rate model (form + pick price + edge).',
+        'REMOVED — User filter panel (model%, edge dropdowns, rank gates, checkboxes).',
+        'CHANGED — Does not require Pass/Good/Elite; board rank is ignored.',
+        'LOCKED — Price band 28–72¢ · min +5pp edge · main-line bias · max 1/game · up to 3 picks.',
+        'KEPT — Odds API + AI in determination; history strip; empty day when nothing clears.'
+      ]
+    },
     {
       version: '3.4.82',
       date: '2026-10-16',
@@ -7538,22 +7387,74 @@
     var p = closed.filter(function (x) { return x.result === 'push'; }).length;
     var n = w + l;
     var winPct = n ? Math.round((w / n) * 1000) / 10 : null;
-    // flat 1u risk: win +1u approx at -110 style not exact; use +1 / -1 for simple ROI
     var roi = n ? Math.round(((w - l) / n) * 1000) / 10 : null;
     return { w: w, l: l, p: p, n: n, winPct: winPct, roi: roi, open: (list || []).filter(function (x) { return x.result === 'open'; }).length };
+  }
+  function elitePaperStats() {
+    try {
+      var rows = typeof eliteLedger === 'function' ? eliteLedger() : [];
+      var closed = (rows || []).filter(function (e) {
+        var r = String(e.result || '').toLowerCase();
+        return r === 'won' || r === 'win' || r === 'lost' || r === 'loss' || r === 'push';
+      });
+      var w = closed.filter(function (e) { var r = String(e.result||'').toLowerCase(); return r === 'won' || r === 'win'; }).length;
+      var l = closed.filter(function (e) { var r = String(e.result||'').toLowerCase(); return r === 'lost' || r === 'loss'; }).length;
+      var n = w + l;
+      return {
+        w: w, l: l, n: n,
+        winPct: n ? Math.round((w / n) * 1000) / 10 : null,
+        roi: n ? Math.round(((w - l) / n) * 1000) / 10 : null
+      };
+    } catch (e) { return { w: 0, l: 0, n: 0, winPct: null, roi: null }; }
+  }
+  var POTD_NEAR_KEY = 'eliteodds_potd_nearmiss_v1';
+  function potdNearMissLoad() {
+    try { return JSON.parse(localStorage.getItem(POTD_NEAR_KEY) || '[]'); } catch (e) { return []; }
+  }
+  function potdNearMissSave(arr) {
+    try { localStorage.setItem(POTD_NEAR_KEY, JSON.stringify((arr || []).slice(0, 20))); } catch (e) {}
+  }
+  function potdNearMissAdd(g, reason) {
+    var list = potdNearMissLoad();
+    list.unshift({
+      at: new Date().toISOString(),
+      pick: g.modelPick,
+      event: g.eventTitle || g.title,
+      reason: reason || 'failed gate',
+      model: typeof modelPctOf === 'function' ? modelPctOf(g) : null,
+      edge: g._potdEdge != null ? g._potdEdge : g.netEdge
+    });
+    potdNearMissSave(list);
   }
   function potdHistoryRender() {
     var list = potdHistoryLoad().slice(0, 14);
     var st = potdHistoryStats(potdHistoryLoad());
+    var el = elitePaperStats();
     var head = '<div class="mb-1 text-[10px]">';
+    head += '<span class="text-amber-200/90 font-medium">POTD</span> ';
     if (st.n) {
       head += '<span class="text-white font-medium">' + st.w + '–' + st.l + (st.p ? '–' + st.p : '') + '</span>';
       head += ' <span class="text-bb-muted">(' + st.winPct + '%)</span>';
       if (st.roi != null) head += ' · ROI <span class="' + (st.roi >= 0 ? 'text-emerald-300' : 'text-rose-300') + '">' + (st.roi >= 0 ? '+' : '') + st.roi + '%</span>';
     } else {
-      head += '<span class="text-bb-muted">No settled POTDs yet</span>';
+      head += '<span class="text-bb-muted">no settled yet</span>';
     }
-    head += ' · <span class="text-bb-muted">' + st.open + ' open</span></div>';
+    head += ' · <span class="text-bb-muted">' + st.open + ' open</span>';
+    head += '<br><span class="text-bb-muted">Elite paper </span>';
+    if (el.n) {
+      head += '<span class="text-white/80">' + el.w + '–' + el.l + '</span> <span class="text-bb-muted">(' + el.winPct + '%)</span>';
+      if (el.roi != null) head += ' · ROI ' + (el.roi >= 0 ? '+' : '') + el.roi + '%';
+    } else {
+      head += '<span class="text-bb-muted">—</span>';
+    }
+    head += '</div>';
+    var near = potdNearMissLoad().slice(0, 3);
+    if (near.length) {
+      head += '<div class="text-[9px] text-bb-muted mb-1 border-t border-bb-border/30 pt-1">Near misses: ' +
+        near.map(function (n) {
+          return String(n.pick || '').replace(/</g,'') + (n.reason ? ' <span class="opacity-70">(' + String(n.reason).replace(/</g,'').slice(0, 28) + ')</span>' : '');
+        }).join(' · ') + '</div>';
+    }
     var rows = list.map(function (x) {
       var res = String(x.result || 'open');
       var resCls = res === 'win' ? 'text-emerald-300' : (res === 'loss' ? 'text-rose-300' : (res === 'push' ? 'text-bb-muted' : 'text-amber-200/80'));
@@ -7580,21 +7481,34 @@
     });
   }
 
+  document.addEventListener('click', function (ev) {
+    var t = ev.target;
+    if (!t || !t.classList) return;
+    if (t.classList.contains('se-refresh-btn') || (t.closest && t.closest('.se-refresh-btn'))) {
+      var root = (t.closest && (t.closest('[data-se-root]') || t.closest('.se-box'))) || seActiveRoot();
+      runSuperEliteScan(root);
+    }
+  });
   async function runSuperEliteScan(fromRoot) {
     var root = fromRoot || seActiveRoot();
     var venue = seVal(root, 'se-venue') || 'polymarket';
     var sp = seVal(root, 'se-sport') || 'all';
-    var mt = seVal(root, 'se-market') || 'all';
-    var modelMin = Number(seVal(root, 'se-model-min') || 75);
-    var edgeMin = Number(seVal(root, 'se-edge-min') || 3);
-    var maxPicks = Number(seVal(root, 'se-max') || 2);
-    var liveMode = seVal(root, 'se-live') || 'pregame';
-    var scoreMin = Number(seVal(root, 'se-score-min') || 0);
-    var useAi = !!seVal(root, 'se-ai');
-    if (!Number.isFinite(modelMin) || modelMin < 70) modelMin = 70;
-    if (modelMin > 95) modelMin = 95;
-    if (!Number.isFinite(maxPicks) || maxPicks < 1) maxPicks = 2;
-    if (maxPicks > 3) maxPicks = 3;
+    var mt = 'all'; // POTD always cross-market
+    // Fixed hit-rate house model — not user-tunable
+    var modelMin = 55;
+    var edgeMin = 5;
+    var maxPicks = Number(seVal(root, 'se-max') || 3);
+    if (!Number.isFinite(maxPicks) || maxPicks < 1) maxPicks = 3;
+    if (maxPicks > 5) maxPicks = 5;
+    var liveMode = 'pregame';
+    var scoreMin = 0;
+    var useAiAnalyze = !!seVal(root, 'se-ai-analyze'); // optional third-party analyzer
+    var windowMode = seVal(root, 'se-window') || 'next3';
+    // Locked bands for hit rate
+    var PRICE_LO = 0.28;
+    var PRICE_HI = 0.72;
+    var MAIN_LINE_LO = 0.42; // prefer prices near main
+    var MAIN_LINE_HI = 0.58;
 
     function setMsg(html) {
       seRoots().forEach(function (r) {
@@ -7602,7 +7516,19 @@
         if (out) out.innerHTML = html;
       });
     }
-    setMsg('<span class="text-bb-muted">POTD scanning (form · odds · AI)…</span>');
+    var oddsKey0 = (($('odds-key') && $('odds-key').value) || (settings().oddsKey || '')).trim();
+    var aiKey0 = (($('openai') && $('openai').value) || (settings().openai || '')).trim();
+    if (!oddsKey0) {
+      setMsg('<p class="text-amber-200/90 text-[11px] leading-relaxed"><b>Odds API key required</b> for POTD consensus.<br>' +
+        '<span class="text-bb-muted">Add it in Settings. OpenAI only needed if you enable AI analyzer.</span></p>');
+      return;
+    }
+    if (useAiAnalyze && !aiKey0) {
+      setMsg('<p class="text-amber-200/90 text-[11px]">Enable AI analyzer requires <b>OpenAI</b> key in Settings (or uncheck Auto-run AI).</p>');
+      return;
+    }
+    var potdPriceAt = new Date();
+    setMsg('<span class="text-bb-muted">POTD scanning (form · price · odds · AI)…</span>');
     try {
       function venueOf(g) {
         return String(g.venue || g.source || 'polymarket').toLowerCase() === 'kalshi' ? 'kalshi' : 'polymarket';
@@ -7640,83 +7566,103 @@
         setMsg('<p class="text-bb-muted">No games loaded for <b class="text-white">' + venue + '</b>. Open Scan, load that book, then run Super again.</p>');
         return;
       }
-      var reqRole = !!seVal(root, 'se-req-role');
-      var roleMin = !!seVal(root, 'se-role-min');
-      var formGap = !!seVal(root, 'se-form-gap');
-      var formAgree = !!seVal(root, 'se-form-agree');
-      var h2hVeto = !!seVal(root, 'se-h2h-veto');
-      var noExtreme = !!seVal(root, 'se-no-extreme');
-      var mlOnly = !!seVal(root, 'se-ml-only');
-      var sameGame = !!seVal(root, 'se-same-game');
-      var restOk = !!seVal(root, 'se-rest-ok');
-      var rankGate = seVal(root, 'se-rank') || 'good';
-
-      var diag = { pool: pool.length, sport: 0, market: 0, rank: 0, model: 0, edge: 0, form: 0, pass: 0 };
+      // Fixed hit-rate criteria — independent of Pass/Good/Elite
+      var sameGame = false; // allow multiple POTD legs per game; cap via max picks only
+      var diag = { pool: pool.length, sport: 0, market: 0, rank: 0, model: 0, edge: 0, form: 0, pass: 0, price: 0, main: 0 };
       var cands = pool.filter(function (g) {
         if (!seMatchSport(g, sp)) return false;
         diag.sport++;
-        if (mlOnly) {
-          var tmt = String(g.marketType || g.scanType || 'moneyline').toLowerCase();
-          if (tmt && tmt !== 'moneyline' && tmt !== 'ml' && tmt !== 'winner') return false;
-        } else if (!seMatchMarket(g, mt)) return false;
+        // All market types allowed; still prefer core game lines
+        var tmt = String(g.marketType || g.scanType || '').toLowerCase();
+        if (/player_|prop|map_/.test(tmt)) return false; // props/maps out of v1 hit-rate POTD
         diag.market++;
 
-        var rk = String(g.rank || '').toLowerCase();
-        if (rankGate === 'elite') { if (rk !== 'elite') return false; }
-        else { if (rk && rk !== 'elite' && rk !== 'good') return false; }
+        // NO rank gate — Elite not required
         diag.rank++;
+
+        if (liveMode === 'pregame' && seIsLive(g)) return false;
+
+        // Day window
+        if (windowMode === 'today' || windowMode === 'next3') {
+          var iso = g.startTime || g.commenceTime || g.start;
+          if (!iso) return false;
+          var gd = new Date(iso);
+          if (isNaN(gd.getTime())) return false;
+          var now = new Date();
+          var start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+          var t = gd.getTime();
+          if (windowMode === 'today' && (t < start || t >= start + 86400000)) return false;
+          if (windowMode === 'next3' && (t < start || t >= start + 3 * 86400000)) return false;
+        }
 
         var mp = modelPctOf(g);
         if (mp == null || mp < modelMin) return false;
         diag.model++;
+
+        var mkt = g.market_probability != null ? Number(g.market_probability) : (g.impliedPct != null ? Number(g.impliedPct) : null);
+        if (mkt != null && mkt > 1) mkt = mkt / 100;
+        // Pick-side price band — core of hit-rate model
+        if (mkt == null || !Number.isFinite(mkt)) return false;
+        if (mkt < PRICE_LO || mkt > PRICE_HI) return false;
+        diag.price++;
+
         var edge = g.netEdge != null ? Number(g.netEdge) : null;
         if (edge == null && g.probability_edge != null) edge = Number(g.probability_edge);
-        // rebuild edge from model - market if missing
         if (edge == null || !Number.isFinite(edge)) {
-          var mktP = g.market_probability != null ? Number(g.market_probability) : (g.impliedPct != null ? Number(g.impliedPct) : null);
-          if (mktP != null && mktP > 1) mktP = mktP / 100;
           var modP = mp / 100;
-          if (mktP != null) edge = Math.round((modP - mktP) * 1000) / 10;
-          else edge = 0;
+          edge = Math.round((modP - mkt) * 1000) / 10;
         }
         if (!Number.isFinite(edge)) edge = 0;
         if (edge < edgeMin) return false;
         diag.edge++;
-        if (scoreMin > 0) {
-          var sc = g.score10 != null ? Number(g.score10) : Math.round((g.betScore || 0) / 10);
-          if (sc < scoreMin) return false;
-        }
-        if (liveMode === 'pregame' && seIsLive(g)) return false;
 
-        var mkt = g.market_probability != null ? Number(g.market_probability) : null;
-        if (mkt != null && mkt > 1) mkt = mkt / 100;
-        if (noExtreme && mkt != null && (mkt < 0.18 || mkt > 0.85)) return false;
+        // Main-line preference: near 50¢ gets full credit; edges need extra edge
+        var nearMain = mkt >= MAIN_LINE_LO && mkt <= MAIN_LINE_HI;
+        if (!nearMain && edge < edgeMin + 4) return false; // alts need +9pp
+        if (nearMain) diag.main++;
 
         var rf = seRoleForm(g);
-        if (reqRole && !rf.hasRole) return false;
-        if (roleMin && (rf.pickWR == null || rf.pickWR < 0.55)) return false;
-        if (formGap && (rf.gap == null || rf.gap < 0.10)) return false;
-        if (formAgree && rf.formLeanHome != null) {
+        // Form required for hit rate
+        if (!rf || !rf.hasRole) return false;
+        // Model side should not fight form when form is clear
+        if (rf.formLeanHome != null && rf.gap != null && rf.gap >= 0.08) {
           if (rf.pickHome !== rf.formLeanHome) return false;
         }
-        if (h2hVeto) {
-          var b = seBreakdown(g);
-          var h2h = b.h2h;
-          if (h2h && h2h.n >= 5) {
-            var hw = Number(h2h.homeWins) || 0;
-            var aw = Number(h2h.awayWins) || 0;
-            if (rf.pickHome && aw >= hw + 4) return false;
-            if (!rf.pickHome && hw >= aw + 4) return false;
+        // Soft form floor: pick side WR if known
+        if (rf.pickWR != null && rf.pickWR < 0.45 && edge < 8) return false;
+
+        // H2H as form context only — never veto
+        var b = seBreakdown(g);
+        var h2h = b && b.h2h;
+        var h2hNote = '';
+        var h2hBoost = 0; // applied to POTD score later
+        if (h2h && h2h.n >= 5) {
+          var hw = Number(h2h.homeWins) || 0;
+          var aw = Number(h2h.awayWins) || 0;
+          var h2hSupports = rf.pickHome ? (hw >= aw) : (aw >= hw);
+          var h2hGap = Math.abs(hw - aw);
+          if (h2hSupports && h2hGap >= 2) {
+            h2hBoost = Math.min(6, h2hGap);
+            h2hNote = 'H2H ' + hw + '-' + aw + ' n=' + h2h.n + ' supports pick';
+          } else if (!h2hSupports && h2hGap >= 2) {
+            h2hBoost = -Math.min(5, h2hGap); // reduces confidence, does not out
+            h2hNote = 'H2H ' + hw + '-' + aw + ' n=' + h2h.n + ' conflicts (soft)';
+          } else {
+            h2hNote = 'H2H ' + hw + '-' + aw + ' n=' + h2h.n + ' neutral';
           }
+        } else if (h2h && h2h.n) {
+          h2hNote = 'H2H n=' + h2h.n + ' thin — low weight';
+        } else {
+          h2hNote = 'H2H n/a';
         }
-        if (restOk) {
-          var b2 = seBreakdown(g);
-          var pickRest = rf.pickHome ? b2.homeRestDays : b2.awayRestDays;
-          var oppRest = rf.pickHome ? b2.awayRestDays : b2.homeRestDays;
-          if (pickRest != null && pickRest <= 0 && oppRest != null && oppRest >= 2) return false;
-        }
+
         g._seForm = rf;
-        g._seFormLine = seFormLine(g);
+        g._seFormLine = seFormLine(g) + (h2hNote ? ' · ' + h2hNote : '');
+        g._potdNearMain = nearMain;
+        g._potdEdge = edge;
+        g._potdMkt = mkt;
+        g._potdH2hBoost = h2hBoost;
+        g._potdH2hNote = h2hNote;
         diag.pass++;
         return true;
       });
@@ -7742,9 +7688,10 @@
       function potdBaseScore(g) {
         var fa = g._seForm && g._seForm.gap != null ? Number(g._seForm.gap) : 0;
         var ma = modelPctOf(g) || 0;
-        var ea = g.netEdge != null ? Number(g.netEdge) : 0;
+        var ea = g.netEdge != null ? Number(g.netEdge) : (g._potdEdge != null ? Number(g._potdEdge) : 0);
         if (!Number.isFinite(ea)) ea = 0;
-        return fa * 40 + ma * 0.35 + ea * 2.5;
+        var h2 = g._potdH2hBoost != null ? Number(g._potdH2hBoost) : 0;
+        return fa * 40 + ma * 0.35 + ea * 2.5 + h2;
       }
       uniq.sort(function (a, b) { return potdBaseScore(b) - potdBaseScore(a); });
 
@@ -7815,18 +7762,25 @@
       uniq.sort(function (a, b) { return (b._potdScore || 0) - (a._potdScore || 0); });
 
       var top = uniq.slice(0, maxPicks);
-      // AI is part of determination when checked (default on)
-      if (useAi && top.length) {
-        setMsg('<span class="text-bb-muted">POTD · AI determination…</span>');
-        try { top = await seAiFilter(top); } catch (e) { console.warn('POTD AI', e); }
+      // Optional third-party AI analyzer (does NOT auto-veto)
+      if (useAiAnalyze && top.length) {
+        setMsg('<span class="text-bb-muted">POTD · third-party AI analyzer…</span>');
+        try { await potdAiAnalyzeBatch(top); } catch (e) { console.warn('POTD AI analyze', e); }
       }
-      // Drop AI vetoes already handled; also drop hard odds divergence if still present without AI confirm
+      // Soft consensus: strong diverge lowers score already; still show unless extreme without analyzer support
       top = top.filter(function (g) {
-        if ((g._potdOddsBoost || 0) < -10 && !(g._seAi && String(g._seAi).indexOf('CONFIRM') >= 0)) return false;
+        if ((g._potdOddsBoost || 0) < -10 && g._potdAiConviction === 'LOW' && g._potdAiSignal && /nay/i.test(g._potdAiSignal)) return false;
         return true;
       });
       if (!top.length) {
-        setMsg('<p class="text-bb-muted">No Pick of the Day for this filter.<br><span class="text-[10px]">Pool ' + diag.pool + ' · sport ' + diag.sport + ' · market ' + diag.market + ' · rank ' + diag.rank + ' · model≥' + modelMin + ' ' + diag.model + ' · edge≥' + edgeMin + ' ' + diag.edge + ' · final ' + diag.pass + '</span><br><span class="text-[10px]">Tip: set Market to <b>All markets</b> or <b>Full game O/U</b> if your Elites are totals. Load Scan for that venue first.</span></p>');
+        try {
+          uniq.slice(0, 5).forEach(function (g) {
+            potdNearMissAdd(g, (g._seAi && String(g._seAi).indexOf('VETO') >= 0) ? 'AI veto' :
+              ((g._potdOddsBoost || 0) < -10 ? 'consensus diverge' : 'below final bar'));
+          });
+          potdHistoryRender();
+        } catch (eN) {}
+        setMsg('<p class="text-bb-muted">No Pick of the Day — strict hit-rate bar (form + price + edge + consensus + AI). Empty is OK.<br><span class="text-[10px]">Pool ' + diag.pool + ' · sport ' + diag.sport + ' · market ' + diag.market + ' · rank ' + diag.rank + ' · model≥' + modelMin + ' ' + diag.model + ' · edge≥' + edgeMin + ' ' + diag.edge + ' · final ' + diag.pass + '</span><br><span class="text-[10px]">Tip: set Market to <b>All markets</b> or <b>Full game O/U</b> if your Elites are totals. Load Scan for that venue first.</span></p>');
         return;
       }
       setMsg(top.map(function (g, i) {
@@ -7837,18 +7791,23 @@
         var px = mkt != null ? (isK ? Math.round(mkt) + '¢' : (Math.round(mkt * 10) / 10 + '%')) : '—';
         var edge = g.netEdge != null ? ((g.netEdge >= 0 ? '+' : '') + g.netEdge + 'pp') : '—';
         return '<div class="se-card" data-se="' + i + '">' +
-          '<div class="tag">POTD ' + (i + 1) + ' · ' + (isK ? 'KALSHI' : 'PM') + '</div>' +
+          '<div class="tag">POTD ' + (i + 1) + ' · HIT-RATE · ' + (isK ? 'KALSHI' : 'PM') + '</div>' +
           '<div class="text-white text-xs font-medium mt-0.5">' + String(g.modelPick || '—').replace(/</g,'') + '</div>' +
           '<div class="text-[10px] text-bb-muted">' + String(g.eventTitle || g.title || '').replace(/</g,'').slice(0, 42) + '</div>' +
           '<div class="flex gap-3 mt-1 text-[10px] flex-wrap"><span>POTD <b class="text-amber-200">' + (g._potdScore != null ? g._potdScore : '—') + '</b></span>' +
           '<span>Model <b class="text-white">' + (mp != null ? Math.round(mp * 10) / 10 : '—') + '%</b></span>' +
           '<span>Mkt <b class="text-white">' + px + '</b></span><span>Edge <b class="text-white">' + edge + '</b></span></div>' +
+          '<div class="text-[9px] text-bb-muted mt-0.5">Price as of ' + (potdPriceAt ? potdPriceAt.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"}) : "—") +
+          (g._potdNearMain ? " · main-line band" : " · alt line (extra edge required)") + '</div>' +
           (g._seFormLine ? '<div class="text-[10px] text-violet-200/90 mt-1">' + String(g._seFormLine).replace(/</g,'') + '</div>' : '') +
           (g._potdConsensusLine ? '<div class="text-[10px] text-sky-200/90 mt-0.5">Odds · ' + String(g._potdConsensusLine).replace(/</g,'') + '</div>' : '') +
           (g._seAi ? '<div class="text-[10px] text-amber-200/90 mt-1">AI · ' + String(g._seAi).replace(/</g,'').slice(0, 160) + '</div>' : '') +
-          '<div class="flex gap-1.5 mt-1.5">' +
+          (g._potdAiLine ? '<div class="text-[10px] text-amber-200/90 mt-1">' + String(g._potdAiLine).replace(/</g,'').slice(0, 220) + '</div>' : '') +
+          (g._potdAiThesis ? '<div class="text-[9px] text-bb-muted mt-0.5 leading-snug">' + String(g._potdAiThesis).replace(/</g,'').slice(0, 280) + '</div>' : '') +
+          '<div class="flex flex-wrap gap-1.5 mt-1.5">' +
+          '<button type="button" class="se-analyze text-[10px] px-2 py-1 rounded border border-violet-400/40 text-violet-200">AI Analyze</button>' +
           '<button type="button" class="se-log text-[10px] px-2 py-1 rounded border border-bb-border text-bb-muted">Log</button>' +
-          '<button type="button" class="se-disc text-[10px] px-2 py-1 rounded border border-amber-400/40 text-amber-200">Discord POTD</button>' +
+          '<button type="button" class="se-disc text-[10px] px-2 py-1 rounded border border-amber-400/40 text-amber-200">Discord</button>' +
           '<a class="text-[10px] px-2 py-1 rounded border border-bb-border text-bb-muted" href="' + (g.url || '#') + '" target="_blank" rel="noopener">Trade</a>' +
           '</div></div>';
       }).join(''));
@@ -7865,43 +7824,80 @@
           if (!g) return;
           var lg = card.querySelector('.se-log');
           var ds = card.querySelector('.se-disc');
+          var an = card.querySelector('.se-analyze');
           if (lg) lg.onclick = function () { logBet(g); potdHistoryMarkLogged(g); };
           if (ds) ds.onclick = function () { sendDiscordSuper(g); };
+          if (an) an.onclick = async function () {
+            an.disabled = true; an.textContent = '…';
+            try {
+              await potdAiAnalyzeOne(g);
+              // re-render this card line
+              runSuperEliteScan(root);
+            } catch (e) { alert(e.message || e); }
+            an.disabled = false; an.textContent = 'AI Analyze';
+          };
         });
       });
     } catch (e) {
       setMsg('<p class="text-bb-red">Error: ' + String(e.message || e) + '</p>');
     }
   }
-  async function seAiFilter(list) {
-    var key = (($('openai') && $('openai').value) || settings().openai || '').trim();
-    if (!key || !list.length) return list;
-    var keep = [];
+  async function potdAiAnalyzeOne(g) {
+    var key = (($('openai') && $('openai').value) || (settings().openai || '')).trim();
+    if (!key) throw new Error('Add OpenAI key in Settings');
+    var payload = {
+      pick: g.modelPick,
+      event: g.eventTitle || g.title,
+      league: g.league || g.sport,
+      marketType: g.marketType,
+      modelPct: modelPctOf(g),
+      marketPct: g._potdMkt != null ? Math.round(g._potdMkt * 1000) / 10 : g.market_probability,
+      edgePp: g._potdEdge != null ? g._potdEdge : g.netEdge,
+      formLine: g._seFormLine,
+      h2h: g._potdH2hNote,
+      consensus: g._potdConsensusLine,
+      potdScore: g._potdScore,
+      nearMain: g._potdNearMain,
+      startTime: g.startTime || g.commenceTime
+    };
+    var r = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        apiKey: key,
+        action: 'potd-analyze',
+        game: payload,
+        system: 'You are an independent third-party sports betting analyst. You are NOT the numeric model that produced this pick. Do not rubber-stamp it and do not oppose it for its own sake. Be unbiased.\n\nRules:\n- Use only the data in the payload unless you mark a claim as uncertain.\n- Do not invent injuries, lineups, or weather.\n- H2H is context only, not a veto.\n- Historical claims older than ~2 years: low weight.\n\nOutput exactly:\nCONVICTION: HIGH|MEDIUM|LOW\nSIGNAL: YAY|LEAN_YAY|NEUTRAL|LEAN_NAY|NAY\nAGREE: (one line — where you agree with the numeric case)\nPUSHBACK: (one line — where you disagree or see risk)\nH2H: (one line)\nGAPS: (unknowns)\nTHESIS: (3-5 neutral sentences)\nBOTTOM: (one line — optional third-party read; not a veto)'
+      })
+    });
+    var d = await r.json().catch(function () { return {}; });
+    var text = String(d.text || d.content || '');
+    var conv = (text.match(/CONVICTION:\s*(HIGH|MEDIUM|LOW)/i) || [])[1] || 'MEDIUM';
+    var sig = (text.match(/SIGNAL:\s*(YAY|LEAN_YAY|NEUTRAL|LEAN_NAY|NAY)/i) || [])[1] || 'NEUTRAL';
+    var thesis = (text.match(/THESIS:\s*([\s\S]+?)(?:\nBOTTOM:|$)/i) || [])[1] || text.slice(0, 280);
+    g._potdAiConviction = String(conv).toUpperCase();
+    g._potdAiSignal = String(sig).toUpperCase();
+    g._potdAiThesis = String(thesis).trim().replace(/\s+/g, ' ').slice(0, 320);
+    g._potdAiLine = 'AI ' + g._potdAiConviction + ' · ' + g._potdAiSignal;
+    // Train log for future adjustments
+    try {
+      var train = JSON.parse(localStorage.getItem('eliteodds_potd_ai_log') || '[]');
+      train.unshift({ at: new Date().toISOString(), pick: g.modelPick, event: g.eventTitle, conviction: g._potdAiConviction, signal: g._potdAiSignal, potdScore: g._potdScore });
+      localStorage.setItem('eliteodds_potd_ai_log', JSON.stringify(train.slice(0, 50)));
+    } catch (e) {}
+    return g;
+  }
+  async function potdAiAnalyzeBatch(list) {
     for (var i = 0; i < list.length; i++) {
-      var g = list[i];
-      try {
-        var r = await fetch('/api/ai', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ apiKey: key, action: 'verdict', game: g })
-        });
-        var d = await r.json().catch(function () { return {}; });
-        var text = String(d.text || '');
-        var up = text.toUpperCase();
-        if (up.indexOf('VERDICT: PASS') >= 0 || up.indexOf('VERDICT: LEAN_OTHER') >= 0) {
-          g._seAi = 'VETO from AI stress-test';
-          continue;
-        }
-        var note = '';
-        var m = text.match(/ONE-LINER:\s*([^\n]+)/i);
-        if (m) note = m[1].trim();
-        g._seAi = (up.indexOf('CAUTION') >= 0 ? 'CAUTION' : 'CONFIRM') + (note ? (': ' + note) : '');
-        keep.push(g);
-      } catch (e) {
-        keep.push(g);
+      try { await potdAiAnalyzeOne(list[i]); } catch (e) {
+        list[i]._potdAiLine = 'AI error: ' + (e.message || e);
       }
     }
-    return keep.length ? keep : list;
+    return list;
+  }
+  async function seAiFilter(list) {
+    // legacy no-op keep: analyzer is non-veto
+    return potdAiAnalyzeBatch(list);
   }
   async function sendDiscordSuper(g) {
     var st = liveSettings();
@@ -7917,7 +7913,7 @@
         { name: 'Model', value: mp != null ? (Math.round(mp * 10) / 10 + '%') : '—', inline: true },
         { name: 'Edge', value: g.netEdge != null ? (String(g.netEdge) + 'pp') : '—', inline: true }
       ],
-      footer: { text: 'EliteOdds Pick of the Day · form + Odds + AI' },
+      footer: { text: 'EliteOdds POTD · form + price + consensus · AI optional' },
       timestamp: new Date().toISOString()
     };
     if (g.url) embed.fields.push({ name: 'Trade', value: '[Open →](' + g.url + ')', inline: false });
