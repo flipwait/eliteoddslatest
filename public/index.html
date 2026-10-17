@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.85</title>
+  <title>EliteOdds v3.4.87</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.85</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.87</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1529,12 +1529,20 @@
               <button type="button" id="elite-minimize" class="ml-auto text-[11px] px-2 py-1 rounded-lg border border-bb-border text-bb-muted">Minimize</button>
             </div>
             <div id="elite-paper-body" class="space-y-3">
+              <div class="flex flex-wrap items-center gap-2 text-[10px] mb-1">
+                <span class="text-bb-muted">Paper view</span>
+                <button type="button" id="elite-pnl-mode-u" class="elite-pnl-mode on px-2 py-1 rounded-lg border border-bb-border text-bb-muted">Units</button>
+                <button type="button" id="elite-pnl-mode-m" class="elite-pnl-mode px-2 py-1 rounded-lg border border-bb-border text-bb-muted">Money $</button>
+                <label class="flex items-center gap-1 text-bb-muted ml-1">Stake $
+                  <input id="elite-paper-stake" type="number" min="1" step="1" value="10" class="w-14 bg-bb-bg border border-bb-border rounded px-1.5 py-0.5 text-white text-[11px]" title="Paper $ per Elite (default 10)" />
+                </label>
+              </div>
               <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-center text-xs">
                 <div class="rounded-xl bg-black/25 border border-bb-border p-2"><div class="text-bb-muted" id="elite-stat-n-label">Picks</div><div id="elite-week-n" class="text-lg font-semibold text-white">0</div></div>
                 <div class="rounded-xl bg-black/25 border border-bb-border p-2"><div class="text-bb-muted">Record</div><div id="elite-week-record" class="text-lg font-semibold text-white">0-0</div></div>
                 <div class="rounded-xl bg-black/25 border border-bb-border p-2"><div class="text-bb-muted">Hit rate</div><div id="elite-week-hit" class="text-lg font-semibold text-white">—</div></div>
                 <div class="rounded-xl bg-black/25 border border-bb-border p-2"><div class="text-bb-muted">Open</div><div id="elite-week-open" class="text-lg font-semibold text-white">0</div></div>
-                <div class="rounded-xl bg-black/25 border border-bb-border p-2"><div class="text-bb-muted">PnL (u)</div><div id="elite-week-pnl" class="text-lg font-semibold text-white">0</div></div>
+                <div class="rounded-xl bg-black/25 border border-bb-border p-2"><div class="text-bb-muted" id="elite-pnl-label">PnL ($)</div><div id="elite-week-pnl" class="text-lg font-semibold text-white">0</div></div>
                 <div class="rounded-xl bg-black/25 border border-bb-border p-2"><div class="text-bb-muted">ROI %</div><div id="elite-week-roi" class="text-lg font-semibold text-white">—</div></div>
               </div>
               <p id="elite-book-statline" class="text-[10px] text-bb-muted">Filter: All books</p>
@@ -1560,17 +1568,23 @@
               </div>
               <p class="text-[10px] text-bb-muted">Auto-settle: <strong class="text-white">ML + O/U</strong> (ESPN) · <strong class="text-white">NRFI/F5</strong> (MLB) · <strong class="text-white">Esports ML</strong> (PandaScore / OpenDota). Spreads/map props manual.</p>
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                <div class="rounded-xl border border-sky-500/30 bg-sky-500/5 p-2.5 space-y-2">
-                  <div class="flex justify-between items-center">
+                <div class="rounded-xl border border-sky-500/30 bg-sky-500/5 p-2.5 space-y-2" id="elite-pm-col">
+                  <div class="flex justify-between items-center gap-2">
                     <span class="text-[11px] font-semibold text-sky-300 uppercase tracking-wide">Polymarket Elite</span>
-                    <span id="elite-pm-stat" class="text-[10px] text-bb-muted">0</span>
+                    <div class="flex items-center gap-2">
+                      <span id="elite-pm-stat" class="text-[10px] text-bb-muted">0</span>
+                      <button type="button" id="elite-pm-min" class="text-[10px] px-2 py-1 rounded-lg border border-violet-400/50 text-violet-200 font-medium shrink-0">Minimize</button>
+                    </div>
                   </div>
                   <div id="elite-list-pm" class="space-y-2 max-h-[40vh] overflow-y-auto"></div>
                 </div>
-                <div class="rounded-xl border border-bb-green/40 bg-bb-green/5 p-2.5 space-y-2">
-                  <div class="flex justify-between items-center">
+                <div class="rounded-xl border border-bb-green/40 bg-bb-green/5 p-2.5 space-y-2" id="elite-kal-col">
+                  <div class="flex justify-between items-center gap-2">
                     <span class="text-[11px] font-semibold text-bb-green uppercase tracking-wide">Kalshi Elite</span>
-                    <span id="elite-kal-stat" class="text-[10px] text-bb-muted">0</span>
+                    <div class="flex items-center gap-2">
+                      <span id="elite-kal-stat" class="text-[10px] text-bb-muted">0</span>
+                      <button type="button" id="elite-kal-min" class="text-[10px] px-2 py-1 rounded-lg border border-bb-green/50 text-bb-green font-medium shrink-0">Minimize</button>
+                    </div>
                   </div>
                   <div id="elite-list-kal" class="space-y-2 max-h-[40vh] overflow-y-auto"></div>
                 </div>
@@ -1861,7 +1875,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.85</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.87</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2237,8 +2251,29 @@
   };
 
   
-  var APP_VERSION = '3.4.85';
+  var APP_VERSION = '3.4.87';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.87',
+      date: '2026-10-17',
+      title: 'Elite paper $ PnL — stake × odds',
+      items: [
+        'ADDED — Units / Money $ toggle on Elite paper track.',
+        'ADDED — Paper stake (default $10): win profit = stake × (1/price − 1), loss = −stake.',
+        'ADDED — ROI % in money mode = dollar PnL / dollars risked on settled picks.',
+        'KEPT — Units mode still shows flat ±1u for quick record view.'
+      ]
+    },
+    {
+      version: '3.4.86',
+      date: '2026-10-17',
+      title: 'Elite paper track — fix undefined record/PnL · PM minimize',
+      items: [
+        'FIXED — Record showed undefined-undefined (second elitePaperStats overwrote won/lost).',
+        'FIXED — PnL/statline Wundefined Lundefined from wrong stats shape.',
+        'ADDED — Minimize on Polymarket Elite and Kalshi Elite list sections.'
+      ]
+    },
     {
       version: '3.4.85',
       date: '2026-10-16',
@@ -3367,8 +3402,8 @@
       var r = String(e.result || '');
       return r === 'won' || r === 'lost' || r === 'push';
     });
-    var won = settled.filter(function (e) { return e.result === 'won'; }).length;
-    var lost = settled.filter(function (e) { return e.result === 'lost'; }).length;
+    var won = settled.filter(function (e) { return eliteNormResult(e.result) === 'won'; }).length;
+    var lost = settled.filter(function (e) { return eliteNormResult(e.result) === 'lost'; }).length;
     var pnl = 0;
     settled.forEach(function (e) {
       if (e.pnl != null) pnl += Number(e.pnl);
@@ -6019,20 +6054,101 @@
     d.setDate(d.getDate() - diff);
     return d.getTime();
   }
+  function eliteNormResult(r) {
+    r = String(r == null ? 'open' : r).toLowerCase().trim();
+    if (r === 'w' || r === 'won' || r === 'win' || r === 'won!' || r === 'cash' || r === 'cashed') return 'won';
+    if (r === 'l' || r === 'lost' || r === 'loss' || r === 'lose' || r === 'lost!') return 'lost';
+    if (r === 'p' || r === 'push' || r === 'void' || r === 'pushed') return 'push';
+    if (r === 'open' || r === '' || r === 'pending' || r === 'active') return 'open';
+    return 'open';
+  }
+  function elitePaperStake() {
+    try {
+      var v = Number(($('elite-paper-stake') && $('elite-paper-stake').value) || localStorage.getItem('eliteodds_paper_stake') || 10);
+      if (!Number.isFinite(v) || v <= 0) v = 10;
+      return v;
+    } catch (e) { return 10; }
+  }
+  function elitePnlMode() {
+    try { return localStorage.getItem('eliteodds_pnl_mode') === 'units' ? 'units' : 'money'; } catch (e) { return 'money'; }
+  }
+  function setElitePnlMode(mode) {
+    try { localStorage.setItem('eliteodds_pnl_mode', mode === 'units' ? 'units' : 'money'); } catch (e) {}
+  }
+  /** Pick-side price as 0–1 probability */
+  function elitePrice01(e) {
+    if (!e) return null;
+    var p = e.marketPct != null ? Number(e.marketPct) : (e.market_probability != null ? Number(e.market_probability) : (e.impliedPct != null ? Number(e.impliedPct) : null));
+    if (p == null || !Number.isFinite(p) || p <= 0) return null;
+    if (p > 1) p = p / 100; // stored as percent
+    if (p > 1) p = 1;
+    if (p < 0.01) p = 0.01; // floor to avoid insane payouts
+    return p;
+  }
+  /** $ profit for one settled row at fixed paper stake */
+  function eliteDollarPnl(e, stake) {
+    stake = stake != null ? stake : elitePaperStake();
+    var r = eliteNormResult(e && e.result);
+    if (r === 'push' || r === 'open') return 0;
+    if (r === 'lost') return -stake;
+    // won: risk stake at price p → profit = stake * (1/p - 1)
+    var p = elitePrice01(e);
+    if (p == null) return stake; // no price → treat like even-money +1 unit of stake
+    return Math.round(stake * (1 / p - 1) * 100) / 100;
+  }
+  function eliteUnitPnl(e) {
+    var r = eliteNormResult(e && e.result);
+    if (r === 'won') return 1;
+    if (r === 'lost') return -1;
+    return 0;
+  }
   function elitePaperStats(list) {
     list = list || [];
-    var open = 0, won = 0, lost = 0, push = 0, pnl = 0;
+    var stake = elitePaperStake();
+    var open = 0, won = 0, lost = 0, push = 0;
+    var pnlU = 0, pnlD = 0, riskedD = 0;
     list.forEach(function (e) {
-      if (e.result === 'open') open++;
-      else if (e.result === 'won') { won++; pnl += (e.pnl != null ? Number(e.pnl) : 1); }
-      else if (e.result === 'lost') { lost++; pnl += (e.pnl != null ? Number(e.pnl) : -1); }
-      else if (e.result === 'push') push++;
+      var r = eliteNormResult(e && e.result);
+      if (r === 'won') {
+        won++;
+        pnlU += 1;
+        pnlD += eliteDollarPnl(e, stake);
+        riskedD += stake;
+      } else if (r === 'lost') {
+        lost++;
+        pnlU -= 1;
+        pnlD += -stake;
+        riskedD += stake;
+      } else if (r === 'push') {
+        push++;
+      } else {
+        open++;
+      }
     });
-    var settled = won + lost + push;
-    var riskU = won + lost; // 1u flat paper
-    var hit = (won + lost) ? Math.round((won / (won + lost)) * 1000) / 10 : null;
-    var roi = riskU ? Math.round((pnl / riskU) * 1000) / 10 : null;
-    return { n: list.length, open: open, won: won, lost: lost, push: push, hit: hit, pnl: Math.round(pnl * 100) / 100, roi: roi, settled: settled };
+    var riskU = won + lost;
+    var hit = riskU > 0 ? Math.round((won / riskU) * 1000) / 10 : null;
+    var roiU = riskU > 0 ? Math.round((pnlU / riskU) * 1000) / 10 : null;
+    var roiD = riskedD > 0 ? Math.round((pnlD / riskedD) * 1000) / 10 : null;
+    return {
+      n: list.length,
+      open: open,
+      won: won,
+      lost: lost,
+      push: push,
+      hit: hit,
+      pnl: Math.round(pnlU * 100) / 100,
+      pnlU: Math.round(pnlU * 100) / 100,
+      pnlD: Math.round(pnlD * 100) / 100,
+      roi: roiU,
+      roiU: roiU,
+      roiD: roiD,
+      stake: stake,
+      riskedD: Math.round(riskedD * 100) / 100,
+      settled: won + lost + push,
+      w: won,
+      l: lost,
+      p: push
+    };
   }
   function eliteWeekStats() {
     var ws = weekStartMs();
@@ -6057,30 +6173,63 @@
   }
   function renderEliteReview() {
     var book = eliteBookFilter || 'all';
-    var day = eliteDayFilter || 'today';
+    var day = eliteDayFilter || 'all';
     var list = filteredEliteList().slice(0, 250);
-    var st = elitePaperStats(list);
-    if ($('elite-week-n')) $('elite-week-n').textContent = st.n;
-    if ($('elite-week-record')) $('elite-week-record').textContent = st.won + '-' + st.lost + (st.push ? '-' + st.push : '');
-    if ($('elite-week-hit')) $('elite-week-hit').textContent = st.hit != null ? (st.hit + '%') : '—';
-    if ($('elite-week-open')) $('elite-week-open').textContent = st.open;
+    var st = elitePaperStats(list) || {};
+    // Never allow undefined into the UI (guards + aliases)
+    var wonN = Number(st.won != null ? st.won : st.w);
+    var lostN = Number(st.lost != null ? st.lost : st.l);
+    var pushN = Number(st.push != null ? st.push : st.p);
+    var openN = Number(st.open);
+    var nAll = Number(st.n);
+    if (!Number.isFinite(wonN)) wonN = 0;
+    if (!Number.isFinite(lostN)) lostN = 0;
+    if (!Number.isFinite(pushN)) pushN = 0;
+    if (!Number.isFinite(openN)) openN = 0;
+    if (!Number.isFinite(nAll)) nAll = list.length || 0;
+    var mode = elitePnlMode();
+    var money = mode !== 'units';
+    var pnlN = money ? Number(st.pnlD) : Number(st.pnlU != null ? st.pnlU : st.pnl);
+    if (!Number.isFinite(pnlN)) pnlN = 0;
+    var roiN = money
+      ? (st.roiD != null && Number.isFinite(Number(st.roiD)) ? Number(st.roiD) : null)
+      : (st.roiU != null && Number.isFinite(Number(st.roiU)) ? Number(st.roiU) : (st.roi != null && Number.isFinite(Number(st.roi)) ? Number(st.roi) : null));
+    var hitN = st.hit != null && Number.isFinite(Number(st.hit)) ? Number(st.hit) : null;
+    var recStr = wonN + '-' + lostN + (pushN ? '-' + pushN : '');
+    var pnlStr = (pnlN >= 0 ? '+' : '') + (money ? (Math.round(pnlN * 100) / 100) : (Math.round(pnlN * 100) / 100));
+    if (money) pnlStr = (pnlN >= 0 ? '+$' : '-$') + Math.abs(Math.round(pnlN * 100) / 100);
+    else pnlStr = (pnlN >= 0 ? '+' : '') + (Math.round(pnlN * 100) / 100) + 'u';
+    if ($('elite-pnl-label')) $('elite-pnl-label').textContent = money ? ('PnL ($' + elitePaperStake() + '/bet)') : 'PnL (u)';
+    if ($('elite-week-n')) $('elite-week-n').textContent = String(nAll);
+    if ($('elite-week-record')) $('elite-week-record').textContent = recStr;
+    if ($('elite-week-hit')) $('elite-week-hit').textContent = hitN != null ? (hitN + '%') : '—';
+    if ($('elite-week-open')) $('elite-week-open').textContent = String(openN);
     try { updateOpenBreakdownUI(); } catch (eOb) {}
     if ($('elite-week-pnl')) {
-      $('elite-week-pnl').textContent = (st.pnl >= 0 ? '+' : '') + st.pnl;
-      $('elite-week-pnl').className = 'text-lg font-semibold ' + (st.pnl > 0 ? 'text-bb-green' : st.pnl < 0 ? 'text-bb-red' : 'text-white');
+      $('elite-week-pnl').textContent = pnlStr;
+      $('elite-week-pnl').className = 'text-lg font-semibold ' + (pnlN > 0 ? 'text-bb-green' : pnlN < 0 ? 'text-bb-red' : 'text-white');
     }
     if ($('elite-week-roi')) {
-      $('elite-week-roi').textContent = st.roi != null ? ((st.roi >= 0 ? '+' : '') + st.roi + '%') : '—';
-      $('elite-week-roi').className = 'text-lg font-semibold ' + (st.roi > 0 ? 'text-bb-green' : st.roi < 0 ? 'text-bb-red' : 'text-white');
+      $('elite-week-roi').textContent = roiN != null ? ((roiN >= 0 ? '+' : '') + roiN + '%') : '—';
+      $('elite-week-roi').className = 'text-lg font-semibold ' + (roiN != null && roiN > 0 ? 'text-bb-green' : roiN != null && roiN < 0 ? 'text-bb-red' : 'text-white');
     }
+    // toggle button styles
+    try {
+      var bu = $('elite-pnl-mode-u'), bm = $('elite-pnl-mode-m');
+      if (bu) { bu.classList.toggle('on', !money); bu.style.borderColor = !money ? 'rgba(250,204,21,0.5)' : ''; bu.style.color = !money ? '#fde68a' : ''; }
+      if (bm) { bm.classList.toggle('on', money); bm.style.borderColor = money ? 'rgba(74,222,128,0.5)' : ''; bm.style.color = money ? '#86efac' : ''; }
+    } catch (eT) {}
     var dayLabel = ({ today: 'Today', yesterday: 'Yesterday', tomorrow: 'Tomorrow', week: 'This week', lastweek: 'Last week', all: 'All time' })[day] || day;
     var bookLabel = book === 'polymarket' ? 'Polymarket' : book === 'kalshi' ? 'Kalshi' : 'All books';
     if ($('elite-book-statline')) {
-      $('elite-book-statline').textContent = bookLabel + ' · ' + dayLabel + ' · W' + st.won + ' L' + st.lost + (st.push ? ' P' + st.push : '') + ' · PnL ' + ((st.pnl >= 0 ? '+' : '') + st.pnl) + 'u' + (st.roi != null ? ' · ROI ' + st.roi + '%' : '');
+      var stake = elitePaperStake();
+      $('elite-book-statline').textContent = bookLabel + ' · ' + dayLabel + ' · W' + wonN + ' L' + lostN + (pushN ? ' P' + pushN : '') +
+        ' · ' + pnlStr + (roiN != null ? ' · ROI ' + roiN + '%' : '') +
+        (money ? (' · $' + stake + '/pick') : ' · flat 1u');
     }
     if ($('elite-week-blurb')) {
-      $('elite-week-blurb').textContent = st.n
-        ? (dayLabel + ' · ' + bookLabel + ': ' + st.n + ' Elite · W' + st.won + ' L' + st.lost + ' · open ' + st.open + (st.hit != null ? ' · hit ' + st.hit + '%' : '') + '.')
+      $('elite-week-blurb').textContent = nAll
+        ? (dayLabel + ' · ' + bookLabel + ': ' + nAll + ' Elite · W' + wonN + ' L' + lostN + ' · open ' + openN + (hitN != null ? ' · hit ' + hitN + '%' : '') + '.')
         : 'No Elites for this filter. Scan to auto-save paper Elites by venue.';
     }
     // Full ledger split for columns (day filter only; book filter controls which columns show)
@@ -6095,15 +6244,15 @@
     if (colPm) colPm.classList.toggle('hidden', book === 'kalshi');
     if (colKal) colKal.classList.toggle('hidden', book === 'polymarket');
     if ($('elite-pm-stat')) {
-      var pw = pm.filter(function (e) { return e.result === 'won'; }).length;
-      var pl = pm.filter(function (e) { return e.result === 'lost'; }).length;
-      var po = pm.filter(function (e) { return e.result === 'open'; }).length;
+      var pw = pm.filter(function (e) { return eliteNormResult(e.result) === 'won'; }).length;
+      var pl = pm.filter(function (e) { return eliteNormResult(e.result) === 'lost'; }).length;
+      var po = pm.filter(function (e) { return eliteNormResult(e.result) === 'open'; }).length;
       $('elite-pm-stat').textContent = pm.length + ' · W' + pw + ' L' + pl + ' · ' + po + ' open';
     }
     if ($('elite-kal-stat')) {
-      var kw = kal.filter(function (e) { return e.result === 'won'; }).length;
-      var kl = kal.filter(function (e) { return e.result === 'lost'; }).length;
-      var ko = kal.filter(function (e) { return e.result === 'open'; }).length;
+      var kw = kal.filter(function (e) { return eliteNormResult(e.result) === 'won'; }).length;
+      var kl = kal.filter(function (e) { return eliteNormResult(e.result) === 'lost'; }).length;
+      var ko = kal.filter(function (e) { return eliteNormResult(e.result) === 'open'; }).length;
       $('elite-kal-stat').textContent = kal.length + ' · W' + kw + ' L' + kl + ' · ' + ko + ' open';
     }
     function rowHtml(e) {
@@ -6150,7 +6299,15 @@
               (mod != null ? ' · model ' + mod + '%' : '') +
               (e.score10 != null ? ' · ' + e.score10 + '/10' : '') +
               ' · <span class="' + (res === 'won' ? 'text-bb-green' : res === 'lost' ? 'text-bb-red' : 'text-bb-muted') + '">' + res.toUpperCase() + '</span>' +
-              (e.pnl != null && res !== 'open' ? ' · ' + (e.pnl >= 0 ? '+' : '') + e.pnl + 'u' : '') +
+              (res !== 'open' && res !== 'push' ? (function () {
+                var money = elitePnlMode() !== 'units';
+                if (money) {
+                  var d = eliteDollarPnl(e);
+                  return ' · ' + (d >= 0 ? '+$' : '-$') + Math.abs(d);
+                }
+                var u = eliteUnitPnl(e);
+                return ' · ' + (u >= 0 ? '+' : '') + u + 'u';
+              })() : (res === 'push' ? ' · $0' : '')) +
               (e.finalScore ? ' · final ' + String(e.finalScore).replace(/</g,'') : '') +
             '</div>' +
           '</div>' +
@@ -7390,7 +7547,7 @@
     var roi = n ? Math.round(((w - l) / n) * 1000) / 10 : null;
     return { w: w, l: l, p: p, n: n, winPct: winPct, roi: roi, open: (list || []).filter(function (x) { return x.result === 'open'; }).length };
   }
-  function elitePaperStats() {
+  function elitePaperCompareStats() {
     try {
       var rows = typeof eliteLedger === 'function' ? eliteLedger() : [];
       var closed = (rows || []).filter(function (e) {
@@ -7429,7 +7586,7 @@
   function potdHistoryRender() {
     var list = potdHistoryLoad().slice(0, 14);
     var st = potdHistoryStats(potdHistoryLoad());
-    var el = elitePaperStats();
+    var el = elitePaperCompareStats();
     var head = '<div class="mb-1 text-[10px]">';
     head += '<span class="text-amber-200/90 font-medium">POTD</span> ';
     if (st.n) {
@@ -8202,7 +8359,15 @@
             ' <span class="' + (res === 'won' ? 'text-bb-green' : res === 'lost' ? 'text-bb-red' : 'text-bb-muted') + '">' + res.toUpperCase() + '</span></div>' +
             '<div class="text-bb-muted">' + String(e.title || '').replace(/</g,'') +
             (e.finalScore ? ' · ' + String(e.finalScore).replace(/</g,'') : '') +
-            (e.pnl != null && res !== 'open' ? ' · ' + (e.pnl >= 0 ? '+' : '') + e.pnl + 'u' : '') +
+            (res !== 'open' && res !== 'push' ? (function () {
+                var money = elitePnlMode() !== 'units';
+                if (money) {
+                  var d = eliteDollarPnl(e);
+                  return ' · ' + (d >= 0 ? '+$' : '-$') + Math.abs(d);
+                }
+                var u = eliteUnitPnl(e);
+                return ' · ' + (u >= 0 ? '+' : '') + u + 'u';
+              })() : (res === 'push' ? ' · $0' : '')) +
             '</div>' +
             '<div class="flex flex-wrap gap-1.5 mt-1.5">' +
             '<button type="button" class="cal-act-details text-[10px] px-2 py-1 rounded-md border border-bb-border text-bb-muted hover:text-white" data-cal-gid="' + gid2 + '">Details</button>' +
@@ -9625,6 +9790,49 @@ function renderSlate() {
     var hid = body.classList.toggle('hidden');
     emin.textContent = hid ? 'Expand' : 'Minimize';
   };
+  (function wireElitePnlToggle() {
+    function refresh() { try { renderEliteReview(); } catch (e) {} }
+    var bu = document.getElementById('elite-pnl-mode-u');
+    var bm = document.getElementById('elite-pnl-mode-m');
+    var st = document.getElementById('elite-paper-stake');
+    if (bu) bu.onclick = function () { setElitePnlMode('units'); refresh(); };
+    if (bm) bm.onclick = function () { setElitePnlMode('money'); refresh(); };
+    if (st) {
+      try {
+        var saved = localStorage.getItem('eliteodds_paper_stake');
+        if (saved) st.value = saved;
+        else st.value = '10';
+      } catch (e) { st.value = '10'; }
+      st.onchange = function () {
+        var v = Number(st.value) || 10;
+        if (v < 1) v = 10;
+        st.value = String(v);
+        try { localStorage.setItem('eliteodds_paper_stake', String(v)); } catch (e2) {}
+        refresh();
+      };
+    }
+  })();
+  function wireEliteColMin(btnId, listId) {
+    var btn = document.getElementById(btnId);
+    if (!btn) return;
+    var key = 'eliteodds_colmin_' + listId;
+    try {
+      if (localStorage.getItem(key) === '1') {
+        var list0 = document.getElementById(listId);
+        if (list0) list0.classList.add('hidden');
+        btn.textContent = 'Expand';
+      }
+    } catch (e) {}
+    btn.onclick = function () {
+      var list = document.getElementById(listId);
+      if (!list) return;
+      var hid = list.classList.toggle('hidden');
+      btn.textContent = hid ? 'Expand' : 'Minimize';
+      try { localStorage.setItem(key, hid ? '1' : '0'); } catch (e2) {}
+    };
+  }
+  wireEliteColMin('elite-pm-min', 'elite-list-pm');
+  wireEliteColMin('elite-kal-min', 'elite-list-kal');
   var ee = document.getElementById('elite-export');
   if (ee) ee.onclick = exportEliteCsv;
   var ed = document.getElementById('elite-week-discord');
