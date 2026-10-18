@@ -1,10 +1,12 @@
 const { listSportGames } = require('../lib/kalshi');
 const { matchupForEvent } = require('../lib/espn');
+let esportsNameInTitle = null;
 let matchupForEsports = async () => null;
 let isEsportsLeague = () => false;
 try {
   const es = require('../lib/esports');
   matchupForEsports = es.matchupForEsports;
+  esportsNameInTitle = es.esportsNameInTitle || null;
   isEsportsLeague = es.isEsportsLeague;
 } catch (e) {}
 const { buildSignal } = require('../lib/score');
