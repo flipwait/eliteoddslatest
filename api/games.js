@@ -832,12 +832,28 @@ module.exports = async function handler(req, res) {
                 return false;
               }
               if (m.homeName && m.awayName && !(okName(m.homeName) && okName(m.awayName))) {
-                return; // do not cache wrong game form
+                if (isEs) {
+                  // Keep a stub so the card can show WHY form was dropped
+                  matchupCache[title] = {
+                    league: lg,
+                    homeName: m.homeName,
+                    awayName: m.awayName,
+                    hasForm: false,
+                    formSource: m.formSource || 'pandascore',
+                    note: 'Title/name mismatch after PandaScore lookup',
+                    formNote: 'Name mismatch: ' + String(m.homeName).slice(0, 24) + ' / ' + String(m.awayName).slice(0, 24),
+                  };
+                }
+                return;
               }
               if (isEs && m) {
                 m.formSource = m.formSource || 'pandascore';
-                m.formNote = (m.homeL10 && m.homeL10.n ? ('L10 ' + (m.homeL10.w || 0) + '-' + (m.homeL10.l || 0)) : '') +
+                var l10n = (m.homeL10 && m.homeL10.n ? ('L10 ' + (m.homeL10.w || 0) + '-' + (m.homeL10.l || 0)) : '') +
                   (m.awayL10 && m.awayL10.n ? (' / ' + (m.awayL10.w || 0) + '-' + (m.awayL10.l || 0)) : '');
+                // Keep failure notes (team not found / no token); only fill L10 when we have data
+                if (l10n && String(l10n).trim()) m.formNote = l10n;
+                else if (!m.formNote && m.note) m.formNote = m.note;
+                else if (!m.formNote && !m.hasForm) m.formNote = 'No series history from PandaScore';
               }
               if (lg === 'mlb') {
                 try { m = await enrichMlbMatchup(m); } catch (e) {}
@@ -1002,7 +1018,18 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
             model_probability: sc ? sc.model_probability : null,
             fairSource: sc ? sc.fairSource : null,
             hasForm: sc ? sc.hasForm : null,
-            formNote: (mu && (mu.formNote || mu.note)) || (sc && sc.formNote) || null,
+            formNote: (function () {
+              if (mu && (mu.formNote || mu.note)) return mu.formNote || mu.note;
+              if (sc && sc.formNote) return sc.formNote;
+              const lg0 = String(ev.league || league || '').toLowerCase();
+              const isEs0 = typeof isEsportsLeague === 'function' && isEsportsLeague(lg0);
+              if (isEs0 && !(sc && sc.hasForm)) {
+                if (!pandascoreToken) return 'No PandaScore token on this scan — Save key in Settings';
+                if (!mu) return 'No matchup fetched (limit or parse) — rescan CS2';
+                return 'No form from PandaScore';
+              }
+              return null;
+            })(),
             formNudgePp: sc ? sc.formNudgePp : null,
             formWinProb: sc ? sc.formWinProb : null,
             formAwayWinProb: sc ? sc.formAwayWinProb : null,
@@ -1182,6 +1209,7 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
         model_probability: mlScore ? mlScore.model_probability : null,
         fairSource: mlScore ? mlScore.fairSource : null,
         hasForm: mlScore ? mlScore.hasForm : null,
+        formNote: (mu && (mu.formNote || mu.note)) || (mlScore && mlScore.formNote) || null,
         formNudgePp: mlScore ? mlScore.formNudgePp : null,
         formWinProb: mlScore ? mlScore.formWinProb : null,
         formAwayWinProb: mlScore ? mlScore.formAwayWinProb : null,
