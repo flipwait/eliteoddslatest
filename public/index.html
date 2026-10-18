@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.95</title>
+  <title>EliteOdds v3.4.96</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.95</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.96</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1122,8 +1122,8 @@
           <div class="eo-filters">
             <label class="text-bb-muted flex items-center gap-1">Rank
               <select id="f-rank">
-                <option value="" selected>All ranks</option>
-                <option value="elite">Elite only</option>
+                <option value="">All ranks</option>
+                <option value="elite" selected>Elite only</option>
                 <option value="good">Good + Elite</option>
                 <option value="pass">Pass only</option>
               </select>
@@ -1893,7 +1893,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.95</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.96</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2269,8 +2269,19 @@
   };
 
   
-  var APP_VERSION = '3.4.95';
+  var APP_VERSION = '3.4.96';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.96',
+      date: '2026-10-18',
+      title: 'Combo legs fix · faster Elite scan · default Elite only',
+      items: [
+        'FIXED — Ticket legs now store marketSlug/url so Estimate / Dry-run / Live create work with 2+ slip legs.',
+        'CHANGED — Rank filter defaults to Elite only.',
+        'FASTER — Elite scan: 2 sports in parallel, ~350ms gap (was 1200ms sequential).',
+        'SERVER — Elite rank keeps more lines per game (less aggressive cap) so Elite is not dropped.'
+      ]
+    },
     {
       version: '3.4.95',
       date: '2026-10-18',
@@ -7116,7 +7127,7 @@
     window.__eliteScanBusy = true;
     var st = settings();
     var gap = Number(st.eliteScanGapMs);
-    if (!(gap >= 0)) gap = 1200; // delay between requests
+    if (!(gap >= 0)) gap = 350; // delay between requests (faster)
     if (gap > 8000) gap = 8000;
     var dayKeep = dayFilter;
     if (!dayKeep || dayKeep === 'all') dayFilter = 'next3';
@@ -7134,44 +7145,48 @@
     var steps = 0;
     var totalSteps = sportsList.length * venues.length;
     try {
+      async function fetchEliteOne(ven, lg) {
+        var data = null;
+        var sportKeep = sport;
+        sport = lg;
+        try {
+          if (ven === 'kalshi') {
+            data = await fetchJsonTimeout(kalQuery('all', '0', true), 16000);
+          } else {
+            // marketType=all, rank elite, allow market-only false → more complete board
+            data = await fetchJsonTimeout(polyQuery('all', 'elite', 0, 0, 0, '0', true, lg), 18000);
+          }
+        } finally {
+          sport = sportKeep;
+        }
+        var list = (data && data.games) ? data.games : [];
+        list = filterGamesClient(dedupeGameCards(list));
+        list.forEach(function (g) {
+          g.venue = ven;
+          g.source = ven;
+          g.league = g.league || lg;
+          var r = String(g.rank || '').toLowerCase();
+          if (r !== 'elite' && r.indexOf('super') < 0) return;
+          var k = eliteKey(g);
+          if (!k || seen[k]) return;
+          seen[k] = true;
+          allFound.push(g);
+        });
+      }
       for (var vi = 0; vi < venues.length; vi++) {
         var ven = venues[vi];
-        for (var si = 0; si < sportsList.length; si++) {
-          var lg = sportsList[si];
-          steps++;
-          var msg = 'Elite scan ' + steps + '/' + totalSteps + ' · ' + ven + ' · ' + lg.toUpperCase();
+        for (var si = 0; si < sportsList.length; si += 2) {
+          var batch = sportsList.slice(si, si + 2);
+          steps += batch.length;
+          var msg = 'Elite scan ' + Math.min(steps, totalSteps) + '/' + totalSteps + ' · ' + ven + ' · ' + batch.join('+').toUpperCase();
           if (status) status.textContent = msg;
           if ($('meta')) $('meta').textContent = msg;
-          try {
-            var data = null;
-            var sportKeep = sport;
-            sport = lg; // kalQuery / polyQuery use league helpers
-            try {
-              if (ven === 'kalshi') {
-                data = await fetchJsonTimeout(kalQuery('all', '0', true), 20000);
-              } else {
-                data = await fetchJsonTimeout(polyQuery('all', 'elite', 0, 0, 0, '0', true, lg), 22000);
-              }
-            } finally {
-              sport = sportKeep;
-            }
-            var list = (data && data.games) ? data.games : [];
-            list = filterGamesClient(dedupeGameCards(list));
-            list.forEach(function (g) {
-              g.venue = ven;
-              g.source = ven;
-              g.league = g.league || lg;
-              var r = String(g.rank || '').toLowerCase();
-              if (r !== 'elite' && r.indexOf('super') < 0) return;
-              var k = eliteKey(g);
-              if (!k || seen[k]) return;
-              seen[k] = true;
-              allFound.push(g);
+          var results = await Promise.all(batch.map(function (lg) {
+            return fetchEliteOne(ven, lg).catch(function (eOne) {
+              errors.push(ven + '/' + lg + ': ' + (eOne.message || eOne));
             });
-          } catch (eOne) {
-            errors.push(ven + '/' + lg + ': ' + (eOne.message || eOne));
-          }
-          if (gap > 0 && !(vi === venues.length - 1 && si === sportsList.length - 1)) {
+          }));
+          if (gap > 0 && !(vi === venues.length - 1 && si + 2 >= sportsList.length)) {
             await eliteScanSleep(gap);
           }
         }
@@ -8707,9 +8722,15 @@ function renderSlate() {
   }
 
   function addTicket(g, units) {
+    var slug = g.marketSlug || g.slug || '';
+    if (!slug && g.url) {
+      var um = String(g.url).match(/\/(?:market|event)\/([^/?#]+)/i);
+      if (um) slug = um[1];
+    }
+    if (!slug && Array.isArray(g.marketSlugs) && g.marketSlugs[0]) slug = g.marketSlugs[0];
     ticket.push({
       title: g.eventTitle || g.title,
-      pick: g.modelPick,
+      pick: g.modelPick || g.pick,
       edge: g.netEdge,
       rank: g.rank,
       units: Number(units) || 0.5,
@@ -8718,10 +8739,15 @@ function renderSlate() {
       marketType: g.marketType || 'moneyline',
       model_probability: g.model_probability,
       market_probability: g.market_probability,
+      marketPriceCents: g.marketPriceCents || (g.market_probability != null ? (g.market_probability > 1 ? g.market_probability : g.market_probability * 100) : null),
       score10: g.score10,
       id: g.id,
       startTime: g.startTime || null,
-      venue: g.venue || 'polymarket'
+      venue: g.venue || 'polymarket',
+      marketSlug: slug,
+      slug: slug,
+      side: g.side || 'YES',
+      modelPick: g.modelPick || g.pick
     });
     localStorage.setItem('bb_ticket', JSON.stringify(ticket));
     renderTicket();
@@ -8845,20 +8871,26 @@ function renderSlate() {
     var legs = [];
     (ticket || []).forEach(function (t) {
       var g = t.game || t;
-      var slug = g.marketSlug || g.slug || (g.marketUrl && String(g.marketUrl).split('/').pop()) || '';
+      var slug = g.marketSlug || g.slug || '';
+      if (!slug && g.url) {
+        var um = String(g.url).match(/\/(?:market|event)\/([^/?#]+)/i);
+        if (um) slug = um[1];
+      }
       slug = String(slug || '').trim();
-      if (!slug) return;
+      // Prefer market path over event path for combo symbols
+      if (slug && !/^[a-z0-9-]+$/i.test(slug)) slug = '';
       var side = 'SIDE_BUY';
-      var sn = String(g.side || g.modelPick || '').toUpperCase();
+      var sn = String(g.side || '').toUpperCase();
       if (sn === 'NO' || sn === 'SELL' || sn === 'SHORT') side = 'SIDE_SELL';
       var px = g.market_probability;
       if (px != null && px > 1) px = px / 100;
       if (px == null && g.marketPriceCents != null) px = Number(g.marketPriceCents) / 100;
       legs.push({
-        symbol: slug,
+        symbol: slug || ('leg-' + legs.length),
         side: side,
         price01: px,
-        label: (g.modelPick || g.pick || g.eventTitle || slug).toString().slice(0, 48),
+        label: (g.modelPick || g.pick || g.title || g.eventTitle || slug || 'leg').toString().slice(0, 48),
+        hasSymbol: !!slug,
       });
     });
     return legs;
@@ -8867,9 +8899,20 @@ function renderSlate() {
   async function runComboExperimental(mode) {
     var out = $('combo-exp-out');
     var legs = ticketLegsForCombo();
-    if (legs.length < 2) {
-      if (out) out.textContent = 'Need 2+ legs on the slip (run AI Parlay gen or + rows).';
+    if (!ticket || ticket.length < 2) {
+      if (out) out.textContent = 'Need 2+ legs on the slip (run AI Parlay gen or + on rows). Slip has ' + (ticket ? ticket.length : 0) + '.';
       return;
+    }
+    if (legs.length < 2) {
+      if (out) out.textContent = 'Slip has ' + ticket.length + ' legs but market slugs missing — re-add picks after refresh, or use Open PM app with the list below.\n' +
+        ticket.map(function (x, i) { return (i + 1) + '. ' + (x.pick || x.title || '?'); }).join('\n');
+      return;
+    }
+    // Estimate can run even if some symbols are synthetic; create needs real symbols
+    var realSym = legs.filter(function (L) { return L.hasSymbol; });
+    if ((mode === 'live' || mode === 'dry-run') && realSym.length < 2) {
+      if (out) out.textContent = 'Need 2+ legs with market links for create. Re-add picks from cards (Trade URL must exist). Estimate still works with prices.';
+      if (mode !== 'estimate') return;
     }
     if (out) out.textContent = 'Experimental combo (' + mode + ')…';
     try {

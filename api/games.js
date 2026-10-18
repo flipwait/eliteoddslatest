@@ -877,14 +877,18 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
       const flat = [];
       // Refresh live Yes/No from BBO for totals (list prices often stale → wrong 50¢ vs 96¢)
       try {
+        // Skip large BBO warm on elite-only (speed) — still refresh a small sample for totals
         const needBbo = [];
+        const bboCap = String(rankFilter || '').toLowerCase() === 'elite' ? 12 : 28;
         for (const ev of events) {
           for (const m of ev.markets || []) {
+            if (needBbo.length >= bboCap) break;
             const t = classifyMarket(m);
             if (/total|nrfi|yrfi|spread/.test(String(t)) && (m.slug || m.marketSlug)) needBbo.push(m);
           }
+          if (needBbo.length >= bboCap) break;
         }
-        await refreshBboBatch(needBbo, 28);
+        await refreshBboBatch(needBbo, bboCap);
       } catch (eBbo) {}
       // Prefer a stable order of market families so board is scannable
       const typePriority = {
@@ -1071,14 +1075,19 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
         }
       }
       // Keep top lines per game + type (PM lists many alternate numbers)
+      // Elite scans need more room so the actual Elite line is not dropped
       const capped = [];
       const seen = new Map();
-      const maxPerType = marketType === 'all' ? 2 : 4;
+      const eliteMode = String(rankFilter || '').toLowerCase() === 'elite';
+      const maxPerType = eliteMode ? 6 : (marketType === 'all' ? 3 : 4);
       flat.sort((a, b) => {
+        // Prefer higher score first so Elites survive the per-type cap
+        const sc = (b.betScore || 0) - (a.betScore || 0);
+        if (sc) return sc;
         const pa = typePriority[String(a.marketType)] || 50;
         const pb = typePriority[String(b.marketType)] || 50;
         if (pa !== pb) return pa - pb;
-        return (b._vol || 0) - (a._vol || 0) || (b.betScore || 0) - (a.betScore || 0);
+        return (b._vol || 0) - (a._vol || 0);
       });
       for (const row of flat) {
         const key = String(row.eventTitle || '') + '|' + String(row.marketType || '');
@@ -1087,17 +1096,23 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
         seen.set(key, n + 1);
         capped.push(row);
       }
-      // Prefer live, then type family order, then score
+      // Prefer live, then score (elite first), then type family
       capped.sort((a, b) => {
         if (a.live !== b.live) return a.live ? -1 : 1;
+        const ra = String(a.rank || '').toLowerCase() === 'elite' ? 0 : 1;
+        const rb = String(b.rank || '').toLowerCase() === 'elite' ? 0 : 1;
+        if (ra !== rb) return ra - rb;
+        const sc = (b.betScore || 0) - (a.betScore || 0);
+        if (sc) return sc;
         const pa = typePriority[String(a.marketType)] || 50;
         const pb = typePriority[String(b.marketType)] || 50;
         if (pa !== pb) return pa - pb;
-        return (b.betScore || 0) - (a.betScore || 0);
+        return 0;
       });
-      // Soft cap total cards so Vercel stays healthy (all sports × all markets)
-      if (marketType === 'all' && capped.length > 180) {
-        capped.length = 180;
+      // Soft cap — higher when filtering elite so we don't truncate before rank filter
+      const softCap = eliteMode ? 320 : (marketType === 'all' ? 200 : 180);
+      if (capped.length > softCap) {
+        capped.length = softCap;
       }
       if (typeof attachEspnLiveBatch === 'function' && capped.length <= 60) {
         try { await attachEspnLiveBatch(capped); } catch (eLive) {}
