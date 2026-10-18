@@ -775,13 +775,20 @@ module.exports = async function handler(req, res) {
     try {
       const seen = new Set();
       const jobs = [];
-      for (const ev of events) {
+      // Prioritize esports events for form fetch
+      const evSorted = events.slice().sort((a, b) => {
+        const ae = typeof isEsportsLeague === 'function' && isEsportsLeague(a.league) ? 0 : 1;
+        const be = typeof isEsportsLeague === 'function' && isEsportsLeague(b.league) ? 0 : 1;
+        return ae - be;
+      });
+      for (const ev of evSorted) {
         const title = ev.title || ev.name || '';
         const lg = (ev.league || league || 'mlb').toLowerCase();
         if (!title || seen.has(title)) continue;
         seen.add(title);
-        const _esJobs = league === 'esports' || ['lol','cs2','dota2','valorant','cod'].includes(String(league||''));
-        if (jobs.length >= (_esJobs ? 22 : (league && league !== "all" ? 14 : 10))) break;
+        const _esJobs = league === 'esports' || ['lol','cs2','dota2','valorant','cod'].includes(String(league||''))
+          || (typeof isEsportsLeague === 'function' && isEsportsLeague(lg));
+        if (jobs.length >= (_esJobs ? 28 : (league && league !== "all" ? 14 : 10))) break;
         jobs.push(
           (async () => {
             let m = null;
@@ -995,6 +1002,7 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
             model_probability: sc ? sc.model_probability : null,
             fairSource: sc ? sc.fairSource : null,
             hasForm: sc ? sc.hasForm : null,
+            formNote: (mu && (mu.formNote || mu.note)) || (sc && sc.formNote) || null,
             formNudgePp: sc ? sc.formNudgePp : null,
             formWinProb: sc ? sc.formWinProb : null,
             formAwayWinProb: sc ? sc.formAwayWinProb : null,
