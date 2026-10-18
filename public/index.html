@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.91</title>
+  <title>EliteOdds v3.4.92</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.91</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.92</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1754,7 +1754,7 @@
             <label class="block text-xs">OpenAI key
               <input id="openai" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" />
             <label class="block text-xs text-bb-muted mt-3">PandaScore API token (esports form — free tier OK)
-              <input id="pandascore" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="Bearer token from pandascore.co dashboard" />
+              <input id="pandascore" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="Token only (or Bearer xxx) — must Save, then rescan" />
             </label>
             <p class="text-[10px] text-bb-muted mt-0.5">Unlocks CS2 / LoL / Valorant map L10 + H2H and auto-settle for esports match winners. Dota2 can settle via free OpenDota. Optional env: PANDASCORE_TOKEN.</p>
             </label>
@@ -1880,7 +1880,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.91</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.92</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2256,8 +2256,17 @@
   };
 
   
-  var APP_VERSION = '3.4.91';
+  var APP_VERSION = '3.4.92';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.92',
+      date: '2026-10-18',
+      title: 'PandaScore token now sent on Polymarket scans',
+      items: [
+        'FIXED — polyQuery never appended &pandascore= (only Kalshi did) → Form: Missing token on every PM esports card.',
+        'ADDED — getPandascoreToken() from Settings + input; strips accidental Bearer prefix on save/scan.'
+      ]
+    },
     {
       version: '3.4.91',
       date: '2026-10-18',
@@ -6875,6 +6884,19 @@
     if (s === 'mls' || s === 'epl' || s === 'lal' || s === 'bun' || s === 'sea' || s === 'ucl' || s === 'uefa' || s === 'fwc' || s === 'football') return 'soccer';
     return s;
   }
+
+  function getPandascoreToken() {
+    try {
+      var st = settings();
+      var fromSt = (st.pandascore || st.pandascoreToken || st.pandaScore || '').trim();
+      var fromForm = ($('pandascore') && $('pandascore').value) ? String($('pandascore').value).trim() : '';
+      var t = (fromForm || fromSt || '').trim();
+      // User may paste "Bearer xxxxx" — API already adds Bearer
+      if (/^bearer\s+/i.test(t)) t = t.replace(/^bearer\s+/i, '').trim();
+      return t;
+    } catch (e) { return ''; }
+  }
+
   function polyQuery(mt, rankF, minEv, minEdge, minSc, strict, allowMkt, leagueOverride) {
     var q = '/api/games?mode=' + encodeURIComponent(apiMode()) +
       '&marketType=' + encodeURIComponent(mt || 'all') +
@@ -6912,6 +6934,12 @@
     if (lg === 'all') q += '&limit=40';
     else if (mt === 'all') q += '&limit=50';
     else q += '&limit=40';
+    // PandaScore form for CS2/LoL/Val/CoD (must be on Poly scans, not only Kalshi)
+    var pst = typeof getPandascoreToken === 'function' ? getPandascoreToken() : '';
+    if (!pst) {
+      try { pst = (settings().pandascore || ($('pandascore') && $('pandascore').value) || '').trim(); } catch (e) {}
+    }
+    if (pst) q += '&pandascore=' + encodeURIComponent(pst);
     return q;
   }
 
@@ -6978,7 +7006,7 @@
       '&allowThinFormElite=' + (($('allow-thin-form-elite') && $('allow-thin-form-elite').checked) ? '1' : '0') +
       '&limit=' + lim;
     try {
-      var pst = (settings().pandascore || ($('pandascore') && $('pandascore').value) || '').trim();
+      var pst = typeof getPandascoreToken === 'function' ? getPandascoreToken() : (settings().pandascore || ($('pandascore') && $('pandascore').value) || '').trim();
       if (pst) kq += '&pandascore=' + encodeURIComponent(pst);
     } catch (e) {}
     return kq;
@@ -9732,7 +9760,12 @@ function renderSlate() {
       webhookAuto: ($('webhook-auto') && $('webhook-auto').value) || '',
       pmAutoWebhookDry: !!($('pm-auto-webhook-dry') && $('pm-auto-webhook-dry').checked),
 
-      pandascore: ($('pandascore') && $('pandascore').value) || '',
+      pandascore: (function () {
+        var t = ($('pandascore') && $('pandascore').value) || '';
+        t = String(t).trim();
+        if (/^bearer\s+/i.test(t)) t = t.replace(/^bearer\s+/i, '').trim();
+        return t;
+      })(),
       oddsKey: ($('odds-key') && $('odds-key').value) || '',
       workerUrl: ($('worker-url') && $('worker-url').value) || '',
       allowThinFormGood: !($('allow-thin-form-good') && !$('allow-thin-form-good').checked),
