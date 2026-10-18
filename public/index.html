@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.93</title>
+  <title>EliteOdds v3.4.95</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.93</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.95</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1449,7 +1449,7 @@
               <label class="flex items-center gap-1.5 cursor-pointer px-2 py-1 rounded-lg border border-bb-border">
                 <input type="checkbox" id="slate-ml-only" /> Board: ML only
               </label>
-              <button type="button" id="slate-ai-parlay" class="px-3 py-1.5 rounded-lg bg-cyan-500/15 text-cyan-300 border border-cyan-400/40 font-medium">AI Parlay generate</button>
+              <button type="button" id="slate-ai-parlay" class="px-3 py-1.5 rounded-lg bg-cyan-500/15 text-cyan-300 border border-cyan-400/40 font-medium">AI Parlay / Combo gen</button>
               <button type="button" id="slate-verdict-legs" class="px-3 py-1.5 rounded-lg bg-violet-500/15 text-violet-300 border border-violet-400/40">AI Verdict legs</button>
             </div>
           </div>
@@ -1474,9 +1474,22 @@
                 </div>
                 <div id="ticket" class="flex-1 p-2.5 text-xs space-y-2 min-h-[120px] max-h-[40vh] overflow-y-auto"></div>
                 <div id="parlay-meta" class="px-3 py-2 text-[10px] text-bb-muted border-t border-bb-border hidden"></div>
-                <div class="p-2.5 border-t border-bb-border grid grid-cols-2 gap-2">
-                  <button type="button" id="ticket-discord" class="py-2 rounded-lg bg-[#5865F2]/25 text-[#5865F2] border border-[#5865F2]/40 text-xs">Discord slip</button>
-                  <button type="button" id="ticket-clear" class="py-2 rounded-lg border border-bb-border text-bb-muted text-xs">Clear</button>
+                <div class="p-2.5 border-t border-bb-border space-y-2">
+                  <div class="text-[9px] uppercase tracking-wider text-amber-300/90">Experimental · PM Combo</div>
+                  <p class="text-[10px] text-bb-muted leading-snug">Estimates use leg×leg (not live RFQ). Create is optional — you can still Build a Combo manually on Polymarket.</p>
+                  <div class="grid grid-cols-2 gap-2">
+                    <button type="button" id="ticket-combo-est" class="py-2 rounded-lg bg-amber-500/15 text-amber-200 border border-amber-400/40 text-xs">Estimate combo</button>
+                    <button type="button" id="ticket-combo-dry" class="py-2 rounded-lg bg-white/5 text-bb-muted border border-bb-border text-xs">Dry-run create</button>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <button type="button" id="ticket-combo-live" class="py-2 rounded-lg bg-amber-600/20 text-amber-100 border border-amber-500/50 text-xs">Live create ⚠</button>
+                    <button type="button" id="ticket-combo-manual" class="py-2 rounded-lg border border-bb-border text-bb-muted text-xs">Open PM app</button>
+                  </div>
+                  <div id="combo-exp-out" class="text-[10px] text-bb-muted whitespace-pre-wrap max-h-28 overflow-y-auto"></div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <button type="button" id="ticket-discord" class="py-2 rounded-lg bg-[#5865F2]/25 text-[#5865F2] border border-[#5865F2]/40 text-xs">Discord slip</button>
+                    <button type="button" id="ticket-clear" class="py-2 rounded-lg border border-bb-border text-bb-muted text-xs">Clear</button>
+                  </div>
                 </div>
               </div>
               <div class="glass p-3 space-y-2">
@@ -1880,7 +1893,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.93</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.95</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2256,8 +2269,30 @@
   };
 
   
-  var APP_VERSION = '3.4.93';
+  var APP_VERSION = '3.4.95';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.95',
+      date: '2026-10-18',
+      title: 'Experimental PM Combo (estimate / dry-run / live create)',
+      items: [
+        'ADDED — Slip panel: Estimate combo, Dry-run create, Live create ⚠, Open PM app.',
+        'ADDED — /api/combo experimental endpoint (POST estimate|create).',
+        'NOTE — Estimate is leg×leg only; real PM price is RFQ. Live create only builds instrument — trade still on PM if preferred.',
+        'Manual Build a Combo on polymarket.us always remains available.'
+      ]
+    },
+    {
+      version: '3.4.94',
+      date: '2026-10-18',
+      title: 'Esports scan timeout fix',
+      items: [
+        'FIXED — External form fetches (PandaScore/CSAPI) hard-timeout at 3.5–4.5s so one slow API cannot hang the scan.',
+        'FIXED — CSAPI marks dead after first failure (skip remaining calls).',
+        'CHANGED — Max 10 esports form jobs, batches of 3; fewer team search hints.',
+        'CHANGED — Client esports timeout 45s (was 20s) so hybrid form can finish.'
+      ]
+    },
     {
       version: '3.4.93',
       date: '2026-10-18',
@@ -6976,7 +7011,7 @@
     var rfServer = '';
     async function oneLeague(lg) {
       try {
-        var d = await fetchJsonTimeout(polyQuery(mt || 'all', rfServer, minEv, minEdge, minSc, strict, allowMkt, lg), 22000);
+        var d = await fetchJsonTimeout(polyQuery(mt || 'all', rfServer, minEv, minEdge, minSc, strict, allowMkt, lg), lg === 'esports' ? 40000 : 22000);
         if (d && d.games && d.games.length) return d.games;
         if (d && d.error) errors.push(lg + ': ' + d.error);
         return [];
@@ -7228,7 +7263,7 @@
         }
       } else {
         var list = [];
-        var tMs2 = sport === 'esports' || sport === 'all' ? 20000 : 18000;
+        var tMs2 = sport === 'esports' ? 45000 : (sport === 'all' ? 35000 : 20000);
         if (forceBoth || venue === 'both') {
           var polyPromise2 = sport === 'all'
             ? fetchPolyAllLeagues(mt, rankF, minEv, minEdge, minSc, strict, allowMkt).then(function (g) { return { ok: true, games: g }; })
@@ -8805,6 +8840,94 @@ function renderSlate() {
     return rows;
   }
 
+
+  function ticketLegsForCombo() {
+    var legs = [];
+    (ticket || []).forEach(function (t) {
+      var g = t.game || t;
+      var slug = g.marketSlug || g.slug || (g.marketUrl && String(g.marketUrl).split('/').pop()) || '';
+      slug = String(slug || '').trim();
+      if (!slug) return;
+      var side = 'SIDE_BUY';
+      var sn = String(g.side || g.modelPick || '').toUpperCase();
+      if (sn === 'NO' || sn === 'SELL' || sn === 'SHORT') side = 'SIDE_SELL';
+      var px = g.market_probability;
+      if (px != null && px > 1) px = px / 100;
+      if (px == null && g.marketPriceCents != null) px = Number(g.marketPriceCents) / 100;
+      legs.push({
+        symbol: slug,
+        side: side,
+        price01: px,
+        label: (g.modelPick || g.pick || g.eventTitle || slug).toString().slice(0, 48),
+      });
+    });
+    return legs;
+  }
+
+  async function runComboExperimental(mode) {
+    var out = $('combo-exp-out');
+    var legs = ticketLegsForCombo();
+    if (legs.length < 2) {
+      if (out) out.textContent = 'Need 2+ legs on the slip (run AI Parlay gen or + rows).';
+      return;
+    }
+    if (out) out.textContent = 'Experimental combo (' + mode + ')…';
+    try {
+      if (mode === 'manual') {
+        window.open('https://polymarket.us', '_blank');
+        if (out) {
+          out.textContent = 'Opened Polymarket. Build a Combo manually with these legs:\n' +
+            legs.map(function (L, i) {
+              return (i + 1) + '. ' + L.label + ' · ' + L.symbol + ' · ' + L.side +
+                (L.price01 != null ? (' · ' + Math.round(L.price01 * 100) + '¢') : '');
+            }).join('\n');
+        }
+        return;
+      }
+      var st = settings();
+      var action = mode === 'estimate' ? 'estimate' : 'create';
+      var body = {
+        action: action,
+        mode: mode === 'live' ? 'live' : 'dry-run',
+        legs: legs,
+        apiKey: st.pmApiKey || '',
+        apiSecret: st.pmApiSecret || '',
+      };
+      if (mode === 'live') {
+        if (!confirm('EXPERIMENTAL: Create combo instrument on Polymarket with ' + legs.length + ' legs?\n\nThis does not auto-fill a trade — it creates/retrieves the combo. You can still build manually in the PM app.')) {
+          if (out) out.textContent = 'Cancelled.';
+          return;
+        }
+      }
+      var r = await fetch('/api/combo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      var d = await r.json();
+      if (out) {
+        var lines = [];
+        lines.push(d.experimental ? '[EXPERIMENTAL]' : '');
+        if (d.message) lines.push(d.message);
+        if (d.error) lines.push('Error: ' + d.error);
+        if (d.estimate && d.estimate.ok) {
+          lines.push('Rough mult ~' + d.estimate.roughMultiplier + 'x · $10 → ~$' + d.estimate.stake10Pays);
+          lines.push('(RFQ on PM will differ)');
+        }
+        if (d.combo && (d.combo.id || d.combo.symbol)) {
+          lines.push('Combo id: ' + (d.combo.id || d.combo.symbol));
+        }
+        if (d.manualHint) lines.push(d.manualHint);
+        if (d.wouldCreate && d.wouldCreate.legs) {
+          lines.push('Legs: ' + d.wouldCreate.legs.map(function (L) { return L.symbol; }).join(', '));
+        }
+        out.textContent = lines.filter(Boolean).join('\n');
+      }
+    } catch (e) {
+      if (out) out.textContent = 'Combo error: ' + String(e.message || e);
+    }
+  }
+
   function buildParlayFromPool(n) {
     n = Math.max(2, Math.min(10, Number(n) || 3));
     var pool = aiGenPool().slice();
@@ -10038,6 +10161,12 @@ function renderSlate() {
   if (sr) sr.onclick = function () { loadGames().then(function () { renderSlate(); }); };
   var sp = document.getElementById('slate-ai-parlay');
   if (sp) sp.onclick = runAiParlayGenerate;
+
+  if ($('ticket-combo-est')) $('ticket-combo-est').onclick = function () { runComboExperimental('estimate'); };
+  if ($('ticket-combo-dry')) $('ticket-combo-dry').onclick = function () { runComboExperimental('dry-run'); };
+  if ($('ticket-combo-live')) $('ticket-combo-live').onclick = function () { runComboExperimental('live'); };
+  if ($('ticket-combo-manual')) $('ticket-combo-manual').onclick = function () { runComboExperimental('manual'); };
+
   var sv = document.getElementById('slate-verdict-legs');
   if (sv) sv.onclick = runAiVerdictLegs;
   var se = document.getElementById('slate-elite-only');

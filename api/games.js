@@ -716,7 +716,7 @@ module.exports = async function handler(req, res) {
 
     let events;
     if (league === 'esports') {
-      const es = await Promise.all(['lol', 'cs2', 'dota2', 'valorant', 'cod'].map((l) => fetchLeagueEvents(l, { limit: 18 })));
+      const es = await Promise.all(['lol', 'cs2', 'dota2', 'valorant', 'cod'].map((l) => fetchLeagueEvents(l, { limit: 10 })));
       events = es.flat();
     } else if (league === 'soccer' || league === 'football' || (typeof isSoccerLeague === 'function' && isSoccerLeague(league))) {
       // One Soccer category: pull every soccer league (EPL, MLS, La Liga, Bundesliga, Serie A, UCL, …)
@@ -788,7 +788,7 @@ module.exports = async function handler(req, res) {
         seen.add(title);
         const _esJobs = league === 'esports' || ['lol','cs2','dota2','valorant','cod'].includes(String(league||''))
           || (typeof isEsportsLeague === 'function' && isEsportsLeague(lg));
-        if (jobs.length >= (_esJobs ? 28 : (league && league !== "all" ? 14 : 10))) break;
+        if (jobs.length >= (_esJobs ? 10 : (league && league !== "all" ? 12 : 8))) break;
         jobs.push(
           (async () => {
             let m = null;
@@ -863,7 +863,10 @@ module.exports = async function handler(req, res) {
             .catch(() => {})
         );
       }
-      await Promise.all(jobs);
+      // Batch matchup fetches (esports external APIs are slow — avoid 20s client timeout)
+      for (let bi = 0; bi < jobs.length; bi += 3) {
+        await Promise.all(jobs.slice(bi, bi + 3));
+      }
     } catch (e) {}
 
 const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1','inning_2','inning_3','inning_4','inning_5','inning_6','inning_7','inning_8','inning_9','inning_winner','inning_scorer','nrfi','yrfi','f5','f5_spread','f5_total','total','totals','spread','spreads','spread_fg','spread_1h','spread_2h','spread_q1','spread_q2','spread_q3','spread_q4','total_fg','total_1h','total_2h','total_q1','total_q2','total_q3','total_q4','total_p2','total_p3','team_totals','team_total_fg','team_total_1h','team_total_2h','prop','f5','nrfi','yrfi','f5_spread','f5_total','player_props','team_props','game_props','innings','player_hr','player_k','player_hits','player_tb','player_hrr','pitcher_outs','pitcher_er','pitcher_ha','pitcher_bb','inning_winner'];
