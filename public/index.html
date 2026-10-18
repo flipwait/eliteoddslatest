@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.87</title>
+  <title>EliteOdds v3.4.88</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.87</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.88</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1431,18 +1431,23 @@
             </div>
             <div class="flex flex-wrap gap-2 items-center text-xs">
               <label class="flex items-center gap-1.5 cursor-pointer px-2 py-1 rounded-lg border border-bb-border">
-                <input type="checkbox" id="slate-elite-only" /> Elite only
+                <input type="checkbox" id="slate-elite-only" /> Board: Elite only
               </label>
-              <label class="flex items-center gap-1">Legs
+              <label class="flex items-center gap-1">Max legs
                 <select id="slate-legs" class="bg-bb-bg border border-bb-border rounded-lg px-2 py-1">
                   <option value="2">2</option>
                   <option value="3" selected>3</option>
-                  <option value="4">4 (fun)</option>
-                  <option value="5">5 (fun)</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
                 </select>
               </label>
               <label class="flex items-center gap-1.5 cursor-pointer px-2 py-1 rounded-lg border border-bb-border">
-                <input type="checkbox" id="slate-ml-only" checked /> ML preferred
+                <input type="checkbox" id="slate-ml-only" /> Board: ML only
               </label>
               <button type="button" id="slate-ai-parlay" class="px-3 py-1.5 rounded-lg bg-cyan-500/15 text-cyan-300 border border-cyan-400/40 font-medium">AI Parlay generate</button>
               <button type="button" id="slate-verdict-legs" class="px-3 py-1.5 rounded-lg bg-violet-500/15 text-violet-300 border border-violet-400/40">AI Verdict legs</button>
@@ -1453,7 +1458,7 @@
             <div class="xl:col-span-8 space-y-2">
               <div class="flex items-center justify-between px-1">
                 <div class="text-[10px] uppercase tracking-wider text-bb-muted">Opportunities · compact list</div>
-                <div class="text-[10px] text-bb-muted">Use AI Parlay or + on a row</div>
+                <div class="text-[10px] text-bb-muted">AI Gen finds its own legs · or + on a row</div>
               </div>
               <div id="slate-board-cards" class="space-y-1.5 overflow-y-auto pr-1 max-h-[70vh]"></div>
               <div id="slate-board" class="hidden"></div>
@@ -1476,7 +1481,7 @@
               </div>
               <div class="glass p-3 space-y-2">
                 <div class="text-[10px] uppercase tracking-wider text-cyan-400/80">AI desk</div>
-                <div id="parlay-ai-out" class="text-[11px] text-bb-muted leading-relaxed min-h-[80px] max-h-[36vh] overflow-y-auto whitespace-pre-wrap">Generate a parlay from Good/Elite, then run AI Verdict on the legs.</div>
+                <div id="parlay-ai-out" class="text-[11px] text-bb-muted leading-relaxed min-h-[80px] max-h-[36vh] overflow-y-auto whitespace-pre-wrap">AI Gen discovers legs from form + price + model (all bet types — not Elite-only). Max legs = ceiling, not a fill target.</div>
               </div>
             </div>
           </div>
@@ -1875,7 +1880,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.87</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.88</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2251,8 +2256,19 @@
   };
 
   
-  var APP_VERSION = '3.4.87';
+  var APP_VERSION = '3.4.88';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.88',
+      date: '2026-10-18',
+      title: 'AI Gen discovery — all bet types, not Elite-only',
+      items: [
+        'CHANGED — AI Parlay generate discovers legs from form + model + price across ML/spreads/totals/props.',
+        'CHANGED — Elite rank not required; Good/edge/form can qualify.',
+        'ADDED — Max legs 2–10 (ceiling only — never force-fill weak legs).',
+        'ADDED — Package P(hit) independent + adjusted; AI TAKE/PASS ticket desk output.'
+      ]
+    },
     {
       version: '3.4.87',
       date: '2026-10-17',
@@ -8676,65 +8692,158 @@ function renderSlate() {
   }
 
 
+  /** Discovery pool for AI Gen — form + model + price, ALL bet types (not Elite-only) */
+  function aiGenPool() {
+    var seen = {};
+    var rows = [];
+    (games || []).forEach(function (g) {
+      if (!g || !g.modelPick) return;
+      if (g.ended) return;
+      var mkt = g.market_probability != null ? Number(g.market_probability) : (g.impliedPct != null ? Number(g.impliedPct) : null);
+      if (mkt != null && mkt > 1) mkt = mkt / 100;
+      var mod = g.model_probability != null ? Number(g.model_probability) : null;
+      if (mod != null && mod > 1) mod = mod / 100;
+      // Tradeable band — skip extreme chalk/lottery for packages
+      if (mkt != null && (mkt < 0.18 || mkt > 0.82)) return;
+      var edge = null;
+      if (mod != null && mkt != null) edge = (mod - mkt) * 100;
+      var rk = String(g.rank || '').toLowerCase();
+      var hasForm = !!(g.formWinProb != null || (g.breakdown && (g.breakdown.homeL10 || g.breakdown.awayL10)));
+      // Qualify: soft edge, or Good/Elite, or form-supported lean — not rank-only
+      var ok = false;
+      if (edge != null && edge >= 2) ok = true;
+      if (rk === 'elite' || rk === 'good') ok = true;
+      if (hasForm && mod != null && mod >= 0.52 && (mkt == null || mod >= mkt - 0.02)) ok = true;
+      if (mod != null && mod >= 0.55 && mkt != null && mod >= mkt) ok = true;
+      if (!ok) return;
+      var k = String(g.id || '') + '|' + String(g.modelPick || '') + '|' + String(g.eventTitle || g.title || '') + '|' + String(g.marketType || '');
+      if (seen[k]) return;
+      seen[k] = true;
+      g._aiGenEdge = edge != null ? Math.round(edge * 10) / 10 : 0;
+      g._aiGenMkt = mkt;
+      g._aiGenMod = mod;
+      rows.push(g);
+    });
+    rows.sort(function (a, b) {
+      var ea = a._aiGenEdge || 0, eb = b._aiGenEdge || 0;
+      if (eb !== ea) return eb - ea;
+      return (b.betScore || 0) - (a.betScore || 0);
+    });
+    return rows;
+  }
+
   function buildParlayFromPool(n) {
-    n = Math.max(2, Math.min(5, Number(n) || 3));
-    var pool = slatePool().slice();
-    // Prefer different events
+    n = Math.max(2, Math.min(10, Number(n) || 3));
+    var pool = aiGenPool().slice();
     var usedEvents = {};
     var picked = [];
+    // Prefer independent events first
     pool.forEach(function (g) {
       if (picked.length >= n) return;
-      var ev = String(g.eventTitle || g.title || g.id || '');
+      var ev = String(g.eventTitle || g.title || g.id || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+      if (!ev) ev = String(g.id || Math.random());
       if (usedEvents[ev]) return;
       usedEvents[ev] = true;
       picked.push(g);
     });
-    // fill if needed
-    if (picked.length < n) {
+    // Optional same-game fill only if still short and remaining have real edge (thesis-friendly)
+    if (picked.length < Math.min(n, 2)) {
       pool.forEach(function (g) {
         if (picked.length >= n) return;
         if (picked.indexOf(g) >= 0) return;
+        if ((g._aiGenEdge || 0) < 3 && String(g.rank || '').toLowerCase() !== 'elite') return;
         picked.push(g);
       });
     }
+    // Do NOT force-fill to n with weak legs
     ticket = [];
     picked.forEach(function (g) {
-      addTicket(g, String(g.rank).toLowerCase() === 'elite' ? 1 : 0.5);
+      var u = String(g.rank || '').toLowerCase() === 'elite' ? 1 : 0.5;
+      addTicket(g, u);
     });
     return picked;
+  }
+
+  function parlayHitProb(picked) {
+    // Independent product of model %; adjusted haircut if same-game legs
+    var p = 1;
+    var any = false;
+    var events = {};
+    picked.forEach(function (g) {
+      var m = g._aiGenMod != null ? g._aiGenMod : g.model_probability;
+      if (m == null) return;
+      if (m > 1) m = m / 100;
+      if (m > 0 && m < 1) { p *= m; any = true; }
+      var ev = String(g.eventTitle || g.title || '').toLowerCase();
+      events[ev] = (events[ev] || 0) + 1;
+    });
+    if (!any) return { independent: null, adjusted: null };
+    var multi = 0;
+    Object.keys(events).forEach(function (k) { if (events[k] > 1) multi += events[k] - 1; });
+    var adj = p * (multi > 0 ? Math.pow(0.92, multi) : 1);
+    return {
+      independent: Math.round(p * 1000) / 10,
+      adjusted: Math.round(adj * 1000) / 10,
+      correlated: multi > 0
+    };
   }
 
   async function runAiParlayGenerate() {
     var out = $('parlay-ai-out');
     var n = Number(($('slate-legs') && $('slate-legs').value) || 3);
-    var picked = buildParlayFromPool(n);
-    if (!picked.length) {
-      if (out) out.textContent = 'No Good/Elite on the board. Load Scanner first.';
+    if (!Number.isFinite(n) || n < 2) n = 2;
+    if (n > 10) n = 10;
+    if (!(games && games.length)) {
+      if (out) out.textContent = 'No markets loaded. Run Scanner first, then AI Gen.';
       return;
     }
-    if (out) out.textContent = 'Built ' + picked.length + '-leg slip from top ranked independent events. Running AI ticket note…';
-    var st = settings();
+    if (out) out.textContent = 'AI Gen scanning all bet types (form · model · price)…';
+    var pool = aiGenPool();
+    var picked = buildParlayFromPool(n);
+    if (!picked.length) {
+      if (out) out.textContent = 'AI Gen found 0 legs. Pool candidates: ' + pool.length + '. Need form/model edge or Good/Elite with tradeable prices. Refresh Scanner with more markets.';
+      return;
+    }
+    var hit = parlayHitProb(picked);
+    var hitLine = hit.independent != null
+      ? ('P(hit) if independent ~' + hit.independent + '%' + (hit.correlated ? (' · adjusted ~' + hit.adjusted + '% (same-game haircut)') : ''))
+      : 'P(hit) n/a';
+    if (out) out.textContent = 'Found ' + picked.length + ' leg(s) of max ' + n + ' · ' + hitLine + '\\nRunning AI package review…';
     if (!getOpenAIKey()) {
-      if (out) out.textContent = 'Slip built (' + picked.length + ' legs). Add OpenAI key in Settings + Save for AI parlay write-up. Legs are on the slip — run AI Verdict when ready.';
+      var legLines0 = picked.map(function (g, i) {
+        var mk = g._aiGenMkt; if (mk != null) mk = Math.round(mk * 1000) / 10;
+        var md = g._aiGenMod; if (md != null) md = Math.round(md * 1000) / 10;
+        var eg = g._aiGenEdge != null ? g._aiGenEdge : '';
+        return (i + 1) + ') ' + (g.modelPick || '?') + ' · ' + (g.eventTitle || g.title || '') +
+          ' · ' + String(g.marketType || 'ml') + ' · ' + (g.rank || 'disc') +
+          ' · mkt ' + (mk != null ? mk + '%' : '—') + ' model ' + (md != null ? md + '%' : '—') +
+          (eg !== '' ? ' edge +' + eg + 'pp' : '');
+      }).join('\\n');
+      if (out) out.textContent = 'AI PACKAGE (' + picked.length + ' legs · discovery, not Elite-only)\\n' + hitLine + '\\n\\n' + legLines0 +
+        '\\n\\nAdd OpenAI key for full thesis / TAKE-PASS review. Slip is ready.';
       return;
     }
     try {
       var payload = {
         marketType: 'parlay',
         league: 'multi',
-        eventTitle: 'Parlay ' + picked.length + ' legs',
-        title: 'Parlay builder',
+        eventTitle: 'AI Gen package ' + picked.length + ' legs',
+        title: 'AI discovery parlay',
         modelPick: picked.map(function (g) { return g.modelPick; }).join(' + '),
-        rank: 'Good',
+        rank: 'Discovery',
+        hitProbIndependent: hit.independent,
+        hitProbAdjusted: hit.adjusted,
         legs: picked.map(function (g) {
           return {
             pick: g.modelPick,
             event: g.eventTitle || g.title,
-            rank: g.rank,
-            model: g.model_probability,
-            market: g.market_probability,
+            rank: g.rank || 'discovery',
+            model: g._aiGenMod != null ? Math.round(g._aiGenMod * 1000) / 10 : g.model_probability,
+            market: g._aiGenMkt != null ? Math.round(g._aiGenMkt * 1000) / 10 : g.market_probability,
+            edgePp: g._aiGenEdge,
             league: g.league,
-            marketType: g.marketType
+            marketType: g.marketType || 'moneyline',
+            form: g.formWinProb != null ? Math.round(Number(g.formWinProb) * 1000) / 10 : null
           };
         })
       };
@@ -8745,26 +8854,32 @@ function renderSlate() {
           apiKey: getOpenAIKey(),
           game: payload,
           parlayMode: true,
-          systemHint: 'You are a sharp sports betting analyst. For this parlay: (1) list each leg with market vs model, (2) correlation risk (same game / same side of total), (3) pass or play with one clear reason, (4) never invent injuries or scores.'
+          system: 'You are an independent sports ticket desk. Legs were discovered from form/model/price across ALL bet types (not Elite-only). Be unbiased.\\n\\nOutput exactly:\\nTICKET: TAKE | LEAN_TAKE | CAUTION | PASS\\nCONVICTION: HIGH|MEDIUM|LOW\\nP_HIT: comment on independent vs adjusted if given\\nCORRELATION: clean | mild | bad\\nWEAKEST_LEG: which + why\\nTHESIS: 3-5 neutral sentences on why these legs were packaged\\nLEGS: one line each\\nBOTTOM: one line\\n\\nRules: Do not invent injuries. Do not force TAKE. Parlays are higher variance. Prefer coherent packages over random stacks.'
         })
       });
       var d = await r.json();
       if (!d.ok) {
-        if (out) out.textContent = 'Slip built. AI note failed: ' + (d.error || 'error');
+        if (out) out.textContent = 'Slip built (' + picked.length + '). AI failed: ' + (d.error || 'error');
         return;
       }
       if (out) {
         var legLines = picked.map(function (g, i) {
-          var mk = g.market_probability; if (mk != null && mk <= 1) mk = Math.round(mk * 1000) / 10;
-          var md = g.model_probability; if (md != null && md <= 1) md = Math.round(md * 1000) / 10;
-          return (i + 1) + ') ' + (g.modelPick || '?') + ' · ' + (g.eventTitle || g.title || '') + ' · ' + (g.rank || '') + ' · mkt ' + (mk != null ? mk + '%' : '—') + ' model ' + (md != null ? md + '%' : '—');
-        }).join('\n');
-        out.textContent = 'SLIP (' + picked.length + ' legs)\n' + legLines + '\n\n' + (d.text || 'AI note ready. Review correlation — same-game legs stack risk.');
+          var mk = g._aiGenMkt; if (mk != null) mk = Math.round(mk * 1000) / 10;
+          var md = g._aiGenMod; if (md != null) md = Math.round(md * 1000) / 10;
+          var eg = g._aiGenEdge != null ? ('+' + g._aiGenEdge + 'pp') : '';
+          return (i + 1) + ') ' + (g.modelPick || '?') + ' · ' + (g.eventTitle || g.title || '') +
+            ' · ' + String(g.marketType || 'ml') + ' · ' + (g.rank || 'disc') +
+            ' · mkt ' + (mk != null ? mk + '%' : '—') + ' model ' + (md != null ? md + '%' : '—') +
+            (eg ? ' edge ' + eg : '');
+        }).join('\\n');
+        out.textContent = 'AI PACKAGE (' + picked.length + ' of max ' + n + ' · discovery)\\n' + hitLine +
+          '\\n\\n' + legLines + '\\n\\n' + (d.text || '');
       }
     } catch (e) {
-      if (out) out.textContent = 'Slip built. AI note error: ' + (e.message || e);
+      if (out) out.textContent = 'Slip built. AI error: ' + (e.message || e);
     }
   }
+
 
   async function runAiVerdictLegs() {
     var out = $('parlay-ai-out');
