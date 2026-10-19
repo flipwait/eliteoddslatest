@@ -14,6 +14,8 @@ const { buildLiveAnalysis } = require('../lib/live');
 let attachEspnLiveBatch = null;
 try { attachEspnLiveBatch = require('../lib/espn').attachEspnLiveBatch; } catch (e) {}
 const { enrichMlbMatchup } = require('../lib/mlb');
+let enrichPlayerProps = async (g) => g;
+try { enrichPlayerProps = require('../lib/playerProps').enrichPlayerProps; } catch (e) {}
 
 
 function nameHit(a, b) {
@@ -124,16 +126,38 @@ module.exports = async function handler(req, res) {
       if (uniqueTitles.length >= 10) break;
     }
 
+    function titleVariants(raw) {
+      const t0 = String(raw || '').trim();
+      const out = [];
+      const add = (x) => {
+        const s = String(x || '').replace(/\s+/g, ' ').trim();
+        if (s && out.indexOf(s) < 0) out.push(s);
+      };
+      add(t0);
+      add(t0.replace(/\s*[·|].*$/, ''));
+      add(t0.replace(/\s*[·|]\s*(Spread|Total|NRFI|YRFI|F5).*$/i, ''));
+      add(t0.replace(/\s+vs\.?\s+/i, ' vs. '));
+      add(t0.replace(/\s+vs\.?\s+/i, ' vs '));
+      add(t0.replace(/\s+at\s+/i, ' at '));
+      // Strip city-only noise and trailing ML
+      add(t0.replace(/\s+ML$/i, ''));
+      return out;
+    }
+
     const matchupCache = {};
     await Promise.all(
       uniqueTitles.map(async (title) => {
         try {
           const pandascoreToken = String(q.pandascore || q.pandascoreToken || process.env.PANDASCORE_TOKEN || '').trim();
           let m = null;
-          if (isEsportsLeague(league) || league === 'esports') {
-            m = await matchupForEsports(league === 'esports' ? 'cs2' : league, title, { pandascoreToken });
-          } else {
-            m = await matchupForEvent(league, title);
+          const variants = titleVariants(title);
+          for (const vt of variants) {
+            if (isEsportsLeague(league) || league === 'esports' || /cs2|lol|dota|valorant|cod/.test(String(league))) {
+              m = await matchupForEsports(league === 'esports' ? 'cs2' : league, vt, { pandascoreToken });
+            } else {
+              m = await matchupForEvent(league, vt);
+            }
+            if (m && (m.hasForm || m.homeL10 || m.homeName)) break;
           }
           if (m && league === 'mlb') {
             try {
@@ -143,14 +167,24 @@ module.exports = async function handler(req, res) {
           if (m) {
             m.league = league;
             matchupCache[title] = m;
+            // alias all variants to same matchup
+            variants.forEach((vt) => { matchupCache[vt] = m; });
           }
         } catch (e) {}
       })
     );
 
+    try {
+      await enrichPlayerProps(capped.slice(0, 60), league);
+    } catch (eProp) {}
+
     const out = [];
     for (const g of capped.slice(0, 60)) {
-      const matchup = matchupCache[g.eventTitle] || null;
+      let matchup = matchupCache[g.eventTitle] || matchupCache[g.title] || null;
+      if (!matchup && g.eventTitle) {
+        const alts = String(g.eventTitle).replace(/\s*[·|].*$/, '').trim();
+        matchup = matchupCache[alts] || null;
+      }
       // Dual team-win markets: order sides as [home, away] and price YES = home
       if (g._kalshiDualTeam && matchup && matchup.homeName && g.sides && g.sides.length >= 2) {
         const s0 = g.sides[0];
@@ -170,33 +204,66 @@ module.exports = async function handler(req, res) {
       if (g._kalshiDualTeam && matchup && matchup.homeName && g.sides && g.sides[0] && nameHit(g.sides[0].name, matchup.homeName)) {
         yesIsHome = true;
       }
+      const lineVal =
+        g.spreadLine != null && !isNaN(Number(g.spreadLine))
+          ? Number(g.spreadLine)
+          : g.totalLine != null && !isNaN(Number(g.totalLine))
+            ? Number(g.totalLine)
+            : g.line != null && !isNaN(Number(g.line))
+              ? Number(g.line)
+              : null;
       const sc = buildSignal(
         {
           id: g.marketSlug || g.id,
-          question: g.title,
+          question: g.title || g.eventTitle,
           yesPrice: g.yesPrice,
           noPrice: g.noPrice,
           volume: g.volume,
           liquidity: g.liquidity,
           matchup,
-          league,
+          league: league || g.league,
           marketType: g.marketType || 'moneyline',
-          live: false,
-          eventTitle: g.eventTitle,
+          line: lineVal,
+          spreadLine: g.spreadLine != null ? Number(g.spreadLine) : null,
+          totalLine: g.totalLine != null ? Number(g.totalLine) : null,
+          live: !!g.live,
+          eventTitle: g.eventTitle || g.title,
           url: g.url,
           venue: 'kalshi',
           source: 'kalshi',
           yesIsHome,
+          pickHint: g.pickHint || null,
+          sides: g.sides,
+          playerProp: g.playerProp || null,
+          propProjection: g.propProjection,
+          propPlayer: g.propPlayer,
         },
         {
           strictTruth: q.strict !== '0',
           allowMarketGood: q.allowMarketGood === '1',
+          kalshiThinBook: true,
         }
       );
 
+      // Prefer Kalshi structured labels for spreads/totals (avoid fake Away -1.5 1H)
+      let modelPick = sc.pickName || (sc.side === 'YES'
+        ? (g.sides && g.sides[0] && g.sides[0].name)
+        : (g.sides && g.sides[1] && g.sides[1].name));
+      const mt = String(g.marketType || '').toLowerCase();
+      if (g.pickHint && (/spread|total|nrfi|yrfi|f5/.test(mt))) {
+        if (sc.side === 'YES' || sc.side === 'yes') modelPick = g.sides[0] && g.sides[0].name || g.pickHint;
+        else if (g.sides && g.sides[1]) modelPick = g.sides[1].name;
+      }
+      // Strip bogus "ML" suffix on non-ML titles
+      let cardTitle = g.title;
+      if (mt && mt !== 'moneyline' && /\sML$/i.test(String(cardTitle || ''))) {
+        cardTitle = String(cardTitle).replace(/\sML$/i, '');
+      }
+
       const card = {
         ...g,
-        modelPick: sc.pickName || (sc.side === 'YES' ? g.sides[0].name : g.sides[1].name),
+        title: cardTitle || g.title,
+        modelPick,
         rank: sc.rank,
         betScore: sc.betScore,
         netEdge: sc.netEdge,

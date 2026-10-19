@@ -102,7 +102,7 @@ module.exports = async function handler(req, res) {
         ok: true,
         experimental: true,
         service: 'combo',
-        note: 'POST { action: estimate|create, legs: [{ symbol, side, price01? }] }',
+        note: 'POST { action: estimate|create|trade, legs, comboSymbol?, dollars? }',
       });
     }
     if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
@@ -219,7 +219,99 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    return res.status(400).json({ error: 'action must be estimate or create' });
+    if (action === 'trade') {
+      // Experimental: MARKET order on combo symbol (caoc- / crossd-)
+      const comboSymbol = String(body.comboSymbol || body.symbol || body.comboId || '').trim();
+      const est = estimateCombo(legsIn);
+      if (!comboSymbol || !/^(caoc-|crossd-)/i.test(comboSymbol)) {
+        return res.status(400).json({
+          ok: false,
+          experimental: true,
+          error: 'Need combo symbol (caoc-… / crossd-…) from Live create first.',
+          estimate: est,
+        });
+      }
+      let dollars = Number(body.dollars != null ? body.dollars : body.cost);
+      if (!Number.isFinite(dollars) || dollars <= 0) dollars = 10;
+      if (dollars > 500) dollars = 500;
+      const mode = String(body.mode || 'dry-run').toLowerCase();
+      if (mode === 'paper' || mode === 'dry-run' || mode === 'dry' || body.dryRun) {
+        return res.status(200).json({
+          ok: true,
+          experimental: true,
+          mode: mode === 'paper' ? 'paper' : 'dry-run',
+          message: 'Would MARKET-buy ~$' + dollars + ' on combo ' + comboSymbol + ' (not submitted).',
+          comboSymbol,
+          dollars,
+          estimate: est,
+        });
+      }
+      const apiKey = String(body.apiKey || body.pmApiKey || process.env.PM_API_KEY || '').trim();
+      const apiSecret = String(body.apiSecret || body.pmApiSecret || process.env.PM_API_SECRET || '').trim();
+      if (!apiKey || !apiSecret) {
+        return res.status(400).json({
+          ok: false,
+          experimental: true,
+          error: 'Live trade needs Polymarket API Key + Secret (same as auto-trade).',
+          comboSymbol,
+        });
+      }
+      const base = process.env.POLYMARKET_US_API || 'https://api.polymarket.us';
+      // Prefer order on combo symbol; path mirrors single-market orders
+      const path = '/v1/orders';
+      const { timestamp, signature } = signPolymarket('POST', path, apiSecret);
+      // qty as dollar cost; exchange converts via price — use protective 0.99
+      const orderBody = {
+        marketSlug: comboSymbol,
+        type: 'ORDER_TYPE_MARKET',
+        quantity: dollars,
+        tif: 'TIME_IN_FORCE_IMMEDIATE_OR_CANCEL',
+        intent: 'ORDER_INTENT_BUY_LONG',
+        manualOrderIndicator: 'MANUAL_ORDER_INDICATOR_MANUAL',
+        price: { value: '0.990', currency: 'USD' },
+      };
+      const r = await fetch(base + path, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'X-PM-Access-Key': apiKey,
+          'X-PM-Timestamp': timestamp,
+          'X-PM-Signature': signature,
+        },
+        body: JSON.stringify(orderBody),
+      });
+      const text = await r.text();
+      let data = null;
+      try { data = JSON.parse(text); } catch (e) { data = { raw: text.slice(0, 600) }; }
+      if (!r.ok) {
+        return res.status(200).json({
+          ok: false,
+          experimental: true,
+          mode: 'live',
+          httpStatus: r.status,
+          error: (data && (data.error || data.message)) || ('HTTP ' + r.status),
+          detail: data,
+          comboSymbol,
+          dollars,
+          hint: 'If orders reject combo symbols, use RFQ in the PM app on this instrument, or Build a Combo manually.',
+        });
+      }
+      const orderId = (data && (data.orderId || data.id || (data.order && data.order.id))) || null;
+      return res.status(200).json({
+        ok: true,
+        experimental: true,
+        mode: 'live',
+        message: 'Combo MARKET order submitted ~$' + dollars + ' on ' + comboSymbol + (orderId ? (' · ' + orderId) : ''),
+        order: data,
+        orderId,
+        comboSymbol,
+        dollars,
+        estimate: est,
+      });
+    }
+
+    return res.status(400).json({ error: 'action must be estimate, create, or trade' });
   } catch (e) {
     return res.status(500).json({
       ok: false,

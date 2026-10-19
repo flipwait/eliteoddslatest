@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.96</title>
+  <title>EliteOdds v3.4.105</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.96</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.105</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1485,6 +1485,10 @@
                     <button type="button" id="ticket-combo-live" class="py-2 rounded-lg bg-amber-600/20 text-amber-100 border border-amber-500/50 text-xs">Live create ⚠</button>
                     <button type="button" id="ticket-combo-manual" class="py-2 rounded-lg border border-bb-border text-bb-muted text-xs">Open PM app</button>
                   </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <label class="text-[10px] text-bb-muted flex items-center gap-1">$ <input type="number" id="ticket-combo-dollars" min="1" max="500" step="1" value="10" class="w-16 bg-bb-bg border border-bb-border rounded px-1.5 py-1 text-xs text-white" title="Stake for Trade combo"/></label>
+                    <button type="button" id="ticket-combo-trade" class="py-2 rounded-lg bg-emerald-600/25 text-emerald-200 border border-emerald-500/50 text-xs font-semibold" title="After Live create: MARKET buy combo symbol">Trade combo ⚠</button>
+                  </div>
                   <div id="combo-exp-out" class="text-[10px] text-bb-muted whitespace-pre-wrap max-h-28 overflow-y-auto"></div>
                   <div class="grid grid-cols-2 gap-2">
                     <button type="button" id="ticket-discord" class="py-2 rounded-lg bg-[#5865F2]/25 text-[#5865F2] border border-[#5865F2]/40 text-xs">Discord slip</button>
@@ -1893,7 +1897,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.96</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.105</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2269,8 +2273,105 @@
   };
 
   
-  var APP_VERSION = '3.4.96';
+  var APP_VERSION = '3.4.105';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.105',
+      date: '2026-10-19',
+      title: 'Player props — ESPN L10/season model (Poly + Kalshi)',
+      items: [
+        'ADDED — lib/playerProps.js: ESPN athlete search + overview/gamelog → projection vs line.',
+        'ADDED — evaluatePlayerPropSide uses projection for P(Over), Good/Elite with real edge.',
+        'WIRED — enrichPlayerProps on Kalshi and Polymarket scans (pass/rush/rec yds, pts, reb, HR, Ks, etc.).',
+        'FALLBACK — market-only if player/line cannot be parsed or ESPN miss.'
+      ]
+    },
+    {
+      version: '3.4.104',
+      date: '2026-10-19',
+      title: 'Kalshi model parity — line, form, NRFI, props, team totals',
+      items: [
+        'FIXED — Kalshi buildSignal receives line/spreadLine/totalLine (spread & total edge track real lines).',
+        'FIXED — ESPN/Panda title variants for Kalshi matchup (more hasForm).',
+        'FIXED — NRFI Good/Elite only with team 1st-inning n≥8; league prior surfaces as Pass.',
+        'ADDED — Player prop evaluator (both venues); Good/Elite only with real edge + mid price.',
+        'CHANGED — Team totals use totals branch; totals without projection stay market-only.',
+        'CHANGED — Thin Kalshi books need slightly higher edge for Good; form weight +0.03 (was +0.06).',
+        'Kalshi esports uses matchupForEsports (PandaScore) when league is esports.'
+      ]
+    },
+    {
+      version: '3.4.103',
+      date: '2026-10-19',
+      title: 'Kalshi parity — classify, lines, startTimeSource',
+      items: [
+        'FIXED — "wins by over X points" classified as spread (not ML); pick shows Team -X not Away -1.5 (1H).',
+        'FIXED — Totals/NRFI/YRFI get proper Over/Under and NRFI labels.',
+        'FIXED — startTimeSource set on moneyline and non-ML rows (kalshi-est / kalshi-explicit / espn).',
+        'CHANGED — Card titles for spreads/totals include line; Trade still uses market ticker.'
+      ]
+    },
+    {
+      version: '3.4.102',
+      date: '2026-10-19',
+      title: 'Kalshi/Poly times always Eastern (ET)',
+      items: [
+        'FIXED — All card/modal/calendar times use America/New_York and show ET.',
+        'NOTE — Deploy this build: v3.4.96 still showed raw Kalshi occurrence (~3h late → e.g. 11:08 PM ET instead of ~8:08 PM ET).',
+        'Kalshi kickoff = occurrence − contest length; ESPN date overrides when matched.'
+      ]
+    },
+    {
+      version: '3.4.101',
+      date: '2026-10-19',
+      title: 'Game times always Eastern (ET)',
+      items: [
+        'FIXED — Card times use America/New_York and show ET (not device local only).',
+        'NOTE — Deploy past 3.4.96 required for Kalshi kickoff fix (occurrence − duration).',
+        'Kalshi expected_expiration is hours after start; we estimate tip-off then display in ET.'
+      ]
+    },
+    {
+      version: '3.4.100',
+      date: '2026-10-19',
+      title: 'POTD keys — Vercel env only',
+      items: [
+        'SECURITY — /api/potd ignores oddsKey/openaiKey query params (never log secrets in URLs).',
+        'USE — Set ODDS_API_KEY and OPENAI_API_KEY in Vercel Environment Variables.',
+        'Response includes envHint when keys missing so deploy is easy to verify.'
+      ]
+    },
+    {
+      version: '3.4.99',
+      date: '2026-10-19',
+      title: 'Kalshi kickoff times · POTD keys env-only',
+      items: [
+        'FIXED — Kalshi startTime: occurrence/expected_expiration treated as near end-of-game; subtract typical duration (~3h NFL/MLB) for kickoff.',
+        'FIXED — Kalshi live/ended flags from adjusted start (started games no longer look pregame).',
+        'SECURITY — /api/potd reads ODDS_API_KEY and OPENAI_API_KEY from server env only (query keys ignored).'
+      ]
+    },
+    {
+      version: '3.4.98',
+      date: '2026-10-19',
+      title: 'GET /api/potd read-only + trading-app package',
+      items: [
+        'ADDED — GET /api/potd?venue=&sport=&max=&window=&ai=1 (score, consensus %, AI conviction/signal/thesis).',
+        'ADDED — lib/potd.js shared selection logic for integration.',
+        'PACKAGE — eliteodds-trading-integration zip for drop-in trading apps.'
+      ]
+    },
+    {
+      version: '3.4.97',
+      date: '2026-10-19',
+      title: 'Trade combo · POTD edge loosen · O/U path · Odds optional',
+      items: [
+        'ADDED — Trade combo ⚠ after Live create (MARKET ~$ stake on caoc-/crossd- symbol).',
+        'CHANGED — POTD edge min 4pp (was 5); alt lines +7pp (was +9).',
+        'CHANGED — O/U / F5 totals can qualify with edge ≥6 without full role form.',
+        'CHANGED — Odds API key optional for POTD (consensus is a boost, not a hard gate).'
+      ]
+    },
     {
       version: '3.4.96',
       date: '2026-10-18',
@@ -3706,17 +3807,19 @@
     if (r === 'good') return 'rank-good';
     return 'rank-pass';
   }
+  // Always show game times in US Eastern so Kalshi/Poly cards match TV schedules
+  var EO_TZ = 'America/New_York';
   function formatGameWhen(iso, isLive, isFinal) {
     var d = iso ? new Date(iso) : null;
     var valid = d && !isNaN(d.getTime());
-    var timeStr = valid ? d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : '';
+    var timeOpts = { hour: 'numeric', minute: '2-digit', timeZone: EO_TZ };
+    var dateOpts = { month: 'short', day: 'numeric', timeZone: EO_TZ };
+    var timeStr = valid ? d.toLocaleTimeString('en-US', timeOpts) + ' ET' : '';
     if (isFinal) {
       if (!valid) return 'Final';
-      // Finals: always calendar date of the contest, never "Tomorrow"
-      var dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      var dateStr = d.toLocaleDateString('en-US', dateOpts);
       return 'Final · ' + dateStr + ' · ' + timeStr;
     }
-    // Live games must never read as "Tomorrow" even if listed start is off
     if (isLive) {
       if (valid) {
         var nowL = new Date();
@@ -3729,19 +3832,26 @@
     }
     if (!valid) return '';
     var now = new Date();
-    // If listed start is in the past by >4h and not live, treat as already played window
     if (d.getTime() < now.getTime() - 4 * 3600 * 1000) {
-      var dateStr2 = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      var dateStr2 = d.toLocaleDateString('en-US', dateOpts);
       return dateStr2 + ' · ' + timeStr + ' (past)';
     }
-    var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    var startOfThat = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-    var dayDiff = Math.round((startOfThat - startOfToday) / 86400000);
+    // Day label in Eastern (not device local)
+    function etYmd(dt) {
+      return dt.toLocaleDateString('en-CA', { timeZone: EO_TZ }); // YYYY-MM-DD
+    }
+    var todayEt = etYmd(now);
+    var thatEt = etYmd(d);
     var dayLabel = 'Today';
-    if (dayDiff === 1) dayLabel = 'Tomorrow';
-    else if (dayDiff === -1) dayLabel = 'Yesterday';
-    else if (dayDiff > 1) dayLabel = d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-    else if (dayDiff < -1) dayLabel = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    if (thatEt > todayEt) {
+      var t0 = new Date(todayEt + 'T12:00:00Z').getTime();
+      var t1 = new Date(thatEt + 'T12:00:00Z').getTime();
+      var dayDiff = Math.round((t1 - t0) / 86400000);
+      if (dayDiff === 1) dayLabel = 'Tomorrow';
+      else dayLabel = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: EO_TZ });
+    } else if (thatEt < todayEt) {
+      dayLabel = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: EO_TZ });
+    }
     return dayLabel + ' · ' + timeStr;
   }
 
@@ -4418,7 +4528,7 @@
     var when = '';
     if (g.startTime) {
       try {
-        when = new Date(g.startTime).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+        when = formatGameWhen(g.startTime, !!(g.live || g.isLive), !!(g.ended));
       } catch (e) { when = ''; }
     }
     var res = String(g.result || '').toLowerCase();
@@ -5683,10 +5793,10 @@
   }
   function formatGameDateTime(iso) {
     if (!iso) return '';
-    try {
-      var dt = new Date(iso);
-      if (isNaN(dt.getTime())) return '';
-      return dt.toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: EO_TZ }) + ' ET';
+  });
     } catch (e) { return ''; }
   }
   function logBet(g) {
@@ -6399,7 +6509,7 @@
         try {
           var dt = new Date(e.startTime);
           if (!isNaN(dt.getTime())) {
-            whenStr = dt.toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+            whenStr = formatGameWhen(e.startTime, false, false);
           }
         } catch (err) {}
       }
@@ -7790,9 +7900,9 @@
     var venue = seVal(root, 'se-venue') || 'polymarket';
     var sp = seVal(root, 'se-sport') || 'all';
     var mt = 'all'; // POTD always cross-market
-    // Fixed hit-rate house model — not user-tunable
+    // Fixed hit-rate house model — slightly loosened edge; more O/U friendly
     var modelMin = 55;
-    var edgeMin = 5;
+    var edgeMin = 4;
     var maxPicks = Number(seVal(root, 'se-max') || 3);
     if (!Number.isFinite(maxPicks) || maxPicks < 1) maxPicks = 3;
     if (maxPicks > 5) maxPicks = 5;
@@ -7814,11 +7924,7 @@
     }
     var oddsKey0 = (($('odds-key') && $('odds-key').value) || (settings().oddsKey || '')).trim();
     var aiKey0 = (($('openai') && $('openai').value) || (settings().openai || '')).trim();
-    if (!oddsKey0) {
-      setMsg('<p class="text-amber-200/90 text-[11px] leading-relaxed"><b>Odds API key required</b> for POTD consensus.<br>' +
-        '<span class="text-bb-muted">Add it in Settings. OpenAI only needed if you enable AI analyzer.</span></p>');
-      return;
-    }
+    // Odds API optional — consensus boost only when key present
     if (useAiAnalyze && !aiKey0) {
       setMsg('<p class="text-amber-200/90 text-[11px]">Enable AI analyzer requires <b>OpenAI</b> key in Settings (or uncheck Auto-run AI).</p>');
       return;
@@ -7914,18 +8020,23 @@
 
         // Main-line preference: near 50¢ gets full credit; edges need extra edge
         var nearMain = mkt >= MAIN_LINE_LO && mkt <= MAIN_LINE_HI;
-        if (!nearMain && edge < edgeMin + 4) return false; // alts need +9pp
+        if (!nearMain && edge < edgeMin + 3) return false; // alts need +7pp (loosened)
         if (nearMain) diag.main++;
 
         var rf = seRoleForm(g);
-        // Form required for hit rate
-        if (!rf || !rf.hasRole) return false;
-        // Model side should not fight form when form is clear
-        if (rf.formLeanHome != null && rf.gap != null && rf.gap >= 0.08) {
+        var isTotalish = /total|over|under|f5_total|nrfi|yrfi/.test(String(g.marketType || g.scanType || '').toLowerCase())
+          || /\b(over|under)\b/i.test(String(g.modelPick || g.pick || ''));
+        // Form required for ML/spreads; O/U can pass with solid edge when form thin
+        if (!rf || !rf.hasRole) {
+          if (!(isTotalish && edge >= 6)) return false;
+          rf = rf || { hasRole: false, pickWR: null, formLeanHome: null, gap: null };
+        }
+        // Model side should not fight form when form is clear (ML/spreads)
+        if (!isTotalish && rf.formLeanHome != null && rf.gap != null && rf.gap >= 0.08) {
           if (rf.pickHome !== rf.formLeanHome) return false;
         }
         // Soft form floor: pick side WR if known
-        if (rf.pickWR != null && rf.pickWR < 0.45 && edge < 8) return false;
+        if (rf.pickWR != null && rf.pickWR < 0.45 && edge < 7) return false;
 
         // H2H as form context only — never veto
         var b = seBreakdown(g);
@@ -8076,7 +8187,7 @@
           });
           potdHistoryRender();
         } catch (eN) {}
-        setMsg('<p class="text-bb-muted">No Pick of the Day — strict hit-rate bar (form + price + edge + consensus + AI). Empty is OK.<br><span class="text-[10px]">Pool ' + diag.pool + ' · sport ' + diag.sport + ' · market ' + diag.market + ' · rank ' + diag.rank + ' · model≥' + modelMin + ' ' + diag.model + ' · edge≥' + edgeMin + ' ' + diag.edge + ' · final ' + diag.pass + '</span><br><span class="text-[10px]">Tip: set Market to <b>All markets</b> or <b>Full game O/U</b> if your Elites are totals. Load Scan for that venue first.</span></p>');
+        setMsg('<p class="text-bb-muted">No Pick of the Day — hit-rate bar (form · price · edge≥4 · O/U edge≥6 ok without full form). Empty is OK. Odds key optional (consensus boost only).<br><span class="text-[10px]">Pool ' + diag.pool + ' · sport ' + diag.sport + ' · market ' + diag.market + ' · rank ' + diag.rank + ' · model≥' + modelMin + ' ' + diag.model + ' · edge≥' + edgeMin + ' ' + diag.edge + ' · final ' + diag.pass + '</span><br><span class="text-[10px]">Tip: set Market to <b>All markets</b> or <b>Full game O/U</b> if your Elites are totals. Load Scan for that venue first.</span></p>');
         return;
       }
       setMsg(top.map(function (g, i) {
@@ -8693,7 +8804,7 @@ function renderSlate() {
           when = formatGameWhen(g.startTime, !!g.live, !!g.ended);
         } else if (g.startTime) {
           var dd = new Date(g.startTime);
-          if (!isNaN(dd.getTime())) when = dd.toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+          if (!isNaN(dd.getTime())) when = dd.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: EO_TZ }) + ' ET';
         }
       } catch (eW) {}
       return '<div class="glass px-3 py-2.5 flex flex-wrap items-center gap-2 justify-between" data-slate-i="' + i + '">' +
@@ -8800,7 +8911,7 @@ function renderSlate() {
           when = formatGameWhen(x.startTime || x.at, !!x.live, !!x.ended);
         } else if (x.startTime) {
           var dd = new Date(x.startTime);
-          if (!isNaN(dd.getTime())) when = dd.toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+          if (!isNaN(dd.getTime())) when = dd.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: EO_TZ }) + ' ET';
         }
       } catch (eW) {}
       return '<div class="rounded-lg border border-bb-border p-2 bg-bb-elev/40">' +
@@ -8958,16 +9069,68 @@ function renderSlate() {
           lines.push('(RFQ on PM will differ)');
         }
         if (d.combo && (d.combo.id || d.combo.symbol)) {
-          lines.push('Combo id: ' + (d.combo.id || d.combo.symbol));
+          var cid = d.combo.id || d.combo.symbol;
+          lines.push('Combo id: ' + cid);
+          try { window.__lastComboSymbol = cid; localStorage.setItem('bb_last_combo', cid); } catch (eC) {}
+          lines.push('→ Use Trade combo to MARKET-buy this instrument.');
+        }
+        if (d.comboSymbol) {
+          try { window.__lastComboSymbol = d.comboSymbol; localStorage.setItem('bb_last_combo', d.comboSymbol); } catch (eC2) {}
         }
         if (d.manualHint) lines.push(d.manualHint);
         if (d.wouldCreate && d.wouldCreate.legs) {
           lines.push('Legs: ' + d.wouldCreate.legs.map(function (L) { return L.symbol; }).join(', '));
         }
+        if (d.orderId) lines.push('Order: ' + d.orderId);
         out.textContent = lines.filter(Boolean).join('\n');
       }
     } catch (e) {
       if (out) out.textContent = 'Combo error: ' + String(e.message || e);
+    }
+  }
+
+  async function runComboTrade() {
+    var out = $('combo-exp-out');
+    var st = settings();
+    var cid = window.__lastComboSymbol || '';
+    try { if (!cid) cid = localStorage.getItem('bb_last_combo') || ''; } catch (e) {}
+    if (!cid) {
+      if (out) out.textContent = 'No combo symbol yet — run Live create first (or paste caoc-… / crossd-…).';
+      return;
+    }
+    var dollars = Number(($('ticket-combo-dollars') && $('ticket-combo-dollars').value) || 10);
+    if (!Number.isFinite(dollars) || dollars < 1) dollars = 10;
+    if (!confirm('EXPERIMENTAL Trade combo\n\nMARKET buy ~$' + dollars + ' on\n' + cid + '\n\nConfirm live order?')) {
+      if (out) out.textContent = 'Trade cancelled.';
+      return;
+    }
+    if (out) out.textContent = 'Trading combo ' + cid + '…';
+    try {
+      var r = await fetch('/api/combo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'trade',
+          mode: 'live',
+          comboSymbol: cid,
+          dollars: dollars,
+          apiKey: st.pmApiKey || '',
+          apiSecret: st.pmApiSecret || '',
+          legs: ticketLegsForCombo(),
+        }),
+      });
+      var d = await r.json();
+      if (out) {
+        out.textContent = [
+          d.experimental ? '[EXPERIMENTAL]' : '',
+          d.message || '',
+          d.error ? ('Error: ' + d.error) : '',
+          d.hint || '',
+          d.orderId ? ('Order ' + d.orderId) : '',
+        ].filter(Boolean).join('\n');
+      }
+    } catch (e) {
+      if (out) out.textContent = 'Trade error: ' + String(e.message || e);
     }
   }
 
@@ -9278,7 +9441,7 @@ function renderSlate() {
     var when = '';
     if (g.startTime) {
       try {
-        when = new Date(g.startTime).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+        when = formatGameWhen(g.startTime, !!(g.live || g.isLive), !!(g.ended));
       } catch (e) { when = ''; }
     }
     var score10 = g.score10 != null ? g.score10 : Math.max(1, Math.min(10, Math.round((Number(g.betScore) || 50) / 10)));
@@ -10209,6 +10372,7 @@ function renderSlate() {
   if ($('ticket-combo-dry')) $('ticket-combo-dry').onclick = function () { runComboExperimental('dry-run'); };
   if ($('ticket-combo-live')) $('ticket-combo-live').onclick = function () { runComboExperimental('live'); };
   if ($('ticket-combo-manual')) $('ticket-combo-manual').onclick = function () { runComboExperimental('manual'); };
+  if ($('ticket-combo-trade')) $('ticket-combo-trade').onclick = function () { runComboTrade(); };
 
   var sv = document.getElementById('slate-verdict-legs');
   if (sv) sv.onclick = runAiVerdictLegs;

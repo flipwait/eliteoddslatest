@@ -23,6 +23,8 @@ let isEsportsLeague = () => false;
 let esportsNameInTitle = null;
 try {
   const esMod = require('../lib/esports');
+let enrichPlayerProps = async (g) => g;
+try { enrichPlayerProps = require('../lib/playerProps').enrichPlayerProps; } catch (e) {}
   matchupForEsports = esMod.matchupForEsports || matchupForEsports;
   isEsportsLeague = esMod.isEsportsLeague || isEsportsLeague;
   esportsNameInTitle = esMod.esportsNameInTitle || null;
@@ -389,6 +391,14 @@ function scoreOne(m, ev, matchup, rankOpts, yesIsHome) {
     bookImbalance: book ? book.imbalance : null,
     matchup: matchup || null,
     marketType: classifyMarket(m),
+    playerProp: m.playerProp || null,
+    propProjection: m.propProjection,
+    propPlayer: m.propPlayer,
+    line: m.line != null ? Number(m.line) : (m.playerProp && m.playerProp.line != null ? Number(m.playerProp.line) : null),
+    playerProp: m.playerProp || null,
+    propProjection: m.propProjection,
+    propPlayer: m.propPlayer,
+    line: m.line != null ? m.line : (m.playerProp && m.playerProp.line),
     yesIsHome: yesIsHome,
     yesName: yesName,
     noName: noName,
@@ -890,6 +900,23 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
         }
         await refreshBboBatch(needBbo, bboCap);
       } catch (eBbo) {}
+      // Player props: attach ESPN L5/season projection before scoring
+      try {
+        const propMarkets = [];
+        for (const ev of events) {
+          for (const m of ev.markets || []) {
+            const t = classifyMarket(m);
+            if (t === 'player_prop' || t === 'prop' || String(t).indexOf('player_') === 0 || String(t).indexOf('pitcher_') === 0) {
+              m.marketType = t;
+              m.title = m.question || m.title;
+              m.league = ev.league || league;
+              m.eventTitle = ev.title;
+              propMarkets.push(m);
+            }
+          }
+        }
+        if (propMarkets.length) await enrichPlayerProps(propMarkets, league);
+      } catch (eProp) {}
       // Prefer a stable order of market families so board is scannable
       const typePriority = {
         moneyline: 1, moneyline_1h: 2,
