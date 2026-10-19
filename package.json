@@ -1,8 +1,8 @@
 {
-  "name": "betbetter",
+  "name": "eliteodds",
   "private": true,
-  "version": "2.1.2",
+  "version": "3.4.106",
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   }
 }
