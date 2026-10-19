@@ -1192,8 +1192,20 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
       if (minEdge > 0) out = out.filter((g) => Math.abs(g.netEdge || 0) >= minEdge);
       if (minScore > 0) out = out.filter((g) => (g.betScore || 0) >= minScore);
       if (minLiq > 0) out = out.filter((g) => (g.liquidity || 0) >= minLiq);
-      if (rankFilter === 'elite') out = out.filter((g) => g.rank === 'Elite');
-      if (rankFilter === 'good') out = out.filter((g) => g.rank === 'Good' || g.rank === 'Elite');
+      if (rankFilter === 'elite') {
+        out = out.filter((g) => {
+          const r = String(g.rank || '');
+          return r === 'Elite' || r === 'POTD' || r === 'Super Elite';
+        });
+      } else if (rankFilter === 'good' || !rankFilter || rankFilter === 'all') {
+        // Default board: never return Pass (Good / Elite / POTD only)
+        out = out.filter((g) => {
+          const r = String(g.rank || '');
+          return r === 'Good' || r === 'Elite' || r === 'POTD' || r === 'Super Elite';
+        });
+      } else if (rankFilter === 'pass') {
+        out = out.filter((g) => g.rank === 'Pass');
+      }
 
       return res.status(200).json({
         ok: true,
@@ -1209,13 +1221,7 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
           elite: out.filter((g) => g.rank === 'Elite').length,
           good: out.filter((g) => g.rank === 'Good').length,
         },
-        games: (function(list){
-        if (!rankFilter || rankFilter === 'all') return list;
-        if (rankFilter === 'elite') return list.filter((g) => g.rank === 'Elite');
-        if (rankFilter === 'good') return list.filter((g) => g.rank === 'Good' || g.rank === 'Elite');
-        if (rankFilter === 'pass') return list.filter((g) => g.rank === 'Pass');
-        return list;
-      })(out),
+        games: out,
       });
     }
 
@@ -1366,12 +1372,19 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
     if (minLiq > 0) filtered = filtered.filter((g) => (g.liquidity || 0) >= minLiq || g.marketCount > 3);
     if (minScore > 0) filtered = filtered.filter((g) => (g.betScore || 0) >= minScore);
     if (rankFilter === 'elite') {
-      filtered = filtered.filter((g) => g.rank === 'Elite' || (g.props || []).some((p) => p.rank === 'Elite'));
-    }
-    if (rankFilter === 'good') {
-      filtered = filtered.filter(
-        (g) => g.rank === 'Good' || g.rank === 'Elite' || (g.props || []).some((p) => p.rank === 'Good' || p.rank === 'Elite')
-      );
+      filtered = filtered.filter((g) => {
+        const r = String(g.rank || '');
+        return r === 'Elite' || r === 'POTD' || r === 'Super Elite' ||
+          (g.props || []).some((p) => ['Elite','POTD','Super Elite'].includes(p.rank));
+      });
+    } else if (rankFilter === 'good' || !rankFilter || rankFilter === 'all') {
+      filtered = filtered.filter((g) => {
+        const r = String(g.rank || '');
+        return r === 'Good' || r === 'Elite' || r === 'POTD' || r === 'Super Elite' ||
+          (g.props || []).some((p) => ['Good','Elite','POTD','Super Elite'].includes(p.rank));
+      });
+    } else if (rankFilter === 'pass') {
+      filtered = filtered.filter((g) => g.rank === 'Pass');
     }
 
     return res.status(200).json({
