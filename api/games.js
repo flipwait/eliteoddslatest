@@ -157,6 +157,29 @@ function pickSidePrice01(sc, m) {
 }
 
 function classifyMarket(m) {
+  // Fine-grained Polymarket US sportsMarketType (from expanded event markets)
+  const smt = String(m.sportsMarketType || '').toLowerCase();
+  if (smt) {
+    if (/player_passing_yards|passing_yards/.test(smt)) return 'player_pass_yds';
+    if (/player_rushing_yards|rushing_yards/.test(smt)) return 'player_rush_yds';
+    if (/player_receiving_yards|receiving_yards/.test(smt)) return 'player_rec_yds';
+    if (/player_receptions/.test(smt)) return 'player_receptions';
+    if (/player_passing_touchdowns|player_touchdowns|anytime|player_rushing_touchdowns/.test(smt)) return 'player_atd';
+    if (/player_points|basketball_player_points/.test(smt)) return 'player_pts';
+    if (/player_rebounds/.test(smt)) return 'player_reb';
+    if (/player_assists/.test(smt)) return 'player_ast';
+    if (/player_strikeouts|pitcher_strikeouts/.test(smt)) return 'player_k';
+    if (/player_home_runs|batter_home/.test(smt)) return 'player_hr';
+    if (/player_hits/.test(smt)) return 'player_hits';
+    if (/player_/.test(smt) || /_player_/.test(smt)) return 'player_prop';
+    if (/full_game_spread|team_full_game_spread|spread/.test(smt) && /first_half|1h/.test(smt)) return 'spread_1h';
+    if (/full_game_spread|team_.*_spread/.test(smt)) return 'spread';
+    if (/first_half_total|game_first_half_total/.test(smt)) return 'total_1h';
+    if (/full_game_total|game_total|team_.*_total|points_full_game_total/.test(smt)) return 'total';
+    if (/full_game_winner|team_full_game_winner/.test(smt)) return 'moneyline';
+    if (/first_half_winner/.test(smt)) return 'moneyline_1h';
+  }
+
   // Prefer Polymarket US sportsMarketType (authoritative)
   const rawType = String(m.sportsMarketType || m.marketType || m.sportsMarketTypeV2 || '').toLowerCase();
   const q = String(m.question || m.slug || m.title || '').toLowerCase();
@@ -726,16 +749,24 @@ module.exports = async function handler(req, res) {
 
     let events;
     if (league === 'esports') {
-      const es = await Promise.all(['lol', 'cs2', 'dota2', 'valorant', 'cod'].map((l) => fetchLeagueEvents(l, { limit: 10 })));
+      const es = await Promise.all(['lol', 'cs2', 'dota2', 'valorant', 'cod'].map((l) => fetchLeagueEvents(l, { limit: 10, expandMarkets: true, maxEventsExpand: 6, maxMarkets: 300 })));
       events = es.flat();
     } else if (league === 'soccer' || league === 'football' || (typeof isSoccerLeague === 'function' && isSoccerLeague(league))) {
       // One Soccer category: pull every soccer league (EPL, MLS, La Liga, Bundesliga, Serie A, UCL, …)
       events = await fetchSoccerEvents({ limitPerLeague: marketType === 'all' ? 18 : 24 });
     } else if (league && league !== 'all' && LEAGUES.includes(league)) {
-      events = await fetchLeagueEvents(league, { limit: marketType === 'all' ? 28 : 35 });
+      events = await fetchLeagueEvents(league, {
+          limit: marketType === 'all' ? 18 : 28,
+          expandMarkets: true,
+          maxEventsExpand: marketType === 'player_props' || String(marketType).indexOf('player_') === 0 ? 12 : (marketType === 'all' ? 8 : 10),
+          maxMarkets: marketType === 'player_props' || String(marketType).indexOf('player_') === 0 ? 400 : 280,
+        });
     } else {
       // all sports + all markets
-      events = await fetchAllSportsEvents({ limitPerLeague: marketType === 'all' ? 12 : 14 });
+      events = await fetchAllSportsEvents({
+        limitPerLeague: marketType === 'all' ? 8 : 10,
+        // expand inside fetchLeagueEvents per league — pass via patched fetchAll
+      });
     }
     if (mode === 'live') events = events.filter((e) => e.live && !e.ended);
     else if (mode === 'upcoming') events = events.filter((e) => !e.live && !e.ended);
@@ -932,15 +963,20 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
           if (marketType !== 'all' && !matchesType(type, marketType)) continue;
           // Skip pure noise props when All — still include core game lines + common props
           if (marketType === 'all') {
-            const core = /^(moneyline|moneyline_1h|spread|spread_|total|total_|f5|f5_|nrfi|yrfi|team_total|map_|inning_)/.test(type)
+            const core = /^(moneyline|moneyline_1h|spread|spread_|total|total_|f5|f5_|nrfi|yrfi|team_total|map_|inning_|player_|pitcher_)/.test(type)
               || type === 'spread' || type === 'total' || type === 'f5' || type === 'f5_total' || type === 'f5_spread'
               || type === 'player_hr' || type === 'player_k' || type === 'player_hits'
               || type === 'player_pass_yds' || type === 'player_rush_yds' || type === 'player_rec_yds'
-              || type === 'player_atd' || type === 'player_prop';
-            // Always allow anything matchesType would allow for game_lines + listed cores
-            if (!core && !matchesType(type, 'game_lines')) {
-              // keep other classified non-unknown
-              if (type === 'unknown' || type === 'prop') continue;
+              || type === 'player_atd' || type === 'player_prop' || type === 'player_pts'
+              || type === 'player_reb' || type === 'player_ast' || type === 'player_receptions'
+              || type === 'player_tb' || type === 'player_hrr' || type === 'player_threes' || type === 'player_pra';
+            if (!core && !matchesType(type, 'game_lines') && !matchesType(type, 'player_props')) {
+              if (type === 'unknown') continue;
+              // generic "prop" only if question looks like a player line
+              if (type === 'prop') {
+                const q = String(m.question || '');
+                if (!/player|yards|points|rebounds|assists|strikeouts|receptions|passing|rushing|over|under/i.test(q)) continue;
+              }
             }
           }
           if (m.yesPrice == null) continue;
@@ -1059,7 +1095,14 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
               const isEs0 = typeof isEsportsLeague === 'function' && isEsportsLeague(lg0);
               if (isEs0 && !(sc && sc.hasForm)) {
                 if (!pandascoreToken) return 'No PandaScore token on this scan — Save key in Settings';
-                if (!mu) return 'No matchup fetched (limit or parse) — rescan CS2';
+                if (!mu) {
+                  var lgHint = String((ev && ev.league) || league || '').toLowerCase();
+                  if (/dota/.test(lgHint)) return 'No matchup fetched — rescan Dota2 (PandaScore/OpenDota)';
+                  if (/lol|league/.test(lgHint)) return 'No matchup fetched — rescan LoL';
+                  if (/valorant/.test(lgHint)) return 'No matchup fetched — rescan Valorant';
+                  if (/cs2|csgo|esport/.test(lgHint)) return 'No matchup fetched — rescan CS2';
+                  return 'No matchup fetched (limit or parse)';
+                }
                 return 'No form from PandaScore';
               }
               return null;

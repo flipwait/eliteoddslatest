@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.106</title>
+  <title>EliteOdds v3.4.108</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.106</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.108</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1897,7 +1897,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.106</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.108</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2273,8 +2273,32 @@
   };
 
   
-  var APP_VERSION = '3.4.106';
+  var APP_VERSION = '3.4.108';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.108',
+      date: '2026-10-19',
+      title: 'Polymarket player props — expand full event markets',
+      items: [
+        'FIXED — PM league list only returned moneyline (1 market/event). Now expands via /v1/events/slug/{slug} (100s of markets).',
+        'ADDED — Classify football_player_passing_yards, receiving, rushing, TDs, NBA points, etc.',
+        'FIXED — All/player_props filters include player_* types so props appear on the board.',
+        'Scan Player props or NFL All after deploy to see pass/rush/rec yards and more.'
+      ]
+    },
+    {
+      version: '3.4.107',
+      date: '2026-10-19',
+      title: 'Player props pick fix + form matchups',
+      items: [
+        'FIXED — Player props no longer show a different player as model pick (Wemby card → SGA bug).',
+        'FIXED — Kalshi "Name: 35+" classified as player prop, not ML; titles strip bogus ML.',
+        'FIXED — Parse "Victor Wembanyama: 35+" for ESPN projection path.',
+        'FIXED — WNBA ESPN aliases (Golden State Valkyries, Atlanta Dream) + search fallback.',
+        'FIXED — Esports form note uses correct game (Dota2/LoL/CS2) not always CS2.',
+        'FIXED — Kalshi FG spread pick stays Team -X not Away -1.5 (1H).'
+      ]
+    },
     {
       version: '3.4.106',
       date: '2026-10-19',

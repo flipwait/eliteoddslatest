@@ -245,7 +245,7 @@ module.exports = async function handler(req, res) {
         }
       );
 
-      // Prefer Kalshi structured labels for spreads/totals (avoid fake Away -1.5 1H)
+      // Prefer Kalshi structured labels for spreads/totals/props
       let modelPick = sc.pickName || (sc.side === 'YES'
         ? (g.sides && g.sides[0] && g.sides[0].name)
         : (g.sides && g.sides[1] && g.sides[1].name));
@@ -254,10 +254,29 @@ module.exports = async function handler(req, res) {
         if (sc.side === 'YES' || sc.side === 'yes') modelPick = g.sides[0] && g.sides[0].name || g.pickHint;
         else if (g.sides && g.sides[1]) modelPick = g.sides[1].name;
       }
-      // Strip bogus "ML" suffix on non-ML titles
-      let cardTitle = g.title;
-      if (mt && mt !== 'moneyline' && /\sML$/i.test(String(cardTitle || ''))) {
-        cardTitle = String(cardTitle).replace(/\sML$/i, '');
+      // Player props: NEVER show a different player's name
+      const titleQ = String(g.title || g.eventTitle || '');
+      const propM = titleQ.match(/^\s*([^:\n]{3,40}?)\s*:\s*(\d+(?:\.\d+)?)\+?/i);
+      if (propM || mt.indexOf('player_') === 0 || mt === 'player_prop') {
+        const pname = propM ? propM[1].replace(/\s+ML$/i, '').trim() : null;
+        const pline = propM ? propM[2] : (g.line != null ? g.line : '');
+        if (pname) {
+          modelPick = pname + (pline !== '' ? (' ' + pline + '+') : '');
+        }
+        // If sc.pickName already has correct player, keep richer version
+        if (sc.pickName && pname && String(sc.pickName).indexOf(pname.split(' ').pop()) >= 0) {
+          modelPick = sc.pickName;
+        }
+      }
+      // Spreads: never Away -1.5 1H on FG "wins by over X"
+      if (/wins by over\s*(\d+)/i.test(titleQ) && /spread/.test(mt)) {
+        const sm = titleQ.match(/wins by over\s*(\d+(?:\.\d+)?)/i);
+        const team = titleQ.replace(/\s*wins by over.*/i, '').replace(/\s*ML$/i, '').trim();
+        if (sm && team) modelPick = team + ' -' + sm[1];
+      }
+      let cardTitle = String(g.title || '').replace(/\s+ML$/i, '');
+      if (mt && mt !== 'moneyline' && /\sML$/i.test(String(g.title || ''))) {
+        cardTitle = String(g.title).replace(/\sML$/i, '');
       }
 
       const card = {
