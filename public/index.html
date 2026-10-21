@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.116</title>
+  <title>EliteOdds v3.4.117</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.116</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.117</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1897,7 +1897,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.116</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.117</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2273,10 +2273,10 @@
   };
 
   
-  var APP_VERSION = '3.4.116';
+  var APP_VERSION = '3.4.117';
   var APP_CHANGELOG = [
     {
-      version: '3.4.116',
+      version: '3.4.117',
       date: '2026-10-20',
       title: 'Player prop pick/title lock — no mixed players on Discord',
       items: [
@@ -4385,8 +4385,19 @@
 
   function cardHtml(g) {
     var edge = g.netEdge != null ? ((g.netEdge >= 0 ? '+' : '') + g.netEdge + '%') : '—';
-    var title = String(g.eventTitle || g.title || '').replace(/</g, '');
+    var mt0 = String(g.marketType || '').toLowerCase();
+    var isPropCard = mt0.indexOf('player_') === 0 || mt0.indexOf('pitcher_') === 0 || mt0 === 'player_prop' || mt0 === 'prop'
+      || g.propPlayer || g.propProjection != null
+      || /[A-Za-z].*:\s*\d+\+?/.test(String(g.title || ''));
+    // Player props: show the prop line as title, not only the matchup
+    var title = String(isPropCard ? (g.title || g.eventTitle || '') : (g.eventTitle || g.title || '')).replace(/</g, '');
+    if (isPropCard && g.eventTitle && title && title.indexOf(String(g.eventTitle).slice(0, 12)) < 0) {
+      // keep title as prop; subtitle elsewhere can show event
+    }
     var pick = String(g.modelPick || '—').replace(/</g, '');
+    if (isPropCard && /full game/i.test(pick)) {
+      pick = pick.replace(/full game\s*/i, '').trim();
+    }
     // Spread: ensure ±line on pick
     if ((String(g.marketType || '').indexOf('spread') >= 0 || String(g.marketType || '') === 'f5_spread')
         && !/[+-]?\d/.test(pick)) {
@@ -4498,21 +4509,35 @@
         '</div></div></div>' +
       '<p class="text-sm font-semibold ' + (isKalshi ? 'text-bb-green' : 'text-violet-300') + '">Model pick · ' + (function(){
         var mt = String(g.marketType || '').toLowerCase();
-        var isTot = /total|over|under|ou/.test(mt) || /\bover\b|\bunder\b/i.test(pick);
+        var titleBlob = String(g.title || '') + ' ' + String(g.question || '');
+        // Player props must NEVER get "Full game Under X" totals formatting
+        var isPlayer = mt.indexOf('player_') === 0 || mt.indexOf('pitcher_') === 0 || mt === 'player_prop' || mt === 'prop'
+          || /[A-Za-z][A-Za-z.'\-]+(?:\s+[A-Za-z][A-Za-z.'\-]+){0,3}\s*:\s*\d+/.test(titleBlob)
+          || /will\s+[A-Z].*record\s+at\s+least/i.test(titleBlob)
+          || (g.propPlayer || g.propProjection != null);
+        if (isPlayer) {
+          // Keep server pick; strip accidental Full game prefix
+          var pp = String(pick).replace(/^\s*full game\s+/i, '').trim();
+          return pp.replace(/</g, '');
+        }
+        var isTot = /total|f5_total|team_total/.test(mt) || (mt.indexOf('total_') === 0);
+        // Only pure Over/Under labels — not "Player Under 25"
+        var pureOu = /^\s*(over|under)\s*\d/i.test(pick) || /^\s*(over|under)\s*$/i.test(pick);
+        if (!isTot && pureOu) isTot = true;
         var line = g.totalLine != null ? g.totalLine : null;
-        if (line == null) {
+        if (line == null && isTot) {
           var blob = String(g.title || '') + ' ' + String(g.question || '') + ' ' + String(g.eventTitle || '') + ' ' + pick;
           var m = blob.match(/(?:o\/u|over\/under|total)\s*([0-9]+\.?[0-9]*)/i) || blob.match(/\b([0-9]{1,2}\.[05])\b/);
           if (m) line = m[1];
+          if (line == null && g.line != null && !isPlayer) line = g.line;
         }
         var side = pick;
-        if (isTot) {
+        if (isTot && !isPlayer) {
           var pl = pick.toLowerCase();
           if (/under/.test(pl)) side = 'Under';
           else if (/over/.test(pl)) side = 'Over';
           else if (/^u\b/.test(pl)) side = 'Under';
           else if (/^o\b/.test(pl)) side = 'Over';
-          // Prefer server pickName when it already has scope (1st period / Full game / 1H)
           if (/\b(full game|1st period|2nd period|3rd period|1h|2h|f5|q[1-4]|team total)\b/i.test(pick)) {
             return String(pick).replace(/</g, '');
           }
@@ -4555,8 +4580,27 @@
         })() + '</div></div>' +
       '</div>' +
       '<div class="flex flex-wrap gap-1.5 text-[10px]">' +
-        (form ? '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">' + form.replace(/</g,'') + '</span>' : '') +
-        (g.matchupScore != null ? '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">Matchup ' + g.matchupScore + '</span>' : '') +
+        (function(){
+          var mtP = String(g.marketType||'').toLowerCase();
+          var isP = mtP.indexOf('player_')===0 || mtP.indexOf('pitcher_')===0 || mtP==='player_prop' || mtP==='prop' || g.propProjection != null || g.propPlayer;
+          if (isP) {
+            var bits = [];
+            if (g.propProjection != null) bits.push('Proj ' + g.propProjection);
+            if (g.line != null) bits.push('line ' + g.line);
+            if (g.propRole) bits.push(String(g.propRole));
+            if (g.propDetail) bits.push(String(g.propDetail).slice(0, 90));
+            else if (g.playerProp && g.playerProp.detail) bits.push(String(g.playerProp.detail).slice(0, 90));
+            else if (g.playerProp && g.playerProp.L10) bits.push('L10 ' + g.playerProp.L10.avg + ' n=' + g.playerProp.L10.n);
+            if (!bits.length && form) bits.push(form);
+            return bits.length ? '<span class="px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-200/90">' + bits.join(' · ').replace(/</g,'') + '</span>' : '';
+          }
+          return form ? '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">' + form.replace(/</g,'') + '</span>' : '';
+        })() +
+        (function(){
+          var mtP = String(g.marketType||'').toLowerCase();
+          if (mtP.indexOf('player_')===0 || g.propProjection != null) return '';
+          return g.matchupScore != null ? '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">Matchup ' + g.matchupScore + '</span>' : '';
+        })() +
         '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">Score ' + (g.score10 != null ? g.score10 : Math.max(1, Math.min(10, Math.round((g.betScore||50)/10)))) + '/10</span>' +
       '</div>' +
       '<details class="details-why border-t border-bb-border pt-2">' +

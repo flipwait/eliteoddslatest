@@ -223,21 +223,34 @@ module.exports = async function handler(req, res) {
               : null;
       // Force player marketType when title is "Name: N+" (never score as game total/ML)
       let mtForce = g.marketType || 'moneyline';
-      if (/^\s*[^:\n]{3,40}?\s*:\s*\d+(?:\.\d+)?\+?/i.test(String(g.title || ''))) {
-        if (String(mtForce).indexOf('player_') !== 0 && mtForce !== 'player_prop') mtForce = 'player_pts';
+      const titleIsPlayer = /[A-Za-z][A-Za-z.'\-]+(?:\s+[A-Za-z][A-Za-z.'\-]+){0,3}\s*:\s*\d+(?:\.\d+)?\+?/.test(String(g.title || ''));
+      if (titleIsPlayer) {
+        if (String(mtForce).indexOf('player_') !== 0 && mtForce !== 'player_prop' && String(mtForce).indexOf('pitcher_') !== 0) {
+          mtForce = 'player_pts';
+        }
+        g.marketType = mtForce;
+        g.totalLine = null; // never feed game total path
+      }
+      // Prefer prop line from title over any totalLine contamination
+      let lineForScore = lineVal;
+      if (titleIsPlayer) {
+        const lm = String(g.title || '').match(/:\s*(\d+(?:\.\d+)?)\+?/);
+        if (lm) lineForScore = Number(lm[1]);
+        else if (g.line != null) lineForScore = Number(g.line);
       }
       const sc = buildSignal(
         {
           id: g.marketSlug || g.id,
           question: g.title || g.eventTitle,
+          title: g.title || g.eventTitle,
           yesPrice: g.yesPrice,
           noPrice: g.noPrice,
           volume: g.volume,
           liquidity: g.liquidity,
-          matchup: (/^\s*[^:\n]{3,40}?\s*:\s*\d+/i.test(String(g.title || '')) ? null : matchup),
+          matchup: titleIsPlayer ? null : matchup,
           league: league || g.league,
           marketType: mtForce,
-          line: lineVal,
+          line: lineForScore,
           spreadLine: g.spreadLine != null ? Number(g.spreadLine) : null,
           totalLine: g.totalLine != null ? Number(g.totalLine) : null,
           live: !!g.live,
@@ -263,28 +276,48 @@ module.exports = async function handler(req, res) {
       let modelPick = sc.pickName || (sc.side === 'YES'
         ? (g.sides && g.sides[0] && g.sides[0].name)
         : (g.sides && g.sides[1] && g.sides[1].name));
-      const mt = String(g.marketType || '').toLowerCase();
       const titleQ = String(g.title || g.subTitle || '');
-      const propM = titleQ.match(/^\s*([^:\n]{3,40}?)\s*:\s*(\d+(?:\.\d+)?)\+?/i);
-      const isPlayerCard = !!(propM || mt.indexOf('player_') === 0 || mt === 'player_prop' || mt === 'prop');
-      // NEVER apply spread/total pickHint on player prop cards (fixes "Full game Under 15" on Name: 25+)
+      // Broader player detect: "Name: 25+", "Name: 25+ points", "Name: 25+ ML"
+      const propM = titleQ.match(/([A-Za-z][A-Za-z.'\-]+(?:\s+[A-Za-z][A-Za-z.'\-]+){0,3})\s*:\s*(\d+(?:\.\d+)?)\+?/);
+      let mt = String(g.marketType || '').toLowerCase();
+      if (propM && mt.indexOf('player_') !== 0 && mt !== 'player_prop' && mt !== 'prop') {
+        mt = 'player_pts';
+        g.marketType = 'player_pts';
+      }
+      const isPlayerCard = !!(propM || mt.indexOf('player_') === 0 || mt === 'player_prop' || mt === 'prop' || mt.indexOf('pitcher_') === 0);
+      // NEVER apply spread/total pickHint on player prop cards
       if (!isPlayerCard && g.pickHint && (/spread|total|nrfi|yrfi|f5/.test(mt))) {
-        if (sc.side === 'YES' || sc.side === 'yes') modelPick = g.sides[0] && g.sides[0].name || g.pickHint;
+        if (sc.side === 'YES' || sc.side === 'yes') modelPick = (g.sides && g.sides[0] && g.sides[0].name) || g.pickHint;
         else if (g.sides && g.sides[1]) modelPick = g.sides[1].name;
       }
       if (isPlayerCard) {
-        const pname = propM ? propM[1].replace(/\s+ML$/i, '').trim() : (g.propPlayer || null);
-        const pline = propM ? propM[2] : (g.line != null ? String(g.line) : '');
-        if (sc.pickName && pname && String(sc.pickName).toLowerCase().indexOf(String(pname).split(' ').pop().toLowerCase()) >= 0) {
-          modelPick = sc.pickName;
-        } else if (sc.pickName && !/full game|vs\.?/i.test(String(sc.pickName))) {
-          modelPick = sc.pickName;
-        } else if (pname) {
-          modelPick = pname + (pline !== '' ? (' ' + pline + '+') : '');
+        const pname = propM
+          ? propM[1].replace(/\s+ML$/i, '').replace(/\s+points?$/i, '').trim()
+          : (g.propPlayer || (g.playerProp && g.playerProp.playerName) || null);
+        const pline = propM ? propM[2] : (g.line != null ? String(g.line) : (g.playerProp && g.playerProp.line != null ? String(g.playerProp.line) : ''));
+        // Lock line on object so UI never shows wrong total
+        if (pline !== '' && !isNaN(Number(pline))) {
+          g.line = Number(pline);
+          g.totalLine = null;
+          g.spreadLine = null;
         }
-        // Strip accidental "Full game" labels from totals misroute
-        if (/full game/i.test(String(modelPick || ''))) {
-          modelPick = pname ? (pname + (pline !== '' ? (' ' + pline + '+') : '')) : String(modelPick).replace(/full game\s*/i, '');
+        const last = pname ? pname.split(/\s+/).pop().toLowerCase() : '';
+        const scPick = String(sc.pickName || '');
+        if (scPick && last && scPick.toLowerCase().indexOf(last) >= 0 && !/full game/i.test(scPick)) {
+          modelPick = sc.pickName;
+        } else if (pname && pline !== '') {
+          // Reconstruct from model side: YES on "N+" market = Over / hits threshold
+          const leanUnder = sc.side === 'NO' || /under/i.test(scPick);
+          modelPick = leanUnder ? (pname + ' Under ' + pline) : (pname + ' ' + pline + '+');
+        } else if (pname) {
+          modelPick = pname;
+        }
+        // Absolute ban on totals-style labels for prop cards
+        if (/full game|vs\.?/i.test(String(modelPick || ''))) {
+          const leanUnder = /under/i.test(String(modelPick));
+          modelPick = pname
+            ? (leanUnder && pline !== '' ? pname + ' Under ' + pline : (pline !== '' ? pname + ' ' + pline + '+' : pname))
+            : String(modelPick).replace(/full game\s*/i, '').trim();
         }
       }
       // Spreads: never Away -1.5 1H on FG "wins by over X"
@@ -298,10 +331,22 @@ module.exports = async function handler(req, res) {
         cardTitle = String(g.title).replace(/\sML$/i, '');
       }
 
+      // Prop-only: strip team form pollution so UI shows player stats
+      if (isPlayerCard) {
+        g.formWinProb = null;
+        g.formAwayWinProb = null;
+        // keep hasForm from sc if projection exists
+      }
       const card = {
         ...g,
         title: cardTitle || g.title,
+        marketType: isPlayerCard ? (mt.indexOf('player_') === 0 ? mt : 'player_pts') : (g.marketType || mt),
         modelPick,
+        propProjection: g.propProjection != null ? g.propProjection : (g.playerProp && g.playerProp.projection),
+        propDetail: g.propDetail || (g.playerProp && g.playerProp.detail) || (sc.evaluate && sc.evaluate.detail) || (sc.breakdown && sc.breakdown.detail) || null,
+        propPlayer: g.propPlayer || (g.playerProp && g.playerProp.playerName) || null,
+        propRole: g.propRole || (g.playerProp && g.playerProp.role) || null,
+        playerProp: g.playerProp || null,
         rank: sc.rank,
         betScore: sc.betScore,
         netEdge: sc.netEdge,
