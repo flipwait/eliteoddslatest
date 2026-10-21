@@ -400,10 +400,19 @@ function scoreOne(m, ev, matchup, rankOpts, yesIsHome) {
       if (dm) lineFromSide = Number(dm[1]);
     }
   } catch (eL) {}
-  const lineVal =
+  let lineVal =
     m.line != null && !isNaN(Number(m.line))
       ? Number(m.line)
       : lineFromSide;
+  if (lineVal == null || isNaN(lineVal)) {
+    const qq = String(m.question || '');
+    const am = qq.match(/at least\s+(\d+(?:\.\d+)?)/i) || qq.match(/:\s*(\d+(?:\.\d+)?)\+?/i)
+      || qq.match(/(?:over|under)\s*(\d+(?:\.\d+)?)/i);
+    if (am) lineVal = Number(am[1]);
+  }
+  if ((lineVal == null || isNaN(lineVal)) && m.playerProp && m.playerProp.line != null) {
+    lineVal = Number(m.playerProp.line);
+  }
 
   return buildSignal({
     id,

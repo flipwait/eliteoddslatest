@@ -221,6 +221,11 @@ module.exports = async function handler(req, res) {
             : g.line != null && !isNaN(Number(g.line))
               ? Number(g.line)
               : null;
+      // Force player marketType when title is "Name: N+" (never score as game total/ML)
+      let mtForce = g.marketType || 'moneyline';
+      if (/^\s*[^:\n]{3,40}?\s*:\s*\d+(?:\.\d+)?\+?/i.test(String(g.title || ''))) {
+        if (String(mtForce).indexOf('player_') !== 0 && mtForce !== 'player_prop') mtForce = 'player_pts';
+      }
       const sc = buildSignal(
         {
           id: g.marketSlug || g.id,
@@ -229,9 +234,9 @@ module.exports = async function handler(req, res) {
           noPrice: g.noPrice,
           volume: g.volume,
           liquidity: g.liquidity,
-          matchup,
+          matchup: (/^\s*[^:\n]{3,40}?\s*:\s*\d+/i.test(String(g.title || '')) ? null : matchup),
           league: league || g.league,
-          marketType: g.marketType || 'moneyline',
+          marketType: mtForce,
           line: lineVal,
           spreadLine: g.spreadLine != null ? Number(g.spreadLine) : null,
           totalLine: g.totalLine != null ? Number(g.totalLine) : null,
@@ -259,29 +264,27 @@ module.exports = async function handler(req, res) {
         ? (g.sides && g.sides[0] && g.sides[0].name)
         : (g.sides && g.sides[1] && g.sides[1].name));
       const mt = String(g.marketType || '').toLowerCase();
-      if (g.pickHint && (/spread|total|nrfi|yrfi|f5/.test(mt))) {
+      const titleQ = String(g.title || g.subTitle || '');
+      const propM = titleQ.match(/^\s*([^:\n]{3,40}?)\s*:\s*(\d+(?:\.\d+)?)\+?/i);
+      const isPlayerCard = !!(propM || mt.indexOf('player_') === 0 || mt === 'player_prop' || mt === 'prop');
+      // NEVER apply spread/total pickHint on player prop cards (fixes "Full game Under 15" on Name: 25+)
+      if (!isPlayerCard && g.pickHint && (/spread|total|nrfi|yrfi|f5/.test(mt))) {
         if (sc.side === 'YES' || sc.side === 'yes') modelPick = g.sides[0] && g.sides[0].name || g.pickHint;
         else if (g.sides && g.sides[1]) modelPick = g.sides[1].name;
       }
-      // Player props: NEVER show a different player's name — title is source of truth
-      const titleQ = String(g.title || g.subTitle || '');
-      const propM = titleQ.match(/^\s*([^:\n]{3,40}?)\s*:\s*(\d+(?:\.\d+)?)\+?/i);
-      if (propM || mt.indexOf('player_') === 0 || mt === 'player_prop' || mt === 'prop') {
-        const pname = propM ? propM[1].replace(/\s+ML$/i, '').trim() : null;
+      if (isPlayerCard) {
+        const pname = propM ? propM[1].replace(/\s+ML$/i, '').trim() : (g.propPlayer || null);
         const pline = propM ? propM[2] : (g.line != null ? String(g.line) : '');
-        if (pname) {
-          // Always lock to title player (fixes Shamet title + Edgecombe pick mixups)
-          modelPick = pname + (pline !== '' ? (' ' + pline + '+') : '');
-          if (sc.pickName && String(sc.pickName).toLowerCase().indexOf(pname.split(' ').pop().toLowerCase()) >= 0) {
-            // Allow Over/Under wording from scorer only if same player
-            modelPick = sc.pickName;
-          }
-        } else if (sc.pickName && !/vs\.?/i.test(String(sc.pickName))) {
+        if (sc.pickName && pname && String(sc.pickName).toLowerCase().indexOf(String(pname).split(' ').pop().toLowerCase()) >= 0) {
           modelPick = sc.pickName;
+        } else if (sc.pickName && !/full game|vs\.?/i.test(String(sc.pickName))) {
+          modelPick = sc.pickName;
+        } else if (pname) {
+          modelPick = pname + (pline !== '' ? (' ' + pline + '+') : '');
         }
-        // eventTitle should stay the GAME matchup, not another player's line
-        if (g.eventTitle && /^\s*[^:]{3,40}?\s*:\s*\d+/.test(String(g.eventTitle)) && pname) {
-          // leave eventTitle; card title is the prop
+        // Strip accidental "Full game" labels from totals misroute
+        if (/full game/i.test(String(modelPick || ''))) {
+          modelPick = pname ? (pname + (pline !== '' ? (' ' + pline + '+') : '')) : String(modelPick).replace(/full game\s*/i, '');
         }
       }
       // Spreads: never Away -1.5 1H on FG "wins by over X"
