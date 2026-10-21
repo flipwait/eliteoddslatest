@@ -80,6 +80,10 @@ function matchesType(type, marketType) {
   if (marketType === 'player_rec_yds') return type === 'player_rec_yds' || type === 'player_prop';
   if (marketType === 'player_receptions') return type === 'player_receptions' || type === 'player_prop';
   if (marketType === 'player_atd') return type === 'player_atd' || type === 'player_prop';
+  if (marketType === 'player_pts') return type === 'player_pts' || type === 'player_prop';
+  if (marketType === 'player_reb') return type === 'player_reb' || type === 'player_prop';
+  if (marketType === 'player_ast') return type === 'player_ast' || type === 'player_prop';
+  if (marketType === 'player_pra') return type === 'player_pra' || type === 'player_pts' || type === 'player_prop';
   if (marketType === 'player_props') return String(type).startsWith('player_') || String(type).startsWith('pitcher_') || type === 'player_prop' || type === 'prop';
   if (marketType === 'innings') return type === 'nrfi' || type === 'yrfi' || /^inning_/.test(type);
   return type === marketType;
@@ -104,14 +108,19 @@ module.exports = async function handler(req, res) {
     if (mode === 'upcoming') filtered = filtered.filter((g) => !g.live);
     if (mode === 'live') filtered = filtered.filter((g) => g.live);
 
-    // Cap alternate lines
+    // Cap alternate lines — player props unique by ticker/title (never collapse players)
     const capped = [];
     const seen = new Map();
     filtered.sort((a, b) => (b.volume || 0) - (a.volume || 0));
     for (const g of filtered) {
-      const key = String(g.eventTitle || '') + '|' + String(g.marketType || '');
+      const mt = String(g.marketType || '');
+      const isProp = mt.indexOf('player_') === 0 || mt === 'player_prop' || mt === 'prop' || mt.indexOf('pitcher_') === 0;
+      const key = isProp
+        ? ('prop|' + String(g.marketSlug || g.marketTicker || g.id || '') + '|' + String(g.title || '').slice(0, 80))
+        : (String(g.eventTitle || '') + '|' + mt);
       const n = seen.get(key) || 0;
-      if (n >= 4) continue;
+      const maxN = isProp ? 1 : 4;
+      if (n >= maxN) continue;
       seen.set(key, n + 1);
       capped.push(g);
     }
