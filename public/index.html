@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.109</title>
+  <title>EliteOdds v3.4.112</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.109</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.112</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1896,7 +1896,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.109</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.112</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2272,8 +2272,30 @@
   };
 
   
-  var APP_VERSION = '3.4.109';
+  var APP_VERSION = '3.4.112';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.112',
+      date: '2026-10-20',
+      title: 'Player prop pick/title lock — no mixed players on Discord',
+      items: [
+        'FIXED — Elite Discord could show Player A in the header and Player B as the pick (e.g. Shamet 15+ + Edgecombe Over 10).',
+        'FIXED — Kalshi/Poly player props: modelPick, card title, and sides all lock to the player named on THAT market.',
+        'FIXED — Discord embed uses the same player for title and pick; game matchup only when it is Team vs Team.',
+        'FIXED — Unique market ids when ticker missing so props do not collide and mix fields.'
+      ]
+    },
+    {
+      version: '3.4.110',
+      date: '2026-10-19',
+      title: 'Player market flat path — Pts/Reb/Ast/PRA actually load',
+      items: [
+        'FIXED — Selecting Pts+Reb+Ast / Points / Rebounds / etc. skipped the flat market path and showed moneyline game cards instead.',
+        'FIXED — Any marketType starting with player_ or pitcher_ now expands full event markets and returns one card per prop line.',
+        'FIXED — PRA filter includes separate Points, Rebounds, Assists markets (Polymarket rarely lists combined PRA).',
+        'Use Rank Pass only (debug) to see all prop lines; Good+Elite to hide Passes.'
+      ]
+    },
     {
       version: '3.4.109',
       date: '2026-10-19',
@@ -7019,6 +7041,11 @@
         if (marketType === 'player_receptions') return tt === 'player_receptions' || /receptions/.test(q);
         if (marketType === 'player_atd') return tt === 'player_atd' || /anytime|touchdown/.test(q);
         if (marketType === 'player_props') return tt.indexOf('player_') === 0 || tt.indexOf('pitcher_') === 0 || tt === 'player_prop' || tt === 'prop';
+        if (marketType === 'player_pra') return tt === 'player_pra' || tt === 'player_pts' || tt === 'player_reb' || tt === 'player_ast' || /pts\s*\+\s*reb|pra/i.test(q);
+        if (marketType === 'player_pts') return tt === 'player_pts' || /\bpoints\b|\bpts\b/.test(q);
+        if (marketType === 'player_reb') return tt === 'player_reb' || /rebound/.test(q);
+        if (marketType === 'player_ast') return tt === 'player_ast' || /assist/.test(q);
+        if (marketType === 'player_threes') return tt === 'player_threes' || /three|3\s*-?pt/.test(q);
         if (marketType === 'nrfi') return tt === 'nrfi' || tt === 'yrfi';
         return tt === marketType || tt.indexOf(marketType) >= 0;
       });
@@ -9475,8 +9502,39 @@ function renderSlate() {
       }
     }
     var rank = String(g.rank || 'Pass').toUpperCase();
-    var title = String(g.eventTitle || g.title || 'Pick');
+    // Player-prop lock: title + pick must be the SAME player (never Shamet header + Edgecombe pick)
+    (function lockPlayerPropFields() {
+      var mt0 = String(g.marketType || '').toLowerCase();
+      if (mt0.indexOf('player_') !== 0 && mt0 !== 'player_prop' && mt0 !== 'prop') return;
+      var src = String(g.title || g.subTitle || g.question || '');
+      var pm = src.match(/^\s*([^:\n]{3,40}?)\s*:\s*(\d+(?:\.\d+)?)\+?/i);
+      if (!pm) return;
+      var pname = pm[1].replace(/\s+ML$/i, '').trim();
+      var pline = pm[2];
+      var last = (pname.split(/\s+/).pop() || '').toLowerCase();
+      var cur = String(g.modelPick || '');
+      if (!last || cur.toLowerCase().indexOf(last) < 0) {
+        g.modelPick = pname + ' ' + pline + '+';
+      }
+      // Keep game matchup in eventTitle only when it looks like Team vs Team
+      if (g.eventTitle && /^\s*[^:]{3,40}?\s*:\s*\d+/.test(String(g.eventTitle))) {
+        // eventTitle was wrongly set to another prop — clear to avoid Discord mix
+        if (String(g.eventTitle).toLowerCase().indexOf(last) < 0) {
+          g.eventTitle = g.eventTitle; // leave; prefer title for display below
+        }
+      }
+    })();
+    var title = String(g.title || g.eventTitle || 'Pick');
     var pick = String(g.modelPick || '—');
+    // If both look like player props and disagree, force pick from title
+    (function () {
+      var tm = String(title).match(/^\s*([^:\n]{3,40}?)\s*:\s*(\d+(?:\.\d+)?)\+?/i);
+      if (!tm) return;
+      var last = (tm[1].split(/\s+/).pop() || '').toLowerCase();
+      if (last && pick.toLowerCase().indexOf(last) < 0) {
+        pick = tm[1].replace(/\s+ML$/i, '').trim() + ' ' + tm[2] + '+';
+      }
+    })();
     var modP = g.model_probability;
     if (modP != null && modP <= 1) modP = modP * 100;
     if (modP != null) modP = Math.round(Number(modP) * 10) / 10;
@@ -9520,7 +9578,15 @@ function renderSlate() {
       } catch (e) { when = ''; }
     }
     var score10 = g.score10 != null ? g.score10 : Math.max(1, Math.min(10, Math.round((Number(g.betScore) || 50) / 10)));
-    var eventName = String(g.eventTitle || title || 'Pick').replace(/</g, '');
+    var eventName = (function () {
+      var et = String(g.eventTitle || '').replace(/</g, '');
+      var tt = String(g.title || '').replace(/</g, '');
+      // Prefer Team vs Team as event line; if eventTitle is another player prop, use empty/matchup-only
+      if (et && /\bvs\.?\b/i.test(et)) return et;
+      if (tt && /\bvs\.?\b/i.test(tt)) return tt;
+      if (et && !/^\s*[^:]{3,40}?\s*:\s*\d+/.test(et)) return et;
+      return et || tt || 'Pick';
+    })();
     if (eventName.length > 70) eventName = eventName.slice(0, 67) + '…';
 
     var embedTitle = venueEmoji + ' ' + venueLabel + ' · ' + pick;

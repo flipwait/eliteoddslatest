@@ -166,6 +166,10 @@ function classifyMarket(m) {
     if (/player_receptions/.test(smt)) return 'player_receptions';
     if (/player_passing_touchdowns|player_touchdowns|anytime|player_rushing_touchdowns/.test(smt)) return 'player_atd';
     if (/player_points|basketball_player_points/.test(smt)) return 'player_pts';
+    if (/player_rebounds|basketball_player_rebounds/.test(smt)) return 'player_reb';
+    if (/player_assists|basketball_player_assists/.test(smt)) return 'player_ast';
+    if (/player_threes|basketball_player_threes|three.?point/.test(smt)) return 'player_threes';
+    if (/player_steals|player_blocks|basketball_player_steals|basketball_player_blocks/.test(smt)) return 'player_prop';
     if (/player_rebounds/.test(smt)) return 'player_reb';
     if (/player_assists/.test(smt)) return 'player_ast';
     if (/player_strikeouts|pitcher_strikeouts/.test(smt)) return 'player_k';
@@ -354,6 +358,7 @@ function classifyMarket(m) {
     return 'player_prop';
 
   // NBA / WNBA style player props
+  if (/combined points|points,? rebounds and assist|\bpra\b/i.test(blob)) return 'player_pra';
   if (/\bpoints\b|\bpts\b/.test(blob) && /player|over|under|prop/.test(blob)) return 'player_pts';
   if (/\brebounds?\b|\brebs?\b/.test(blob)) return 'player_reb';
   if (/\bassists?\b/.test(blob) && !/pass(?:ing)?/.test(blob)) return 'player_ast';
@@ -705,7 +710,9 @@ function matchesType(type, marketType) {
   if (marketType === 'player_pts') return type === 'player_pts' || type === 'player_prop';
   if (marketType === 'player_reb') return type === 'player_reb' || type === 'player_prop';
   if (marketType === 'player_ast') return type === 'player_ast' || type === 'player_prop';
-  if (marketType === 'player_pra') return type === 'player_pra' || type === 'player_prop';
+  if (marketType === 'player_pra') {
+    return type === 'player_pra' || type === 'player_pts' || type === 'player_reb' || type === 'player_ast' || type === 'player_prop';
+  }
   if (marketType === 'player_threes') return type === 'player_threes' || type === 'player_prop';
   if (marketType === 'player_props') return String(type).startsWith('player_') || String(type).startsWith('pitcher_') || type === 'player_prop' || type === 'prop';
   if (marketType === 'team_props') return type === 'team_prop';
@@ -910,11 +917,18 @@ module.exports = async function handler(req, res) {
       }
     } catch (e) {}
 
-const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1','inning_2','inning_3','inning_4','inning_5','inning_6','inning_7','inning_8','inning_9','inning_winner','inning_scorer','nrfi','yrfi','f5','f5_spread','f5_total','total','totals','spread','spreads','spread_fg','spread_1h','spread_2h','spread_q1','spread_q2','spread_q3','spread_q4','total_fg','total_1h','total_2h','total_q1','total_q2','total_q3','total_q4','total_p2','total_p3','team_totals','team_total_fg','team_total_1h','team_total_2h','prop','f5','nrfi','yrfi','f5_spread','f5_total','player_props','team_props','game_props','innings','player_hr','player_k','player_hits','player_tb','player_hrr','pitcher_outs','pitcher_er','pitcher_ha','pitcher_bb','inning_winner'];
+const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1','inning_2','inning_3','inning_4','inning_5','inning_6','inning_7','inning_8','inning_9','inning_winner','inning_scorer','nrfi','yrfi','f5','f5_spread','f5_total','total','totals','spread','spreads','spread_fg','spread_1h','spread_2h','spread_q1','spread_q2','spread_q3','spread_q4','total_fg','total_1h','total_2h','total_q1','total_q2','total_q3','total_q4','total_p2','total_p3','team_totals','team_total_fg','team_total_1h','team_total_2h','prop','f5','nrfi','yrfi','f5_spread','f5_total','player_props','team_props','game_props','innings','player_hr','player_k','player_hits','player_tb','player_hrr','pitcher_outs','pitcher_er','pitcher_ha','pitcher_bb','inning_winner','player_pts','player_reb','player_ast','player_pra','player_threes','player_pass_yds','player_rush_yds','player_rec_yds','player_receptions','player_atd','player_prop'];
+
+    function shouldFlattenMarkets(mt) {
+      const s = String(mt || '');
+      if (s === 'all' || flattenTypes.includes(s)) return true;
+      if (s.indexOf('player_') === 0 || s.indexOf('pitcher_') === 0) return true;
+      return false;
+    }
 
     // Flat market cards (each Polymarket market = one card)
     // marketType=all → expand ML, spreads, totals, F5, NRFI, 1H, props, etc.
-    if (marketType === 'all' || flattenTypes.includes(marketType)) {
+    if (shouldFlattenMarkets(marketType)) {
       const flat = [];
       // Refresh live Yes/No from BBO for totals (list prices often stale → wrong 50¢ vs 96¢)
       try {

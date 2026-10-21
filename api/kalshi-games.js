@@ -254,18 +254,25 @@ module.exports = async function handler(req, res) {
         if (sc.side === 'YES' || sc.side === 'yes') modelPick = g.sides[0] && g.sides[0].name || g.pickHint;
         else if (g.sides && g.sides[1]) modelPick = g.sides[1].name;
       }
-      // Player props: NEVER show a different player's name
-      const titleQ = String(g.title || g.eventTitle || '');
+      // Player props: NEVER show a different player's name — title is source of truth
+      const titleQ = String(g.title || g.subTitle || '');
       const propM = titleQ.match(/^\s*([^:\n]{3,40}?)\s*:\s*(\d+(?:\.\d+)?)\+?/i);
-      if (propM || mt.indexOf('player_') === 0 || mt === 'player_prop') {
+      if (propM || mt.indexOf('player_') === 0 || mt === 'player_prop' || mt === 'prop') {
         const pname = propM ? propM[1].replace(/\s+ML$/i, '').trim() : null;
-        const pline = propM ? propM[2] : (g.line != null ? g.line : '');
+        const pline = propM ? propM[2] : (g.line != null ? String(g.line) : '');
         if (pname) {
+          // Always lock to title player (fixes Shamet title + Edgecombe pick mixups)
           modelPick = pname + (pline !== '' ? (' ' + pline + '+') : '');
-        }
-        // If sc.pickName already has correct player, keep richer version
-        if (sc.pickName && pname && String(sc.pickName).indexOf(pname.split(' ').pop()) >= 0) {
+          if (sc.pickName && String(sc.pickName).toLowerCase().indexOf(pname.split(' ').pop().toLowerCase()) >= 0) {
+            // Allow Over/Under wording from scorer only if same player
+            modelPick = sc.pickName;
+          }
+        } else if (sc.pickName && !/vs\.?/i.test(String(sc.pickName))) {
           modelPick = sc.pickName;
+        }
+        // eventTitle should stay the GAME matchup, not another player's line
+        if (g.eventTitle && /^\s*[^:]{3,40}?\s*:\s*\d+/.test(String(g.eventTitle)) && pname) {
+          // leave eventTitle; card title is the prop
         }
       }
       // Spreads: never Away -1.5 1H on FG "wins by over X"
