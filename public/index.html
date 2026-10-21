@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.115</title>
+  <title>EliteOdds v3.4.116</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.115</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.116</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1124,6 +1124,7 @@
               <select id="f-rank">
                 <option value="good" selected>Good + Elite + POTD</option>
                 <option value="elite">Elite + POTD only</option>
+                <option value="all">All ranks (incl. Pass)</option>
                 <option value="pass">Pass only (debug)</option>
               </select>
             </label>
@@ -1896,7 +1897,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.115</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.116</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2272,10 +2273,10 @@
   };
 
   
-  var APP_VERSION = '3.4.115';
+  var APP_VERSION = '3.4.116';
   var APP_CHANGELOG = [
     {
-      version: '3.4.115',
+      version: '3.4.116',
       date: '2026-10-20',
       title: 'Player prop pick/title lock — no mixed players on Discord',
       items: [
@@ -4094,8 +4095,14 @@
 
   function applyMarketType(val) {
     marketType = val || 'all';
-    if (typeof isSpecialMarket === 'function' && isSpecialMarket(marketType) && $('f-rank')) {
-      if (!$('f-rank').value || $('f-rank').value === 'pass') $('f-rank').value = 'good';
+    if ($('f-rank')) {
+      var mt0 = String(marketType || '');
+      if (mt0.indexOf('player_') === 0 || mt0 === 'player_props' || mt0 === 'prop') {
+        // Props need Pass visible until projections rank them
+        $('f-rank').value = 'all';
+      } else if (typeof isSpecialMarket === 'function' && isSpecialMarket(marketType)) {
+        if (!$('f-rank').value || $('f-rank').value === 'pass') $('f-rank').value = 'good';
+      }
     }
     var tip = $('market-process-tip');
     if (tip) {
@@ -7061,7 +7068,6 @@
       list = list.filter(function (g) { return (g.netEdge != null ? g.netEdge : 0) >= minEvC; });
     }
     var rankF = ($('f-rank') && $('f-rank').value) || 'good';
-    // Board never shows Pass unless user explicitly chooses Pass only (debug)
     if (rankF === 'pass') {
       list = list.filter(function (g) { return String(g.rank||'').toLowerCase() === 'pass'; });
     } else if (rankF === 'elite') {
@@ -7069,8 +7075,10 @@
         var r = String(g.rank||'').toLowerCase();
         return r === 'elite' || r === 'potd' || r === 'super elite' || r === 'super_elite';
       });
+    } else if (rankF === 'all') {
+      /* keep Pass + Good + Elite */
     } else {
-      // good (default): Good + Elite + POTD only — never Pass
+      // good (default): Good + Elite + POTD only
       list = list.filter(function (g) {
         var r = String(g.rank||'').toLowerCase();
         return r === 'elite' || r === 'good' || r === 'potd' || r === 'super elite' || r === 'super_elite';
@@ -7174,7 +7182,7 @@
         return '0';
       })();
     // Rank filter applied client-side too — still pass for server summary
-    if (rankF && rankF !== 'all') q += '&rank=' + encodeURIComponent(rankF);
+    if (rankF) q += '&rank=' + encodeURIComponent(rankF);
     if (Number(minEv) > 0) q += '&minGoodEv=' + encodeURIComponent(minEv);
     if (Number(minEdge) > 0) q += '&minGoodEdge=' + encodeURIComponent(minEdge);
     var lg = leagueOverride != null ? leagueOverride : sport;
@@ -7263,10 +7271,10 @@
     return kq;
   }
   function renderGameList(box, list) {
-    // NO_PASS_BOARD: hide Pass unless Rank = Pass only
+    // Hide Pass only when Rank is Good+ or Elite-only (not All / Pass)
     try {
       var __rf = ($('f-rank') && $('f-rank').value) || 'good';
-      if (__rf !== 'pass' && Array.isArray(list)) {
+      if (__rf !== 'pass' && __rf !== 'all' && Array.isArray(list)) {
         list = list.filter(function (g) {
           var r = String(g.rank || '').toLowerCase();
           return r === 'good' || r === 'elite' || r === 'potd' || r === 'super elite' || r === 'super_elite';
@@ -7285,7 +7293,7 @@
       } else if (rk === 'elite') {
         tip = '<p class="text-bb-muted text-sm p-3">No games for this filter.<br><span class="text-[11px]">Elite only is on — switch <strong class="text-white">Rank</strong> to All ranks (or Good+) to see more markets.</span></p>';
       } else if (special) {
-        tip = '<p class="text-bb-muted text-sm p-3">No markets found for <strong class="text-white">' + mt.replace(/_/g,' ') + '</strong> on this board.<br><span class="text-[11px]">Book may not list them yet for these games, or Sport/Mode is too narrow. Try MLB · Pregame · Rank All ranks.</span></p>';
+        tip = '<p class="text-bb-muted text-sm p-3">No markets found for <strong class="text-white">' + mt.replace(/_/g,' ') + '</strong> on this board.<br><span class="text-[11px]">Set Rank to <strong class="text-white">All ranks (incl. Pass)</strong>, Sport NBA or NFL, Mode Live+Pregame. Props often start as Pass until ESPN projection ranks them Good/Elite.</span></p>';
       } else {
         tip = '<p class="text-bb-muted text-sm p-3">No games for this filter.<br><span class="text-[11px]">Try Sport: MLB, Market: ML, Mode: Live + Pregame, Rank: All ranks.</span></p>';
       }

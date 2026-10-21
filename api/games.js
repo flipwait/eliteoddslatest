@@ -1220,14 +1220,21 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
           const r = String(g.rank || '');
           return r === 'Elite' || r === 'POTD' || r === 'Super Elite';
         });
-      } else if (rankFilter === 'good' || !rankFilter || rankFilter === 'all') {
-        // Default board: never return Pass (Good / Elite / POTD only)
+      } else if (rankFilter === 'pass') {
+        out = out.filter((g) => g.rank === 'Pass');
+      } else if (rankFilter === 'all') {
+        /* keep Pass + Good + Elite */
+      } else if (rankFilter === 'good' || !rankFilter) {
+        // Default board: Good / Elite / POTD only
+        const before = out.slice();
         out = out.filter((g) => {
           const r = String(g.rank || '');
           return r === 'Good' || r === 'Elite' || r === 'POTD' || r === 'Super Elite';
         });
-      } else if (rankFilter === 'pass') {
-        out = out.filter((g) => g.rank === 'Pass');
+        // Props: if nothing clears Good+, show Pass so board is not empty
+        if (!out.length && before.length && (String(marketType || '').indexOf('player_') === 0 || marketType === 'player_props' || marketType === 'prop')) {
+          out = before;
+        }
       }
 
       return res.status(200).json({
@@ -1400,14 +1407,20 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
         return r === 'Elite' || r === 'POTD' || r === 'Super Elite' ||
           (g.props || []).some((p) => ['Elite','POTD','Super Elite'].includes(p.rank));
       });
-    } else if (rankFilter === 'good' || !rankFilter || rankFilter === 'all') {
+    } else if (rankFilter === 'pass') {
+      filtered = filtered.filter((g) => g.rank === 'Pass');
+    } else if (rankFilter === 'all') {
+      /* keep all ranks */
+    } else if (rankFilter === 'good' || !rankFilter) {
+      const before = filtered.slice();
       filtered = filtered.filter((g) => {
         const r = String(g.rank || '');
         return r === 'Good' || r === 'Elite' || r === 'POTD' || r === 'Super Elite' ||
           (g.props || []).some((p) => ['Good','Elite','POTD','Super Elite'].includes(p.rank));
       });
-    } else if (rankFilter === 'pass') {
-      filtered = filtered.filter((g) => g.rank === 'Pass');
+      if (!filtered.length && before.length && (String(marketType || '').indexOf('player_') === 0 || marketType === 'player_props' || marketType === 'prop')) {
+        filtered = before;
+      }
     }
 
     return res.status(200).json({
