@@ -23,13 +23,22 @@ let isEsportsLeague = () => false;
 let esportsNameInTitle = null;
 try {
   const esMod = require('../lib/esports');
+  matchupForEsports = esMod.matchupForEsports || matchupForEsports;
+  isEsportsLeague = esMod.isEsportsLeague || isEsportsLeague;
+  esportsNameInTitle = esMod.esportsNameInTitle || null;
+} catch (e) {
+  console.error('esports module optional', e.message);
+}
+
 let enrichPlayerProps = async (g) => g;
 let enrichOneGame = async (g) => g;
 try {
   const _pp = require('../lib/playerProps');
   enrichPlayerProps = _pp.enrichPlayerProps;
   if (_pp.enrichOneGame) enrichOneGame = _pp.enrichOneGame;
-} catch (e) {}
+} catch (e) {
+  console.error('playerProps module optional', e.message);
+}
 
 /** Strip verbose API titles → "Team A vs Team B" */
 function cleanEventTitle(raw) {
@@ -50,13 +59,6 @@ function cleanEventTitle(raw) {
   t = t.replace(/\s+vs\.?\s+/i, ' vs. ');
   t = t.replace(/\s+/g, ' ').trim();
   return t;
-}
-
-  matchupForEsports = esMod.matchupForEsports || matchupForEsports;
-  isEsportsLeague = esMod.isEsportsLeague || isEsportsLeague;
-  esportsNameInTitle = esMod.esportsNameInTitle || null;
-} catch (e) {
-  console.error('esports module optional', e.message);
 }
 
 
