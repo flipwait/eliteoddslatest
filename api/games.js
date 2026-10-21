@@ -24,7 +24,12 @@ let esportsNameInTitle = null;
 try {
   const esMod = require('../lib/esports');
 let enrichPlayerProps = async (g) => g;
-try { enrichPlayerProps = require('../lib/playerProps').enrichPlayerProps; } catch (e) {}
+let enrichOneGame = async (g) => g;
+try {
+  const _pp = require('../lib/playerProps');
+  enrichPlayerProps = _pp.enrichPlayerProps;
+  if (_pp.enrichOneGame) enrichOneGame = _pp.enrichOneGame;
+} catch (e) {}
 
 /** Strip verbose API titles → "Team A vs Team B" */
 function cleanEventTitle(raw) {
@@ -1026,7 +1031,9 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
           });
           await enrichPlayerProps(propMarkets, league || (events[0] && events[0].league));
         }
-      } catch (eProp) {}
+      } catch (eProp) {
+        console.warn('[props] batch enrich', eProp && eProp.message);
+      }
       // Prefer a stable order of market families so board is scannable
       const typePriority = {
         moneyline: 1, moneyline_1h: 2,
@@ -1062,6 +1069,19 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
           const mu = matchupCache[ev.title || ev.name || ''] || null;
           const sd = sidesFromMarket(m, ev.title, type, mu);
           const sides = sd.sides || sd;
+          // Guarantee ESPN form on every player prop card
+          if (
+            (String(type).indexOf('player_') === 0 || String(type).indexOf('pitcher_') === 0 || type === 'player_prop' || type === 'prop') &&
+            !(m.playerProp && m.playerProp.projection != null) &&
+            !(m.propProjection != null)
+          ) {
+            try {
+              m.marketType = type;
+              m.league = m.league || ev.league || league;
+              m.question = m.question || m.title;
+              await enrichOneGame(m, m.league);
+            } catch (eOne) {}
+          }
           let sc = scoreOne(m, ev, mu, rankOpts, sd.yesIsHome);
           // PM props: if ESPN enrich attached projection but score stayed prop-market, re-score with explicit fields
           if (
