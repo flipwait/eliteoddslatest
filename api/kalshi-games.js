@@ -1,3 +1,12 @@
+function cleanEventTitle(raw) {
+  let s = String(raw || "").trim();
+  s = s.replace(/^who\s+will\s+win\s+(in\s+)?(the\s+)?(upcoming\s+)?/i, "");
+  s = s.replace(/^who\s+wins\s+(in\s+)?(the\s+)?/i, "");
+  s = s.replace(/\s+game\??\s*$/i, "");
+  s = s.replace(/\?+$/g, "");
+  s = s.replace(/\s+versus\s+/i, " vs. ");
+  return s.replace(/\s+/g, " ").trim();
+}
 const { listSportGames } = require('../lib/kalshi');
 const { matchupForEvent } = require('../lib/espn');
 let esportsNameInTitle = null;
@@ -254,7 +263,7 @@ module.exports = async function handler(req, res) {
           spreadLine: g.spreadLine != null ? Number(g.spreadLine) : null,
           totalLine: g.totalLine != null ? Number(g.totalLine) : null,
           live: !!g.live,
-          eventTitle: g.eventTitle || g.title,
+          eventTitle: cleanEventTitle(g.eventTitle || g.title) || g.title,
           url: g.url,
           venue: 'kalshi',
           source: 'kalshi',
@@ -339,7 +348,7 @@ module.exports = async function handler(req, res) {
       }
       const card = {
         ...g,
-        title: cardTitle || g.title,
+        title: cleanEventTitle(cardTitle || g.title),
         marketType: isPlayerCard ? (mt.indexOf('player_') === 0 ? mt : 'player_pts') : (g.marketType || mt),
         modelPick,
         propProjection: g.propProjection != null ? g.propProjection : (g.playerProp && g.playerProp.projection),

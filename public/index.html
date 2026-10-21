@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.118</title>
+  <title>EliteOdds v3.4.119</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.118</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.119</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1897,7 +1897,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.118</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.119</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2273,10 +2273,10 @@
   };
 
   
-  var APP_VERSION = '3.4.118';
+  var APP_VERSION = '3.4.119';
   var APP_CHANGELOG = [
     {
-      version: '3.4.118',
+      version: '3.4.119',
       date: '2026-10-20',
       title: 'Player prop pick/title lock — no mixed players on Discord',
       items: [
@@ -4383,6 +4383,18 @@
       line1 + line2 + line3 + '</div>';
   }
 
+  function cleanDisplayTitle(raw) {
+    var t = String(raw || '').trim();
+    if (!t) return t;
+    t = t.replace(/^who\s+will\s+win\s+(in\s+)?(the\s+)?(upcoming\s+)?/i, '');
+    t = t.replace(/^who\s+wins\s+(in\s+)?(the\s+)?/i, '');
+    t = t.replace(/\s+game\??\s*$/i, '');
+    t = t.replace(/\s+match\??\s*$/i, '');
+    t = t.replace(/\?+$/g, '');
+    t = t.replace(/\s+versus\s+/i, ' vs. ');
+    t = t.replace(/\s+vs\.\s+/i, ' vs. ');
+    return t.replace(/\s+/g, ' ').trim();
+  }
   function cardHtml(g) {
     var edge = g.netEdge != null ? ((g.netEdge >= 0 ? '+' : '') + g.netEdge + '%') : '—';
     var mt0 = String(g.marketType || '').toLowerCase();
@@ -4390,7 +4402,7 @@
       || g.propPlayer || g.propProjection != null
       || /[A-Za-z].*:\s*\d+\+?/.test(String(g.title || ''));
     // Player props: show the prop line as title, not only the matchup
-    var title = String(isPropCard ? (g.title || g.eventTitle || '') : (g.eventTitle || g.title || '')).replace(/</g, '');
+    var title = cleanDisplayTitle(isPropCard ? (g.title || g.eventTitle || '') : (g.eventTitle || g.title || '')).replace(/</g, '');
     if (isPropCard && g.eventTitle && title && title.indexOf(String(g.eventTitle).slice(0, 12)) < 0) {
       // keep title as prop; subtitle elsewhere can show event
     }

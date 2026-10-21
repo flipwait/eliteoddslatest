@@ -25,6 +25,22 @@ try {
   const esMod = require('../lib/esports');
 let enrichPlayerProps = async (g) => g;
 try { enrichPlayerProps = require('../lib/playerProps').enrichPlayerProps; } catch (e) {}
+
+/** Strip verbose API titles → "Team A vs Team B" */
+function cleanEventTitle(raw) {
+  let t = String(raw || '').trim();
+  if (!t) return t;
+  t = t.replace(/^who\s+will\s+win\s+(in\s+)?(the\s+)?(upcoming\s+)?/i, '');
+  t = t.replace(/^who\s+wins\s+(in\s+)?(the\s+)?/i, '');
+  t = t.replace(/\s+game\??\s*$/i, '');
+  t = t.replace(/\s+match\??\s*$/i, '');
+  t = t.replace(/\?+$/g, '');
+  t = t.replace(/\s+vs\.\s+/i, ' vs. ');
+  t = t.replace(/\s+versus\s+/i, ' vs. ');
+  t = t.replace(/\s+/g, ' ').trim();
+  return t;
+}
+
   matchupForEsports = esMod.matchupForEsports || matchupForEsports;
   isEsportsLeague = esMod.isEsportsLeague || isEsportsLeague;
   esportsNameInTitle = esMod.esportsNameInTitle || null;
@@ -1024,7 +1040,40 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
           const mu = matchupCache[ev.title || ev.name || ''] || null;
           const sd = sidesFromMarket(m, ev.title, type, mu);
           const sides = sd.sides || sd;
-          const sc = scoreOne(m, ev, mu, rankOpts, sd.yesIsHome);
+          let sc = scoreOne(m, ev, mu, rankOpts, sd.yesIsHome);
+          // PM props: if ESPN enrich attached projection but score stayed prop-market, re-score with explicit fields
+          if (
+            m.playerProp &&
+            m.playerProp.projection != null &&
+            sc &&
+            (!sc.hasForm || /prop-market/i.test(String(sc.fairSource || '')))
+          ) {
+            try {
+              const { buildSignal } = require('../lib/score');
+              sc = buildSignal(
+                {
+                  id: String(m.id || m.question || ev.id),
+                  question: m.question || ev.title,
+                  title: m.question || m.title,
+                  yesPrice: m.yesPrice,
+                  noPrice: m.noPrice,
+                  volume: m.volume || 0,
+                  liquidity: m.liquidity || 0,
+                  matchup: null,
+                  marketType: type,
+                  line: m.line != null ? Number(m.line) : (m.playerProp.line != null ? Number(m.playerProp.line) : null),
+                  league: ev.league || league,
+                  live: !!ev.live,
+                  eventTitle: cleanEventTitle(ev.title),
+                  playerProp: m.playerProp,
+                  propProjection: m.playerProp.projection,
+                  propPlayer: m.playerProp.playerName || m.propPlayer,
+                  sides: sides,
+                },
+                rankOpts || {}
+              );
+            } catch (eRe) {}
+          }
           // Prefer team name matching form: if side YES/NO, map via yesIsHome + form
           let pickSide = sc && sc.side === 'NO' ? sides[1] : sides[0];
           if (sc && sc.pickName) {
@@ -1033,8 +1082,8 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
           }
           flat.push({
             id: m.id || ev.id + '-' + type,
-            title: m.question || ev.title,
-            eventTitle: ev.title,
+            title: m.question || cleanEventTitle(ev.title),
+            eventTitle: cleanEventTitle(ev.title),
             league: ev.league,
             _vol: Number(m.volume || 0),
             live: !!ev.live,
@@ -1334,7 +1383,7 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
 
       return {
         id: ev.id,
-        title: ev.title,
+        title: cleanEventTitle(ev.title),
         eventSlug: ev.slug || null,
         marketSlug: primary && (primary.slug || primary.marketSlug) || null,
         marketSlugs: markets.map((m) => m.slug).filter(Boolean),
