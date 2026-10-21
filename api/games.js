@@ -496,8 +496,10 @@ function scoreOne(m, ev, matchup, rankOpts, yesIsHome) {
     live: !!(ev && ev.live),
     eventTitle: (ev && (ev.title || ev.name)) || null,
     line: lineVal,
+    venue: 'polymarket',
   }, rankOpts || {});
 }
+
 
 function nameHit(a, b) {
   if (!a || !b) return false;
@@ -1113,6 +1115,7 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
                   propProjection: m.playerProp.projection,
                   propPlayer: m.playerProp.playerName || m.propPlayer,
                   sides: sides,
+                  venue: 'polymarket',
                 },
                 rankOpts || {}
               );
