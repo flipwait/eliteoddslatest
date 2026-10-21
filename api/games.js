@@ -30,13 +30,19 @@ try { enrichPlayerProps = require('../lib/playerProps').enrichPlayerProps; } cat
 function cleanEventTitle(raw) {
   let t = String(raw || '').trim();
   if (!t) return t;
+  // Who will win in the upcoming basketball event TEAM vs TEAM scheduled for DATE at TIME UTC?
   t = t.replace(/^who\s+will\s+win\s+(in\s+)?(the\s+)?(upcoming\s+)?/i, '');
   t = t.replace(/^who\s+wins\s+(in\s+)?(the\s+)?/i, '');
+  t = t.replace(/^(the\s+)?(upcoming\s+)?/i, '');
+  t = t.replace(/^(basketball|football|baseball|hockey|soccer|tennis|mma|ufc|esports?)\s+event\s+/i, '');
+  t = t.replace(/\s+scheduled\s+for\s+.+$/i, '');
+  t = t.replace(/\s+on\s+\w+\s+\d{1,2},?\s+\d{4}.*$/i, '');
+  t = t.replace(/\s+at\s+\d{1,2}:\d{2}\s*(AM|PM)?\s*(UTC|ET|EST|EDT)?.*$/i, '');
   t = t.replace(/\s+game\??\s*$/i, '');
   t = t.replace(/\s+match\??\s*$/i, '');
   t = t.replace(/\?+$/g, '');
-  t = t.replace(/\s+vs\.\s+/i, ' vs. ');
   t = t.replace(/\s+versus\s+/i, ' vs. ');
+  t = t.replace(/\s+vs\.?\s+/i, ' vs. ');
   t = t.replace(/\s+/g, ' ').trim();
   return t;
 }
@@ -1082,8 +1088,17 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
           }
           flat.push({
             id: m.id || ev.id + '-' + type,
-            title: m.question || cleanEventTitle(ev.title),
-            eventTitle: cleanEventTitle(ev.title),
+            title: (function () {
+              const t = String(type || '');
+              const isProp = t.indexOf('player_') === 0 || t.indexOf('pitcher_') === 0 || t === 'player_prop' || t === 'prop';
+              if (isProp) {
+                let q = String(m.question || '').trim();
+                q = q.replace(/\s+in\s+.+$/i, '');
+                return q || cleanEventTitle(ev.title);
+              }
+              return cleanEventTitle(ev.title || m.question || '');
+            })(),
+            eventTitle: cleanEventTitle(ev.title || m.question || ''),
             league: ev.league,
             _vol: Number(m.volume || 0),
             live: !!ev.live,
@@ -1182,8 +1197,13 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
             })(),
             no_vig_probability: sc ? sc.no_vig_probability : null,
             model_probability: sc ? sc.model_probability : null,
-            fairSource: sc ? sc.fairSource : null,
-            hasForm: sc ? sc.hasForm : null,
+            fairSource: (function () {
+              if (sc && sc.fairSource && !/prop-market/i.test(String(sc.fairSource))) return sc.fairSource;
+              if (m.playerProp && m.playerProp.source) return String(m.playerProp.source) + (String(m.playerProp.source).indexOf('+line') >= 0 ? '' : '+line');
+              if (m.propSource) return String(m.propSource) + (String(m.propSource).indexOf('line') >= 0 ? '' : '+line');
+              return sc ? sc.fairSource : null;
+            })(),
+            hasForm: (sc && sc.hasForm) || !!(m.playerProp && m.playerProp.projection != null),
             formNote: (function () {
               if (mu && (mu.formNote || mu.note)) return mu.formNote || mu.note;
               if (sc && sc.formNote) return sc.formNote;
