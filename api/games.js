@@ -182,22 +182,36 @@ function classifyMarket(m) {
   // Fine-grained Polymarket US sportsMarketType (from expanded event markets)
   const smt = String(m.sportsMarketType || '').toLowerCase();
   if (smt) {
+    // Order matters: longer / more specific first (points_rebounds_assists before points)
+    if (/points_rebounds_assists|player_pra|pts.?reb.?ast/.test(smt)) return 'player_pra';
     if (/player_passing_yards|passing_yards/.test(smt)) return 'player_pass_yds';
     if (/player_rushing_yards|rushing_yards/.test(smt)) return 'player_rush_yds';
     if (/player_receiving_yards|receiving_yards/.test(smt)) return 'player_rec_yds';
     if (/player_receptions/.test(smt)) return 'player_receptions';
-    if (/player_passing_touchdowns|player_touchdowns|anytime|player_rushing_touchdowns/.test(smt)) return 'player_atd';
-    if (/player_points|basketball_player_points/.test(smt)) return 'player_pts';
+    if (/player_passing_completions|passing_completions/.test(smt)) return 'player_pass_comp';
+    if (/player_passing_attempts|passing_attempts/.test(smt)) return 'player_pass_att';
+    if (/player_rushing_attempts|rushing_attempts|rush_attempts/.test(smt)) return 'player_rush_att';
+    if (/scrimmage_yards/.test(smt)) return 'player_scrimmage';
+    if (/longest_reception/.test(smt)) return 'player_long_rec';
+    if (/fantasy_points/.test(smt)) return 'player_fantasy';
+    if (/player_passing_touchdowns|player_rushing_touchdowns|player_receiving_touchdowns|anytime|player_touchdowns/.test(smt)) return 'player_atd';
+    if (/player_blocks|basketball_player_blocks/.test(smt)) return 'player_blocks';
+    if (/player_steals|basketball_player_steals/.test(smt)) return 'player_steals';
+    if (/player_threes|basketball_player_threes|three.?point/.test(smt)) return 'player_threes';
     if (/player_rebounds|basketball_player_rebounds/.test(smt)) return 'player_reb';
     if (/player_assists|basketball_player_assists/.test(smt)) return 'player_ast';
-    if (/player_threes|basketball_player_threes|three.?point/.test(smt)) return 'player_threes';
-    if (/player_steals|player_blocks|basketball_player_steals|basketball_player_blocks/.test(smt)) return 'player_prop';
-    if (/player_rebounds/.test(smt)) return 'player_reb';
-    if (/player_assists/.test(smt)) return 'player_ast';
+    if (/player_points|basketball_player_points/.test(smt) && !/rebound|assist/.test(smt)) return 'player_pts';
     if (/player_strikeouts|pitcher_strikeouts/.test(smt)) return 'player_k';
     if (/player_home_runs|batter_home/.test(smt)) return 'player_hr';
-    if (/player_hits/.test(smt)) return 'player_hits';
-    if (/player_/.test(smt) || /_player_/.test(smt)) return 'player_prop';
+    if (/player_hits/.test(smt) && !/allowed/.test(smt)) return 'player_hits';
+    if (/player_total_bases|total_bases/.test(smt)) return 'player_tb';
+    if (/player_rbis|batter_rbi/.test(smt)) return 'player_rbi';
+    if (/player_runs/.test(smt) && !/allowed|earned/.test(smt)) return 'player_runs';
+    if (/outs_recorded|pitcher_outs/.test(smt)) return 'pitcher_outs';
+    if (/earned_runs|pitcher_er/.test(smt)) return 'pitcher_er';
+    if (/hits_allowed/.test(smt)) return 'pitcher_ha';
+    if (/walks_allowed|pitcher_bb/.test(smt)) return 'pitcher_bb';
+    if (/player_/.test(smt) || /_player_/.test(smt) || /pitcher_/.test(smt) || /batter_/.test(smt)) return 'player_prop';
     if (/full_game_spread|team_full_game_spread|spread/.test(smt) && /first_half|1h/.test(smt)) return 'spread_1h';
     if (/full_game_spread|team_.*_spread/.test(smt)) return 'spread';
     if (/first_half_total|game_first_half_total/.test(smt)) return 'total_1h';
@@ -382,6 +396,8 @@ function classifyMarket(m) {
   // NBA / WNBA style player props
   if (/combined points|points,? rebounds and assist|\bpra\b/i.test(blob)) return 'player_pra';
   if (/\bpoints\b|\bpts\b/.test(blob) && /player|over|under|prop/.test(blob)) return 'player_pts';
+  if (/\bblocks?\b/.test(blob)) return 'player_blocks';
+  if (/\bsteals?\b/.test(blob)) return 'player_steals';
   if (/\brebounds?\b|\brebs?\b/.test(blob)) return 'player_reb';
   if (/\bassists?\b/.test(blob) && !/pass(?:ing)?/.test(blob)) return 'player_ast';
   if (/pts\s*\+\s*reb|points\s*\+\s*rebound|\bpra\b|pts\+reb\+ast/.test(blob)) return 'player_pra';
@@ -1092,9 +1108,20 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
               const t = String(type || '');
               const isProp = t.indexOf('player_') === 0 || t.indexOf('pitcher_') === 0 || t === 'player_prop' || t === 'prop';
               if (isProp) {
-                let q = String(m.question || '').trim();
-                q = q.replace(/\s+in\s+.+$/i, '');
-                return q || cleanEventTitle(ev.title);
+                // "Anthony Davis · 1+ blocks" from question
+                const q = String(m.question || m.title || '');
+                const pm = q.match(/will\s+([A-Z][a-zA-Z.'\-]+(?:\s+[A-Z][a-zA-Z.'\-]+){0,3})\s+record\s+at\s+least\s+(\d+(?:\.\d+)?)\s+(.+?)(?:\s+in\s+|$)/i)
+                  || q.match(/^\s*([^:]{3,40}?)\s*:\s*(\d+(?:\.\d+)?)\+?\s*(.*)$/i);
+                if (pm) {
+                  const name = pm[1].replace(/\s+ML$/i, '').trim();
+                  const ln = pm[2];
+                  let stat = (pm[3] || '').replace(/\s+in\s+.+$/i, '').replace(/\?+$/, '').trim();
+                  stat = stat.replace(/^combined\s+/i, '').replace(/\s+/g, ' ');
+                  if (stat.length > 28) stat = stat.slice(0, 28);
+                  return name + ' · ' + ln + '+' + (stat ? (' ' + stat) : '');
+                }
+                let q2 = q.replace(/\s+in\s+.+$/i, '').replace(/\?+$/, '').trim();
+                return q2 || cleanEventTitle(ev.title);
               }
               return cleanEventTitle(ev.title || m.question || '');
             })(),
