@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.117</title>
+  <title>EliteOdds v3.4.118</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.117</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.118</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1897,7 +1897,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.117</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.118</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2273,10 +2273,10 @@
   };
 
   
-  var APP_VERSION = '3.4.117';
+  var APP_VERSION = '3.4.118';
   var APP_CHANGELOG = [
     {
-      version: '3.4.117',
+      version: '3.4.118',
       date: '2026-10-20',
       title: 'Player prop pick/title lock — no mixed players on Discord',
       items: [
@@ -4516,8 +4516,25 @@
           || /will\s+[A-Z].*record\s+at\s+least/i.test(titleBlob)
           || (g.propPlayer || g.propProjection != null);
         if (isPlayer) {
-          // Keep server pick; strip accidental Full game prefix
           var pp = String(pick).replace(/^\s*full game\s+/i, '').trim();
+          // Prefer classic "Name 20+" / "Name Under 20" wording
+          var nm = String(g.propPlayer || '').trim();
+          if (!nm) {
+            var tm = String(g.title || g.question || '').match(/will\s+([A-Z][a-zA-Z.'\-]+(?:\s+[A-Z][a-zA-Z.'\-]+){0,3})\s+record/i)
+              || String(g.title || '').match(/^\s*([^:]{3,40}?)\s*:\s*\d+/i);
+            if (tm) nm = tm[1].replace(/\s+ML$/i,'').trim();
+          }
+          var ln = g.line != null ? g.line : null;
+          if (ln == null) {
+            var lm = String(g.title || g.question || '').match(/at least\s+(\d+)/i) || String(g.title || '').match(/:\s*(\d+)/);
+            if (lm) ln = lm[1];
+          }
+          var under = /\bunder\b/i.test(pp);
+          var over = /\bover\b/i.test(pp) || /\d+\+/.test(pp);
+          if (nm && ln != null) {
+            if (under) return (nm + ' Under ' + ln).replace(/</g,'');
+            return (nm + ' ' + ln + '+').replace(/</g,'');
+          }
           return pp.replace(/</g, '');
         }
         var isTot = /total|f5_total|team_total/.test(mt) || (mt.indexOf('total_') === 0);
@@ -4584,22 +4601,19 @@
           var mtP = String(g.marketType||'').toLowerCase();
           var isP = mtP.indexOf('player_')===0 || mtP.indexOf('pitcher_')===0 || mtP==='player_prop' || mtP==='prop' || g.propProjection != null || g.propPlayer;
           if (isP) {
-            var bits = [];
-            if (g.propProjection != null) bits.push('Proj ' + g.propProjection);
-            if (g.line != null) bits.push('line ' + g.line);
-            if (g.propRole) bits.push(String(g.propRole));
-            if (g.propDetail) bits.push(String(g.propDetail).slice(0, 90));
-            else if (g.playerProp && g.playerProp.detail) bits.push(String(g.playerProp.detail).slice(0, 90));
-            else if (g.playerProp && g.playerProp.L10) bits.push('L10 ' + g.playerProp.L10.avg + ' n=' + g.playerProp.L10.n);
-            if (!bits.length && form) bits.push(form);
-            return bits.length ? '<span class="px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-200/90">' + bits.join(' · ').replace(/</g,'') + '</span>' : '';
+            var chips = '';
+            if (g.propProjection != null) chips += '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">Proj ' + g.propProjection + '</span>';
+            if (g.line != null) chips += '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">Line ' + g.line + '</span>';
+            var pp = g.playerProp || {};
+            if (pp.L5 && pp.L5.avg != null) chips += '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">L5 ' + pp.L5.avg + '</span>';
+            if (pp.L10 && pp.L10.avg != null) chips += '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">L10 ' + pp.L10.avg + (pp.L10.n ? (' n=' + pp.L10.n) : '') + '</span>';
+            if (pp.season && pp.season.avg != null) chips += '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">Season ' + pp.season.avg + '</span>';
+            if (g.propRole) chips += '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">' + String(g.propRole).replace(/</g,'') + '</span>';
+            if (!chips && form) chips = '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">' + form.replace(/</g,'') + '</span>';
+            return chips;
           }
-          return form ? '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">' + form.replace(/</g,'') + '</span>' : '';
-        })() +
-        (function(){
-          var mtP = String(g.marketType||'').toLowerCase();
-          if (mtP.indexOf('player_')===0 || g.propProjection != null) return '';
-          return g.matchupScore != null ? '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">Matchup ' + g.matchupScore + '</span>' : '';
+          return (form ? '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">' + form.replace(/</g,'') + '</span>' : '') +
+            (g.matchupScore != null ? '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">Matchup ' + g.matchupScore + '</span>' : '');
         })() +
         '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">Score ' + (g.score10 != null ? g.score10 : Math.max(1, Math.min(10, Math.round((g.betScore||50)/10)))) + '/10</span>' +
       '</div>' +

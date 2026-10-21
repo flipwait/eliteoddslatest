@@ -426,7 +426,13 @@ function scoreOne(m, ev, matchup, rankOpts, yesIsHome) {
     slug: m.slug || m.marketSlug || (m.url && String(m.url).split('/').filter(Boolean).pop()) || null,
     priorPrice: prior,
     bookImbalance: book ? book.imbalance : null,
-    matchup: matchup || null,
+    matchup: (function(){
+      const t = classifyMarket(m);
+      if (String(t).indexOf('player_')===0 || t==='player_prop' || t==='prop' || String(t).indexOf('pitcher_')===0) return null;
+      const q = String(m.question||'');
+      if (/will\s+[A-Z].*record\s+at\s+least/i.test(q) || /:\s*\d+\+/.test(q)) return null;
+      return matchup || null;
+    })(),
     marketType: classifyMarket(m),
     playerProp: m.playerProp || null,
     propProjection: m.propProjection,
@@ -969,7 +975,19 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
             }
           }
         }
-        if (propMarkets.length) await enrichPlayerProps(propMarkets, league);
+        if (propMarkets.length) {
+          // Prefer enriching markets for the selected filter first
+          const mtQ = String(marketType || '');
+          propMarkets.sort((a, b) => {
+            const ta = String(a.marketType || '');
+            const tb = String(b.marketType || '');
+            const sa = (mtQ.indexOf('player') === 0 || mtQ === 'player_props') && (ta.indexOf('player') === 0 || matchesType(ta, mtQ)) ? 0 : 1;
+            const sb = (mtQ.indexOf('player') === 0 || mtQ === 'player_props') && (tb.indexOf('player') === 0 || matchesType(tb, mtQ)) ? 0 : 1;
+            if (sa !== sb) return sa - sb;
+            return Math.abs((Number(a.yesPrice)||0.5)-0.5) - Math.abs((Number(b.yesPrice)||0.5)-0.5);
+          });
+          await enrichPlayerProps(propMarkets, league || (events[0] && events[0].league));
+        }
       } catch (eProp) {}
       // Prefer a stable order of market families so board is scannable
       const typePriority = {
@@ -1099,6 +1117,12 @@ const flattenTypes = ['map_1','map_2','map_3','map_total','map_winner','inning_1
             line: m.line != null ? Number(m.line) : null,
             side: sc && sc.side ? sc.side : 'YES',
             rank: sc ? sc.rank : 'Pass',
+            playerProp: m.playerProp || null,
+            propProjection: m.propProjection != null ? m.propProjection : (m.playerProp && m.playerProp.projection != null ? m.playerProp.projection : null),
+            propDetail: m.propDetail || (m.playerProp && m.playerProp.detail) || null,
+            propPlayer: m.propPlayer || (m.playerProp && m.playerProp.playerName) || null,
+            propRole: m.propRole || (m.playerProp && m.playerProp.role) || null,
+            propSource: m.propSource || (m.playerProp && m.playerProp.source) || null,
             netEdge: sc ? sc.netEdge : 0,
             probability_edge: sc ? sc.probability_edge : null,
             decimal_odds: sc ? sc.decimal_odds : null,
