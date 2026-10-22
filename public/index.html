@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.126</title>
+  <title>EliteOdds v3.4.127</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.126</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.127</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1897,7 +1897,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.126</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.127</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2273,10 +2273,27 @@
   };
 
   
-  var APP_VERSION = '3.4.126';
+  var APP_VERSION = '3.4.127';
   var APP_CHANGELOG = [
     {
+      version: '3.4.127',
+      title: 'Prop Trade deep-link + honest period settle',
+      items: [
+        'Trade on player props / totals / spreads opens polymarket.us/market/{slug}',
+        'Moneyline Trade still opens the game event page',
+        '1H / 2H / quarter totals settle from ESPN period linescores only',
+        '2H Over uses Q3+Q4 combined — never full-game score (e.g. USA-MRSH 2H=21 → Over 28.5 LOSS)',
+        'Missing period data stays OPEN — not a false WIN',
+        'Settle status WIN / LOSS / PUSH only (cashout is separate)'
+      ]
+    },
+    {
       version: '3.4.126',
+      title: 'Prior build',
+      items: ['See previous changelog entries']
+    },
+    {
+      version: '3.4.110',
       date: '2026-10-20',
       title: 'Player prop pick/title lock — no mixed players on Discord',
       items: [
@@ -3475,7 +3492,32 @@
       if (g.url && /kalshi\.com/i.test(String(g.url))) return g.url;
       return g.url || 'https://kalshi.com/browse/sports';
     }
-    // Polymarket: always open the GAME listed on the card (event page)
+    // Prefer exact market page for props / totals / spreads (deep link)
+    function isLineOrPropMarket(g) {
+      var mt = String(g.marketType || '').toLowerCase();
+      var title = String(g.title || g.question || g.modelPick || '');
+      if (/^player_|^pitcher_|prop|pra|pts|reb|ast/.test(mt)) return true;
+      if (/total|spread|nrfi|yrfi|f5|inning|map_/.test(mt)) return true;
+      if (/\d+\+|at least\s+\d+|over\s+\d|under\s+\d|:\s*\d+/i.test(title)) return true;
+      return false;
+    }
+    function marketSlugFromCard(g) {
+      if (g.marketUrl && /\/market\//i.test(String(g.marketUrl))) {
+        var mm = String(g.marketUrl).match(/\/market\/([^/?#]+)/i);
+        if (mm) return mm[1];
+      }
+      var raw = String(g.marketSlug || '').trim();
+      if (raw && raw.indexOf(' ') < 0 && !/^https?:/i.test(raw)) {
+        // Prefer true market slug (often longer / has total|spread|player tokens)
+        if (/total|spread|pts|player|over|under|neg|pos|pt\d|\d+pt/i.test(raw) || raw.length > 24) return raw.replace(/^\/+/, '').split('?')[0];
+        if (isLineOrPropMarket(g)) return raw.replace(/^\/+/, '').split('?')[0];
+      }
+      var slug = String(g.slug || '').trim();
+      if (slug && /total|spread|pts|player|over|under|neg|pos|pt\d|\d+pt/i.test(slug)) {
+        return slug.replace(/^\/+/, '').replace(/^https?:\/\/[^/]+\/market\//i, '').split('?')[0];
+      }
+      return '';
+    }
     function eventSlugFromCard(g) {
       if (g.eventSlug) return String(g.eventSlug).replace(/^\//, '').split('/')[0].split('?')[0];
       var candidates = [g.url, g.eventUrl, g.slug, g.marketSlug, g.marketUrl];
@@ -3484,18 +3526,21 @@
         if (!s) continue;
         var em = s.match(/\/event\/([^/?#]+)/i);
         if (em) return em[1];
-        // tsc-cfb-kenest-msrst-2026-10-14-total-43pt5 → cfb-kenest-msrst-2026-10-14
         var m = s.match(/((?:nba|nhl|nfl|cfb|cbb|mlb|wnba|ufc|mls|epl)-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2})/i);
         if (m) return m[1];
-        // already event-shaped
         if (/^(nba|nhl|nfl|cfb|cbb|mlb)-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2}$/i.test(s)) return s;
       }
       return '';
     }
+    // Props / O-U / spreads → exact market URL first
+    if (isLineOrPropMarket(g)) {
+      var msExact = marketSlugFromCard(g);
+      if (msExact) return 'https://polymarket.us/market/' + msExact;
+      if (g.marketUrl && /polymarket\.(us|com)\/market\//i.test(String(g.marketUrl))) return g.marketUrl;
+    }
     var es = eventSlugFromCard(g);
     if (es) return 'https://polymarket.us/event/' + es;
-    // Fallback: exact market if we only have a market slug
-    var ms = String(g.marketSlug || g.slug || '').replace(/^https?:\/\/[^/]+\/market\//i, '').split('?')[0];
+    var ms = marketSlugFromCard(g) || String(g.marketSlug || g.slug || '').replace(/^https?:\/\/[^/]+\/market\//i, '').split('?')[0];
     if (ms && ms.indexOf(' ') < 0) return 'https://polymarket.us/market/' + ms;
     if (g.url && /polymarket\.(us|com)/i.test(String(g.url))) return g.url;
     return 'https://polymarket.us';
@@ -6054,9 +6099,9 @@
 
     var color = resKey === 'won' ? 0x22c55e : resKey === 'lost' ? 0xef4444 : 0x64748b;
     var emoji = resKey === 'won' ? '✅' : resKey === 'lost' ? '❌' : '➖';
-    var statusWord = resKey === 'won' ? 'CASHOUT' : resKey === 'lost' ? 'LOSS' : 'PUSH';
+    var statusWord = resKey === 'won' ? 'WIN' : resKey === 'lost' ? 'LOSS' : 'PUSH';
     var headline = resKey === 'won'
-      ? '✅ **WIN · CASHOUT** — pick hit'
+      ? '✅ **WIN** — pick hit on final'
       : resKey === 'lost'
         ? '❌ **LOSS** — pick did not cash'
         : '➖ **PUSH** — stake returned';
@@ -6224,7 +6269,7 @@
         var pnl$ = (pnl != null && unit$ > 0) ? Math.round(pnl * unit$ * 100) / 100 : null;
         var msg;
         if (result === 'won') {
-          msg = '✅ CASHOUT · ' + String(settled.pick || '') +
+          msg = '✅ WIN · ' + String(settled.pick || '') +
             (pnl != null ? (' · +' + pnl + 'u') : '') +
             (pnl$ != null ? (' (+$' + Math.abs(pnl$) + ')') : '') +
             (ok ? ' · Discord win channel notified' : ' · Discord skipped — set Win webhook in Settings');
@@ -6250,7 +6295,7 @@
     var unit$ = Number(stg.unitSize) || 0;
     var pnl$ = (b.pnl != null && unit$ > 0) ? Math.round(Number(b.pnl) * unit$ * 100) / 100 : null;
     var badge =
-      res === 'won' ? '<span class="text-[10px] px-1.5 py-0.5 rounded border border-bb-green/50 text-bb-green bg-bb-green/10 font-semibold">✅ CASHOUT</span>' :
+      res === 'won' ? '<span class="text-[10px] px-1.5 py-0.5 rounded border border-bb-green/50 text-bb-green bg-bb-green/10 font-semibold">✅ WIN</span>' :
       res === 'lost' ? '<span class="text-[10px] px-1.5 py-0.5 rounded border border-bb-red/50 text-bb-red bg-bb-red/10 font-semibold">LOSS</span>' :
       res === 'push' ? '<span class="text-[10px] px-1.5 py-0.5 rounded border border-bb-border text-bb-muted">PUSH</span>' :
       '<span class="text-[10px] px-1.5 py-0.5 rounded border border-bb-border text-bb-muted">OPEN</span>';

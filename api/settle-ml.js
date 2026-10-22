@@ -12,8 +12,8 @@ function isTotalType(mt, pick) {
   const t = String(mt || '').toLowerCase();
   const p = String(pick || '').toLowerCase();
   if (/f5/.test(t) || /f5|first\s*5/.test(p)) return false;
-  if (/total|totals|over|under/.test(t)) return true;
-  if (/\bover\b|\bunder\b|o\/u/.test(p)) return true;
+  if (/total|totals|over|under|total_1h|total_2h|total_q|total_p|team_total/.test(t)) return true;
+  if (/\bover\b|\bunder\b|o\/u|\b1h\b|\b2h\b/.test(p)) return true;
   return false;
 }
 
@@ -103,30 +103,38 @@ module.exports = async function handler(req, res) {
         }
 
         let outcome = null;
-        if (asTotal) outcome = pickWonTotal(pick, result, totalLine);
+        if (asTotal) outcome = pickWonTotal(pick, result, totalLine, mt);
         else outcome = pickWonMoneyline(pick, result);
 
         if (!outcome) {
+          // Period O/U without period linescores must stay OPEN — never grade as FG win
+          const needPeriod = /1h|2h|q1|q2|q3|q4|period|total_1h|total_2h|total_q/i.test(mt + ' ' + pick);
           out.push({
             key: p.key,
-            completed: true,
+            completed: needPeriod ? false : true,
             outcome: null,
-            error: 'could not map pick to result',
+            error: needPeriod
+              ? 'period score missing — left open (not full-game grade)'
+              : 'could not map pick to result',
             score: result.awayScore != null
               ? (result.awayName + ' ' + result.awayScore + ' - ' + result.homeName + ' ' + result.homeScore)
               : null,
             kind: asTotal ? 'total' : 'moneyline',
+            window: needPeriod ? 'period' : 'fg',
           });
           continue;
         }
 
+        const scoreNote = (result.awayName || 'A') + ' ' + result.awayScore + ' - ' + (result.homeName || 'H') + ' ' + result.homeScore;
         out.push({
           key: p.key,
           completed: true,
           outcome,
-          score: (result.awayName || 'A') + ' ' + result.awayScore + ' - ' + (result.homeName || 'H') + ' ' + result.homeScore,
+          score: scoreNote,
           kind: asTotal ? 'total' : 'moneyline',
           source: 'espn',
+          // outcome is won|lost|push only — never invent CASHOUT here
+          status: outcome === 'won' ? 'WIN' : outcome === 'lost' ? 'LOSS' : outcome === 'push' ? 'PUSH' : null,
         });
       } catch (e) {
         out.push({
