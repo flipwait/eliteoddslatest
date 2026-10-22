@@ -1,4 +1,4 @@
-const { finalResultForEvent, pickWonMoneyline, pickWonTotal } = require('../lib/espn');
+const { finalResultForEvent, pickWonMoneyline, pickWonTotal, pickWonPlayerProp } = require('../lib/espn');
 const { settleMlbSpecial, isNrfiType, isF5Type } = require('../lib/mlb-settle');
 const { settleEsportsSpecial, isEsportsLeague } = require('../lib/esports-settle');
 
@@ -75,14 +75,23 @@ module.exports = async function handler(req, res) {
         continue;
       }
 
-      const asTotal = isTotalType(mt, pick);
-      const asMl = !asTotal && (isMoneylineType(mt) || !mt || mt === 'moneyline');
+      function isPlayerPropType(mt, pick) {
+        const t = String(mt || '').toLowerCase();
+        const pk = String(pick || '').toLowerCase();
+        if (/^player_|^pitcher_|player_prop|\bprop\b/.test(t)) return true;
+        if (/\d+\+|at least\s+\d+|over\s+\d+|under\s+\d+/.test(pk) && /pts|points|reb|ast|pra|yard|reception|strikeout|hits|hr/.test(pk + t)) return true;
+        return false;
+      }
 
-      if (!asTotal && !asMl) {
+      const asProp = isPlayerPropType(mt, pick);
+      const asTotal = !asProp && isTotalType(mt, pick);
+      const asMl = !asProp && !asTotal && (isMoneylineType(mt) || !mt || mt === 'moneyline');
+
+      if (!asTotal && !asMl && !asProp) {
         out.push({
           key: p.key,
           skipped: true,
-          reason: 'market type not auto-settled (spread/prop) — settle manually',
+          reason: 'market type not auto-settled (spread/map) — settle manually',
         });
         continue;
       }
@@ -97,13 +106,19 @@ module.exports = async function handler(req, res) {
             key: p.key,
             completed: false,
             error: (result && result.error) || 'not final',
-            kind: asTotal ? 'total' : 'moneyline',
+            kind: asProp ? 'player_prop' : (asTotal ? 'total' : 'moneyline'),
           });
           continue;
         }
 
         let outcome = null;
-        if (asTotal) outcome = pickWonTotal(pick, result, totalLine, mt);
+        if (asProp) {
+          outcome = await pickWonPlayerProp(pick, result, {
+            marketType: mt,
+            totalLine,
+            league,
+          });
+        } else if (asTotal) outcome = pickWonTotal(pick, result, totalLine, mt);
         else outcome = pickWonMoneyline(pick, result);
 
         if (!outcome) {
@@ -119,7 +134,7 @@ module.exports = async function handler(req, res) {
             score: result.awayScore != null
               ? (result.awayName + ' ' + result.awayScore + ' - ' + result.homeName + ' ' + result.homeScore)
               : null,
-            kind: asTotal ? 'total' : 'moneyline',
+            kind: asProp ? 'player_prop' : (asTotal ? 'total' : 'moneyline'),
             window: needPeriod ? 'period' : 'fg',
           });
           continue;
@@ -131,7 +146,7 @@ module.exports = async function handler(req, res) {
           completed: true,
           outcome,
           score: scoreNote,
-          kind: asTotal ? 'total' : 'moneyline',
+          kind: asProp ? 'player_prop' : (asTotal ? 'total' : 'moneyline'),
           source: 'espn',
           // outcome is won|lost|push only — never invent CASHOUT here
           status: outcome === 'won' ? 'WIN' : outcome === 'lost' ? 'LOSS' : outcome === 'push' ? 'PUSH' : null,
@@ -141,7 +156,7 @@ module.exports = async function handler(req, res) {
           key: p.key,
           completed: false,
           error: e.message || 'settle failed',
-          kind: asTotal ? 'total' : 'moneyline',
+          kind: asProp ? 'player_prop' : (asTotal ? 'total' : 'moneyline'),
         });
       }
     }

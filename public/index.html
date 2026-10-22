@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.127</title>
+  <title>EliteOdds v3.4.128</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.127</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.128</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1897,7 +1897,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.127</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.128</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2273,8 +2273,18 @@
   };
 
   
-  var APP_VERSION = '3.4.127';
+  var APP_VERSION = '3.4.128';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.128',
+      title: 'Trade slug safety + player prop ESPN settle',
+      items: [
+        'FIXED — Trade never uses pure event slug under /market/ (games open again)',
+        'FIXED — Props still deep-link when marketSlug is astatc-/tsc-/… shaped',
+        'ADDED — ESPN settle for player props (pts/reb/ast/PRA) from boxscore when final',
+        '1H/2H totals still period-aware; missing period data stays OPEN'
+      ]
+    },
     {
       version: '3.4.127',
       title: 'Prop Trade deep-link + honest period settle',
@@ -3492,60 +3502,63 @@
       if (g.url && /kalshi\.com/i.test(String(g.url))) return g.url;
       return g.url || 'https://kalshi.com/browse/sports';
     }
-    // Prefer exact market page for props / totals / spreads (deep link)
-    function isLineOrPropMarket(g) {
-      var mt = String(g.marketType || '').toLowerCase();
-      var title = String(g.title || g.question || g.modelPick || '');
-      if (/^player_|^pitcher_|prop|pra|pts|reb|ast/.test(mt)) return true;
-      if (/total|spread|nrfi|yrfi|f5|inning|map_/.test(mt)) return true;
-      if (/\d+\+|at least\s+\d+|over\s+\d|under\s+\d|:\s*\d+/i.test(title)) return true;
+
+    function isEventShaped(s) {
+      s = String(s || '').replace(/^\/+/, '').split('?')[0];
+      return /^(nba|nhl|nfl|cfb|cbb|mlb|wnba|ufc|mls|epl)-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2}$/i.test(s);
+    }
+    function extractEventSlug(s) {
+      s = String(s || '');
+      var em = s.match(/\/event\/([^/?#]+)/i);
+      if (em) return em[1];
+      var m = s.match(/((?:nba|nhl|nfl|cfb|cbb|mlb|wnba|ufc|mls|epl)-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2})/i);
+      return m ? m[1] : '';
+    }
+    /** True market slug (prop/line) — never pure event slug */
+    function isMarketShaped(s) {
+      s = String(s || '').replace(/^\/+/, '').split('?')[0];
+      if (!s || isEventShaped(s)) return false;
+      if (/^(astatc|tsc|asc|atc)-/i.test(s)) return true;
+      if (/-(total|spread|pts|reb|ast|blk|stl|threes|pass|rush|rec|gte|lte|neg|pos|1h|2h|q[1-4]|f5|nrfi)/i.test(s)) return true;
+      // long product slugs with extra segments after the date
+      if (/-?\d{4}-\d{2}-\d{2}-.+/i.test(s) && s.length > 28) return true;
       return false;
     }
-    function marketSlugFromCard(g) {
+    function isLineOrPropMarket(g) {
+      var mt = String(g.marketType || '').toLowerCase();
+      if (/^player_|^pitcher_|prop|pra/.test(mt)) return true;
+      if (/total|spread|nrfi|yrfi|f5|inning|map_/.test(mt)) return true;
+      return false;
+    }
+
+    // 1) Exact market deep-link only when we have a real market-shaped slug
+    if (isLineOrPropMarket(g)) {
+      var ms = '';
       if (g.marketUrl && /\/market\//i.test(String(g.marketUrl))) {
         var mm = String(g.marketUrl).match(/\/market\/([^/?#]+)/i);
-        if (mm) return mm[1];
+        if (mm) ms = mm[1];
       }
-      var raw = String(g.marketSlug || '').trim();
-      if (raw && raw.indexOf(' ') < 0 && !/^https?:/i.test(raw)) {
-        // Prefer true market slug (often longer / has total|spread|player tokens)
-        if (/total|spread|pts|player|over|under|neg|pos|pt\d|\d+pt/i.test(raw) || raw.length > 24) return raw.replace(/^\/+/, '').split('?')[0];
-        if (isLineOrPropMarket(g)) return raw.replace(/^\/+/, '').split('?')[0];
+      if (!ms && isMarketShaped(g.marketSlug)) ms = String(g.marketSlug).replace(/^\/+/, '').split('?')[0];
+      if (!ms && isMarketShaped(g.slug)) ms = String(g.slug).replace(/^\/+/, '').split('?')[0];
+      if (ms && isMarketShaped(ms)) {
+        return 'https://polymarket.us/market/' + ms;
       }
-      var slug = String(g.slug || '').trim();
-      if (slug && /total|spread|pts|player|over|under|neg|pos|pt\d|\d+pt/i.test(slug)) {
-        return slug.replace(/^\/+/, '').replace(/^https?:\/\/[^/]+\/market\//i, '').split('?')[0];
-      }
-      return '';
+      // No valid market slug → fall through to event (still opens the game)
     }
-    function eventSlugFromCard(g) {
-      if (g.eventSlug) return String(g.eventSlug).replace(/^\//, '').split('/')[0].split('?')[0];
-      var candidates = [g.url, g.eventUrl, g.slug, g.marketSlug, g.marketUrl];
-      for (var ci = 0; ci < candidates.length; ci++) {
-        var s = String(candidates[ci] || '');
-        if (!s) continue;
-        var em = s.match(/\/event\/([^/?#]+)/i);
-        if (em) return em[1];
-        var m = s.match(/((?:nba|nhl|nfl|cfb|cbb|mlb|wnba|ufc|mls|epl)-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2})/i);
-        if (m) return m[1];
-        if (/^(nba|nhl|nfl|cfb|cbb|mlb)-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2}$/i.test(s)) return s;
-      }
-      return '';
-    }
-    // Props / O-U / spreads → exact market URL first
-    if (isLineOrPropMarket(g)) {
-      var msExact = marketSlugFromCard(g);
-      if (msExact) return 'https://polymarket.us/market/' + msExact;
-      if (g.marketUrl && /polymarket\.(us|com)\/market\//i.test(String(g.marketUrl))) return g.marketUrl;
-    }
-    var es = eventSlugFromCard(g);
+
+    // 2) Always safe: game event page
+    var es = '';
+    if (g.eventSlug && isEventShaped(g.eventSlug)) es = String(g.eventSlug).replace(/^\/+/, '').split('?')[0];
+    if (!es) es = extractEventSlug(g.eventSlug);
+    if (!es) es = extractEventSlug(g.url);
+    if (!es) es = extractEventSlug(g.eventUrl);
+    if (!es) es = extractEventSlug(g.slug);
+    if (!es) es = extractEventSlug(g.marketSlug);
+    if (!es) es = extractEventSlug(g.marketUrl);
     if (es) return 'https://polymarket.us/event/' + es;
-    var ms = marketSlugFromCard(g) || String(g.marketSlug || g.slug || '').replace(/^https?:\/\/[^/]+\/market\//i, '').split('?')[0];
-    if (ms && ms.indexOf(' ') < 0) return 'https://polymarket.us/market/' + ms;
-    if (g.url && /polymarket\.(us|com)/i.test(String(g.url))) return g.url;
+    if (g.url && /polymarket\.(us|com)\/event\//i.test(String(g.url))) return g.url;
     return 'https://polymarket.us';
   }
-
 
   function gameGroupKey(g) {
     var v = String(g.venue || g.source || 'polymarket').toLowerCase();
