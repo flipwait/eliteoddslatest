@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.128</title>
+  <title>EliteOdds v3.4.129</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.128</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.129</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1897,7 +1897,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.128</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.129</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2273,8 +2273,18 @@
   };
 
   
-  var APP_VERSION = '3.4.128';
+  var APP_VERSION = '3.4.129';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.129',
+      title: 'Trade uses event URLs only (PM /market broken)',
+      items: [
+        'FIXED — polymarket.us/market/{slug} redirects to homepage — Trade no longer uses it',
+        'Trade always opens /event/{game-slug} so games load correctly',
+        'Props/totals append ?market=slug when available (same event page)',
+        'Player prop ESPN settle unchanged from 3.4.128'
+      ]
+    },
     {
       version: '3.4.128',
       title: 'Trade slug safety + player prop ESPN settle',
@@ -3496,68 +3506,68 @@
     if (!g) return 'https://polymarket.us';
     var isK = g.venue === 'kalshi' || g.source === 'kalshi';
     if (isK) {
-      if (g.marketUrl) return g.marketUrl;
+      if (g.marketUrl && /kalshi\.com/i.test(String(g.marketUrl))) return g.marketUrl;
       var tick = g.marketTicker || g.marketSlug || g.slug || '';
-      if (tick && !/^https?:/i.test(String(tick))) return 'https://kalshi.com/markets/' + encodeURIComponent(tick);
+      if (tick && !/^https?:/i.test(String(tick))) {
+        // Kalshi series/event pages work better with browse + ticker when full path unknown
+        return 'https://kalshi.com/markets/' + encodeURIComponent(String(tick).split('/').pop());
+      }
       if (g.url && /kalshi\.com/i.test(String(g.url))) return g.url;
       return g.url || 'https://kalshi.com/browse/sports';
     }
 
-    function isEventShaped(s) {
-      s = String(s || '').replace(/^\/+/, '').split('?')[0];
-      return /^(nba|nhl|nfl|cfb|cbb|mlb|wnba|ufc|mls|epl)-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2}$/i.test(s);
-    }
+    // Polymarket US: /market/{slug} REDIRECTS TO HOME (broken).
+    // Only /event/{eventSlug} works. Optional ?market= for prop/line context.
     function extractEventSlug(s) {
       s = String(s || '');
       var em = s.match(/\/event\/([^/?#]+)/i);
       if (em) return em[1];
-      var m = s.match(/((?:nba|nhl|nfl|cfb|cbb|mlb|wnba|ufc|mls|epl)-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2})/i);
+      var m = s.match(/((?:nba|nhl|nfl|cfb|cbb|mlb|wnba|ufc|mls|epl|lal|bun|sea|ucl)-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2})/i);
       return m ? m[1] : '';
     }
-    /** True market slug (prop/line) — never pure event slug */
     function isMarketShaped(s) {
       s = String(s || '').replace(/^\/+/, '').split('?')[0];
-      if (!s || isEventShaped(s)) return false;
+      if (!s) return false;
+      if (/^(nba|nhl|nfl|cfb|cbb|mlb|wnba|ufc|mls|epl)-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2}$/i.test(s)) return false;
       if (/^(astatc|tsc|asc|atc)-/i.test(s)) return true;
-      if (/-(total|spread|pts|reb|ast|blk|stl|threes|pass|rush|rec|gte|lte|neg|pos|1h|2h|q[1-4]|f5|nrfi)/i.test(s)) return true;
-      // long product slugs with extra segments after the date
-      if (/-?\d{4}-\d{2}-\d{2}-.+/i.test(s) && s.length > 28) return true;
-      return false;
-    }
-    function isLineOrPropMarket(g) {
-      var mt = String(g.marketType || '').toLowerCase();
-      if (/^player_|^pitcher_|prop|pra/.test(mt)) return true;
-      if (/total|spread|nrfi|yrfi|f5|inning|map_/.test(mt)) return true;
+      if (/-(total|spread|pts|reb|ast|blk|stl|pra|gte|lte|neg|pos|1h|2h|q[1-4]|f5|nrfi)/i.test(s)) return true;
+      if (/\d{4}-\d{2}-\d{2}-.+/i.test(s) && s.length > 28) return true;
       return false;
     }
 
-    // 1) Exact market deep-link only when we have a real market-shaped slug
-    if (isLineOrPropMarket(g)) {
-      var ms = '';
-      if (g.marketUrl && /\/market\//i.test(String(g.marketUrl))) {
-        var mm = String(g.marketUrl).match(/\/market\/([^/?#]+)/i);
-        if (mm) ms = mm[1];
-      }
-      if (!ms && isMarketShaped(g.marketSlug)) ms = String(g.marketSlug).replace(/^\/+/, '').split('?')[0];
-      if (!ms && isMarketShaped(g.slug)) ms = String(g.slug).replace(/^\/+/, '').split('?')[0];
-      if (ms && isMarketShaped(ms)) {
-        return 'https://polymarket.us/market/' + ms;
-      }
-      // No valid market slug → fall through to event (still opens the game)
-    }
-
-    // 2) Always safe: game event page
     var es = '';
-    if (g.eventSlug && isEventShaped(g.eventSlug)) es = String(g.eventSlug).replace(/^\/+/, '').split('?')[0];
-    if (!es) es = extractEventSlug(g.eventSlug);
+    if (g.eventSlug) es = extractEventSlug(g.eventSlug) || String(g.eventSlug).replace(/^\/+/, '').split('?')[0];
     if (!es) es = extractEventSlug(g.url);
     if (!es) es = extractEventSlug(g.eventUrl);
     if (!es) es = extractEventSlug(g.slug);
     if (!es) es = extractEventSlug(g.marketSlug);
     if (!es) es = extractEventSlug(g.marketUrl);
-    if (es) return 'https://polymarket.us/event/' + es;
-    if (g.url && /polymarket\.(us|com)\/event\//i.test(String(g.url))) return g.url;
-    return 'https://polymarket.us';
+
+    // Derive event from market slug: astatc-nba-ind-no-2026-10-21-pra-… → nba-ind-no-2026-10-21
+    if (!es) {
+      var raw = String(g.marketSlug || g.slug || '');
+      var dm = raw.match(/((?:nba|nhl|nfl|cfb|cbb|mlb|wnba|ufc|mls|epl)-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2})/i);
+      if (dm) es = dm[1];
+    }
+
+    if (!es) {
+      if (g.url && /polymarket\.(us|com)/i.test(String(g.url))) return g.url;
+      return 'https://polymarket.us';
+    }
+
+    var href = 'https://polymarket.us/event/' + es;
+
+    // Attach market slug as query so the event page can focus the line (when supported)
+    var ms = '';
+    if (isMarketShaped(g.marketSlug)) ms = String(g.marketSlug).replace(/^\/+/, '').split('?')[0];
+    else if (isMarketShaped(g.slug)) ms = String(g.slug).replace(/^\/+/, '').split('?')[0];
+    else if (g.marketUrl) {
+      var mm = String(g.marketUrl).match(/\/market\/([^/?#]+)/i);
+      if (mm && isMarketShaped(mm[1])) ms = mm[1];
+    }
+    if (ms) href += '?market=' + encodeURIComponent(ms);
+
+    return href;
   }
 
   function gameGroupKey(g) {
