@@ -141,6 +141,7 @@ module.exports = async function handler(req, res) {
         }
 
         const scoreNote = (result.awayName || 'A') + ' ' + result.awayScore + ' - ' + (result.homeName || 'H') + ' ' + result.homeScore;
+        const detail = asTotal && pickWonTotal._lastDetail ? pickWonTotal._lastDetail : null;
         out.push({
           key: p.key,
           completed: true,
@@ -148,8 +149,16 @@ module.exports = async function handler(req, res) {
           score: scoreNote,
           kind: asProp ? 'player_prop' : (asTotal ? 'total' : 'moneyline'),
           source: 'espn',
-          // outcome is won|lost|push only — never invent CASHOUT here
           status: outcome === 'won' ? 'WIN' : outcome === 'lost' ? 'LOSS' : outcome === 'push' ? 'PUSH' : null,
+          settleDetail: detail
+            ? {
+                side: detail.side,
+                line: detail.line,
+                combined: detail.combined,
+                window: detail.window,
+                reason: detail.reason,
+              }
+            : null,
         });
       } catch (e) {
         out.push({

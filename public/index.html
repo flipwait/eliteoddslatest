@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.129</title>
+  <title>EliteOdds v3.4.131</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1035,7 +1035,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.129</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.131</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1847,48 +1847,50 @@
             <p class="text-[10px] text-bb-muted">Discord 1 = Polymarket · Discord 2 = Kalshi only</p>
           </div>
         
-        <div class="mt-6 rounded-xl border border-cyan-500/25 bg-cyan-500/5 p-4 space-y-3" id="retooler-section">
+        <div class="mt-6 rounded-xl border border-cyan-500/30 bg-gradient-to-b from-cyan-500/10 to-transparent p-4 space-y-3" id="retooler-section">
           <div class="flex items-center justify-between gap-2 flex-wrap">
             <div>
-              <h3 class="text-sm font-semibold text-white">Retooler · Auto Coach</h3>
-              <p class="text-[11px] text-bb-muted mt-0.5">Learns from <strong class="text-white">Elite paper</strong> by sport · suggests rank/edge tweaks · optional AI notes</p>
+              <h3 class="text-sm font-semibold text-white">Coach Dashboard</h3>
+              <p class="text-[11px] text-bb-muted mt-0.5">All <strong class="text-white">Elite paper</strong> · by sport, market, book · fine-tune only (no model rewrite)</p>
             </div>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded border border-cyan-400/30 text-cyan-200">coach</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded border border-cyan-400/30 text-cyan-200">v coach</span>
           </div>
           <div class="grid sm:grid-cols-2 gap-2 text-[11px]">
             <label class="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" id="coach-auto" class="rounded" checked />
-              Show coach summary when opening Journal
+              Auto-refresh when opening Journal
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" id="coach-ai" class="rounded" />
-              Optional AI summary (needs OpenAI key)
+              Optional AI blurb (OpenAI key)
             </label>
-            <label class="block">Min sample before suggestion
+            <label class="block">Min sample / tip
               <select id="coach-min-n" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs">
                 <option value="5">5 settled</option>
-                <option value="10" selected>10 settled</option>
+                <option value="8" selected>8 settled</option>
+                <option value="10">10 settled</option>
                 <option value="15">15 settled</option>
-                <option value="20">20 settled</option>
               </select>
             </label>
             <label class="block">Window
               <select id="coach-window" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs">
-                <option value="10">Last 10 settled</option>
-                <option value="20" selected>Last 20 settled</option>
-                <option value="50">Last 50 settled</option>
+                <option value="20">Last 20</option>
+                <option value="50" selected>Last 50</option>
+                <option value="100">Last 100</option>
                 <option value="0">All settled</option>
               </select>
             </label>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button type="button" id="btn-run-coach" class="px-3 py-1.5 rounded-lg border border-cyan-400/40 text-cyan-200 text-xs bg-cyan-500/10">Run coach now</button>
-            <button type="button" id="btn-coach-apply" class="px-3 py-1.5 rounded-lg border border-bb-green/40 text-bb-green text-xs hidden">Apply suggested filters</button>
+            <button type="button" id="btn-run-coach" class="px-3 py-1.5 rounded-lg border border-cyan-400/40 text-cyan-200 text-xs bg-cyan-500/10 font-semibold">Refresh dashboard</button>
+            <button type="button" id="btn-coach-settle" class="px-3 py-1.5 rounded-lg border border-bb-green/40 text-bb-green text-xs">Settle open (ESPN)</button>
+            <button type="button" id="btn-coach-apply" class="px-3 py-1.5 rounded-lg border border-amber-400/40 text-amber-200 text-xs hidden">Apply top fine-tune</button>
           </div>
-          <div id="coach-out" class="text-[11px] text-bb-muted space-y-2 max-h-72 overflow-y-auto leading-snug">
-            <p class="text-bb-muted">Run coach after settled Elite paper (Journal → ESPN settle). Future games stay Open on purpose.</p>
+          <div id="coach-open-queue" class="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2.5 text-[11px] text-bb-muted"></div>
+          <div id="coach-out" class="text-[11px] text-bb-muted space-y-3 max-h-[28rem] overflow-y-auto leading-snug">
+            <p class="text-bb-muted">Open Coach Dashboard after Scan (Elites auto-log) and ESPN settle for a full picture.</p>
           </div>
-          <div id="open-breakdown" class="rounded-lg border border-bb-border bg-black/20 p-2 text-[10px] text-bb-muted"></div>
+          <div id="open-breakdown" class="hidden"></div>
         </div>
 
         <div class="mt-6 rounded-xl border border-bb-border bg-bb-elev/40 p-4 space-y-3">
@@ -1897,7 +1899,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.129</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.131</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2273,8 +2275,32 @@
   };
 
   
-  var APP_VERSION = '3.4.129';
+  var APP_VERSION = '3.4.131';
   var APP_CHANGELOG = [
+    {
+      version: '3.4.131',
+      title: 'Coach Dashboard · Elite paper by category',
+      items: [
+        'ADDED — Coach Dashboard: overall W-L, by sport / market / book / price band',
+        'ADDED — Open queue: not started · live · past start → ESPN settle',
+        'ADDED — Fine-tune tips per category (tighten edge / pause — no model rewrite)',
+        'ADDED — Player props tracked as their own market bucket when Elite',
+        'CHANGED — Elite log captures side, entry price, market bucket, edge, rank',
+        'UNCHANGED — Coach still uses Elite paper only'
+      ]
+    },
+    {
+      version: '3.4.130',
+      title: 'O/U settle fix · calendar W/L · Elite coach',
+      items: [
+        'FIXED — O/U grade uses Over/Under line from the pick text (not a shared wrong totalLine)',
+        'FIXED — Over with combined score above the line grades WIN (e.g. 54 vs Over 0.5/8.5)',
+        'ADDED — Settle reason on Elite rows: Combined X vs line → WIN/LOSS',
+        'ADDED — Re-grade existing O/U paper from final score on next ESPN settle',
+        'CHANGED — Calendar paper rows: green/red borders, WIN/LOSS labels, score math',
+        'UNCHANGED — AI Coach still uses Elite paper only'
+      ]
+    },
     {
       version: '3.4.129',
       title: 'Trade uses event URLs only (PM /market broken)',
@@ -6446,35 +6472,51 @@
     ledger.forEach(function (e) { keys[e.key] = true; });
     var added = 0;
     (list || []).forEach(function (g) {
-      if (String(g.rank || '').toLowerCase() !== 'elite') return;
+      var rk = String(g.rank || '').toLowerCase();
+      if (rk !== 'elite' && rk !== 'superelite' && rk !== 'super_elite' && rk !== 'potd') return;
       var key = eliteKey(g);
       if (!key || keys[key]) return;
       keys[key] = true;
+      var mt = String(g.marketType || 'moneyline').toLowerCase();
+      var pick = String(g.modelPick || '');
+      var side = null;
+      if (/\bunder\b/i.test(pick)) side = 'under';
+      else if (/\bover\b/i.test(pick)) side = 'over';
+      var entry = g.market_probability != null ? g.market_probability : g.impliedPct;
+      if (entry != null && entry > 1) entry = entry / 100;
       ledger.unshift({
         key: key,
         id: g.id || null,
         title: g.eventTitle || g.title,
         pick: g.modelPick,
         league: g.league,
-        venue: g.venue || 'polymarket',
-        marketType: g.marketType || 'moneyline',
+        venue: g.venue || g.source || 'polymarket',
+        marketType: mt,
+        marketBucket: coachMarketBucket(mt, pick),
+        side: side,
         modelPct: g.model_probability,
         marketPct: g.market_probability != null ? g.market_probability : g.impliedPct,
-        marketType: g.marketType || 'moneyline',
+        entryPrice: entry,
         score10: g.score10 != null ? g.score10 : Math.max(1, Math.min(10, Math.round((g.betScore || 50) / 10))),
-        url: g.url || null,
+        betScore: g.betScore != null ? g.betScore : null,
+        netEdge: g.netEdge != null ? g.netEdge : g.probability_edge,
+        url: g.url || g.marketUrl || null,
+        marketSlug: g.marketSlug || null,
+        eventSlug: g.eventSlug || null,
         startTime: g.startTime || null,
         homeName: g.homeName || null,
         awayName: g.awayName || null,
-        totalLine: g.totalLine != null ? g.totalLine : null,
+        totalLine: g.totalLine != null ? g.totalLine : (g.line != null ? g.line : null),
+        line: g.line != null ? g.line : null,
         question: g.question || g.title || null,
+        rank: rk === 'potd' ? 'potd' : (rk.indexOf('super') >= 0 ? 'super_elite' : 'elite'),
         result: 'open',
         at: new Date().toISOString(),
         paper: true
       });
       added++;
     });
-    if (added) saveEliteLedger(ledger);
+    if (added) saveEliteLedger(ledger.slice(0, 500));
     return added;
   }
   function settleElite(key, result) {
@@ -6720,12 +6762,14 @@
       if (isTot) {
         var side = /under/i.test(pickRaw) ? 'Under' : (/over/i.test(pickRaw) ? 'Over' : pickRaw);
         var totLine = e.totalLine;
+        var pmLine = pickRaw.match(/\b(?:over|under)\s*([0-9]+(?:\.[0-9]+)?)/i);
+        if (pmLine) totLine = pmLine[1];
         if (totLine == null) {
           var blob = String(e.title || '') + ' ' + String(e.question || '') + ' ' + pickRaw;
           var mm = blob.match(/(?:o\/u|over\/under|total)\s*([0-9]+\.?[0-9]*)/i) || blob.match(/\b([0-9]{1,2}\.[05])\b/);
           if (mm) totLine = mm[1];
         }
-        var scope = /f5/.test(mt) ? 'F5' : 'Full game';
+        var scope = /f5/.test(mt) ? 'F5' : (/1h|first\s*half/i.test(mt + pickRaw) ? '1H' : (/2h|second\s*half/i.test(mt + pickRaw) ? '2H' : 'Full game'));
         pickShow = scope + ' ' + side + (totLine != null ? (' ' + totLine) : '');
       }
       var whenStr = '';
@@ -6737,7 +6781,15 @@
           }
         } catch (err) {}
       }
-      return '<div class="rounded-lg border border-bb-border bg-black/20 p-2 text-[11px]">' +
+      var borderCls = res === 'won' ? 'border-bb-green/40 bg-bb-green/5' : (res === 'lost' ? 'border-bb-red/35 bg-bb-red/5' : 'border-bb-border bg-black/20');
+      var reasonLine = '';
+      if (e.settleReason) reasonLine = String(e.settleReason);
+      else if (isTot && e.finalCombined != null) {
+        reasonLine = 'Combined ' + e.finalCombined + (pickShow ? (' · ' + pickShow) : '');
+      } else if (e.finalScore && isTot) {
+        reasonLine = 'Final ' + String(e.finalScore);
+      }
+      return '<div class="rounded-lg border ' + borderCls + ' p-2 text-[11px]">' +
         '<div class="flex justify-between gap-2">' +
           '<div class="min-w-0">' +
             '<div class="text-white font-medium truncate">' + pickShow.replace(/</g,'') + '</div>' +
@@ -6748,7 +6800,7 @@
               (priceStr ? ' · price ' + priceStr : '') +
               (mod != null ? ' · model ' + mod + '%' : '') +
               (e.score10 != null ? ' · ' + e.score10 + '/10' : '') +
-              ' · <span class="' + (res === 'won' ? 'text-bb-green' : res === 'lost' ? 'text-bb-red' : 'text-bb-muted') + '">' + res.toUpperCase() + '</span>' +
+              ' · <span class="' + (res === 'won' ? 'text-bb-green font-semibold' : res === 'lost' ? 'text-bb-red font-semibold' : 'text-bb-muted') + '">' + (res === 'won' ? 'WIN' : res === 'lost' ? 'LOSS' : res.toUpperCase()) + '</span>' +
               (res !== 'open' && res !== 'push' ? (function () {
                 var money = elitePnlMode() !== 'units';
                 if (money) {
@@ -6758,8 +6810,9 @@
                 var u = eliteUnitPnl(e);
                 return ' · ' + (u >= 0 ? '+' : '') + u + 'u';
               })() : (res === 'push' ? ' · $0' : '')) +
-              (e.finalScore ? ' · final ' + String(e.finalScore).replace(/</g,'') : '') +
             '</div>' +
+            (e.finalScore ? '<div class="text-[10px] text-bb-muted mt-0.5">🏁 ' + String(e.finalScore).replace(/</g,'') + (e.finalCombined != null ? (' · combined <b class="text-white/80">' + e.finalCombined + '</b>') : '') + '</div>' : '') +
+            (reasonLine ? '<div class="text-[10px] text-cyan-200/90 mt-0.5">📐 ' + reasonLine.replace(/</g,'') + '</div>' : '') +
           '</div>' +
           (res === 'open'
             ? '<div class="flex flex-col gap-1 shrink-0">' +
@@ -6909,6 +6962,12 @@
         e.settledAt = new Date().toISOString();
         e.settleSource = 'espn';
         e.finalScore = x.score || null;
+        if (x.settleDetail) {
+          e.settleDetail = x.settleDetail;
+          e.settleReason = x.settleDetail.reason || null;
+          e.finalCombined = x.settleDetail.combined != null ? x.settleDetail.combined : null;
+          if (x.settleDetail.line != null) e.totalLine = x.settleDetail.line;
+        }
         return e;
       });
       saveEliteLedger(eList);
@@ -6925,6 +6984,12 @@
         else b.pnl = 0;
         b.settleSource = 'espn';
         b.finalScore = x.score || null;
+        if (x.settleDetail) {
+          b.settleDetail = x.settleDetail;
+          b.settleReason = x.settleDetail.reason || null;
+          b.finalCombined = x.settleDetail.combined != null ? x.settleDetail.combined : null;
+          if (x.settleDetail.line != null) b.totalLine = x.settleDetail.line;
+        }
         settledRows.push(b);
         return b;
       });
@@ -6954,6 +7019,30 @@
         else if (x.outcome === 'push') push++;
         else openLeft++;
       });
+      // Re-grade O/U from finalScore text when detail missing (fixes prior inverted/wrong outcomes)
+      try {
+        eList = eliteLedger().map(function (e) {
+          var mt = String(e.marketType || '').toLowerCase();
+          var pk = String(e.pick || '');
+          var isTot = /total|over|under/.test(mt) || /\bover\b|\bunder\b/i.test(pk);
+          if (!isTot || !e.finalScore) return e;
+          var scores = String(e.finalScore).match(/(\d+)\s*[-–]\s*(\d+)/);
+          if (!scores) return e;
+          var combined = Number(scores[1]) + Number(scores[2]);
+          if (!Number.isFinite(combined)) return e;
+          var side = /\bunder\b/i.test(pk) ? 'under' : (/\bover\b/i.test(pk) ? 'over' : null);
+          var lm = pk.match(/\b(?:over|under)\s*([0-9]+(?:\.[0-9]+)?)/i);
+          var line = lm ? Number(lm[1]) : (e.totalLine != null ? Number(e.totalLine) : null);
+          if (!side || line == null || !Number.isFinite(line)) return e;
+          var outcome = combined === line ? 'push' : (side === 'over' ? (combined > line ? 'won' : 'lost') : (combined < line ? 'won' : 'lost'));
+          e.result = outcome;
+          e.finalCombined = combined;
+          e.settleReason = combined + (combined > line ? ' > ' : combined < line ? ' < ' : ' = ') + line + ' → ' + side + ' ' + outcome;
+          e.settleSource = e.settleSource || 'espn-regrade';
+          return e;
+        });
+        saveEliteLedger(eList);
+      } catch (rgErr) {}
       renderEliteReview();
       renderJournal();
       alert('ESPN settle · W' + won + ' L' + lost + ' P' + push + ' · still open ' + openLeft + ' (not started or no final yet)');
@@ -6963,6 +7052,87 @@
   }
 
 
+
+  function coachMarketBucket(mt, pick) {
+    mt = String(mt || '').toLowerCase();
+    pick = String(pick || '').toLowerCase();
+    if (/^player_|pitcher_|prop|pra/.test(mt) || /\d+\+|at least\s+\d+/.test(pick) && /pts|reb|ast|pra|yard|hit|strike/.test(mt + ' ' + pick)) return 'player_prop';
+    if (/nrfi|yrfi/.test(mt) || /\bnrfi\b|\byrfi\b/.test(pick)) return 'nrfi';
+    if (/f5/.test(mt) || /first\s*5|f5/.test(pick)) return 'f5';
+    if (/total|over|under/.test(mt) || /\bover\b|\bunder\b/.test(pick)) return 'total';
+    if (/spread/.test(mt)) return 'spread';
+    if (/map_/.test(mt)) return 'map';
+    return 'moneyline';
+  }
+  function coachPriceBand(entry) {
+    if (entry == null || !Number.isFinite(Number(entry))) return 'unknown';
+    var p = Number(entry);
+    if (p > 1) p = p / 100;
+    if (p < 0.20) return 'sub20';
+    if (p < 0.35) return '20-35';
+    if (p < 0.50) return '35-50';
+    if (p < 0.65) return '50-65';
+    return '65+';
+  }
+  function coachDashboardStats(list, windowN) {
+    list = list || eliteLedger();
+    var openB = eliteOpenBreakdown();
+    var settled = list.filter(function (e) {
+      var r = eliteNormResult(e.result);
+      return r === 'won' || r === 'lost' || r === 'push';
+    }).sort(function (a, b) {
+      return new Date(b.settledAt || b.at || 0) - new Date(a.settledAt || a.at || 0);
+    });
+    if (windowN > 0) settled = settled.slice(0, windowN);
+    function emptyBucket() { return { w: 0, l: 0, p: 0, n: 0, units: 0 }; }
+    function add(map, key, e) {
+      if (!map[key]) map[key] = emptyBucket();
+      var b = map[key];
+      b.n++;
+      var r = eliteNormResult(e.result);
+      if (r === 'won') { b.w++; b.units += e.pnl != null ? Number(e.pnl) : 1; }
+      else if (r === 'lost') { b.l++; b.units += e.pnl != null ? Number(e.pnl) : -1; }
+      else { b.p++; }
+    }
+    var bySport = {}, byMarket = {}, byBook = {}, bySide = {}, byBand = {};
+    settled.forEach(function (e) {
+      var lg = String(e.league || 'unk').toLowerCase();
+      var mt = e.marketBucket || coachMarketBucket(e.marketType, e.pick);
+      var book = String(e.venue || e.source || 'polymarket').toLowerCase() === 'kalshi' ? 'kalshi' : 'polymarket';
+      var side = e.side || (/\bunder\b/i.test(String(e.pick || '')) ? 'under' : (/\bover\b/i.test(String(e.pick || '')) ? 'over' : 'other'));
+      var band = coachPriceBand(e.entryPrice != null ? e.entryPrice : e.marketPct);
+      add(bySport, lg, e);
+      add(byMarket, mt, e);
+      add(byBook, book, e);
+      if (mt === 'total') add(bySide, side, e);
+      add(byBand, band, e);
+    });
+    var w = 0, l = 0, p = 0, units = 0;
+    settled.forEach(function (e) {
+      var r = eliteNormResult(e.result);
+      if (r === 'won') { w++; units += e.pnl != null ? Number(e.pnl) : 1; }
+      else if (r === 'lost') { l++; units += e.pnl != null ? Number(e.pnl) : -1; }
+      else p++;
+    });
+    var streak = settled.slice(0, 10).map(function (e) {
+      var r = eliteNormResult(e.result);
+      return r === 'won' ? 'W' : r === 'lost' ? 'L' : 'P';
+    }).reverse().join(' ');
+    return {
+      open: openB,
+      settled: settled.length,
+      w: w, l: l, p: p,
+      hit: (w + l) ? Math.round(w / (w + l) * 1000) / 10 : null,
+      units: Math.round(units * 10) / 10,
+      streak: streak,
+      bySport: bySport,
+      byMarket: byMarket,
+      byBook: byBook,
+      bySide: bySide,
+      byBand: byBand,
+      totalLogged: list.length
+    };
+  }
 
   function eliteOpenBreakdown() {
     var list = eliteLedger().filter(function (e) { return String(e.result || 'open') === 'open'; });
@@ -6990,96 +7160,165 @@
       '<div class="mt-1 text-bb-muted">Far-out games stay Open on purpose. ESPN settle only handles moneyline + full-game O/U after finals. Spreads / F5 / props stay manual.</div>';
   }
   function coachBucketStats(list, windowN) {
-    var settled = list.filter(function (e) {
-      var r = String(e.result || '');
-      return r === 'won' || r === 'lost' || r === 'push';
-    }).sort(function (a, b) {
-      return new Date(b.settledAt || b.at || 0) - new Date(a.settledAt || a.at || 0);
-    });
-    if (windowN > 0) settled = settled.slice(0, windowN);
-    var by = {};
-    settled.forEach(function (e) {
-      var lg = String(e.league || 'unk').toLowerCase();
-      var mt = String(e.marketType || 'moneyline').toLowerCase();
-      if (/total|over|under/.test(mt) || /\bover\b|\bunder\b/i.test(String(e.pick || ''))) mt = 'total';
-      else if (/spread/.test(mt)) mt = 'spread';
-      else if (/nrfi|yrfi/.test(mt)) mt = 'nrfi';
-      else mt = 'moneyline';
-      var k = lg + '|' + mt;
-      if (!by[k]) by[k] = { league: lg, market: mt, w: 0, l: 0, p: 0, n: 0 };
-      by[k].n++;
-      if (e.result === 'won') by[k].w++;
-      else if (e.result === 'lost') by[k].l++;
-      else by[k].p++;
-    });
-    return Object.keys(by).map(function (k) { return by[k]; }).sort(function (a, b) { return b.n - a.n; });
+    var stats = coachDashboardStats(list, windowN);
+    return Object.keys(stats.bySport || {}).map(function (lg) {
+      var b = stats.bySport[lg];
+      return { league: lg, market: 'all', w: b.w, l: b.l, p: b.p, n: b.n, units: b.units };
+    }).sort(function (a, b) { return b.n - a.n; });
   }
-  function coachSuggest(buckets, minN) {
+  function coachSuggestFromStats(stats, minN) {
     var tips = [];
-    buckets.forEach(function (b) {
-      var decided = b.w + b.l;
-      if (decided < minN) {
-        tips.push({ level: 'info', text: (b.league + ' ' + b.market).toUpperCase() + ': only ' + decided + ' settled (need ' + minN + ') — keep filters.' });
+    function hitRate(b) {
+      var d = b.w + b.l;
+      return d ? b.w / d : null;
+    }
+    function pushBucket(label, b, sport, market) {
+      var d = b.w + b.l;
+      if (d < minN) {
+        tips.push({ level: 'info', text: label + ': only ' + d + ' settled (need ' + minN + ') — keep filters.', sport: sport, market: market });
         return;
       }
-      var hit = b.w / decided;
-      var label = (b.league + ' · ' + b.market).toUpperCase();
-      if (hit >= 0.58) {
-        tips.push({ level: 'good', text: label + ': ' + b.w + '-' + b.l + ' (' + Math.round(hit * 100) + '%) — working. Optional: loosen min edge −0.5pp.', sport: b.league, action: 'loosen' });
+      var hit = hitRate(b);
+      var u = Math.round((b.units || 0) * 10) / 10;
+      if (hit >= 0.55) {
+        tips.push({ level: 'good', text: label + ': ' + b.w + '-' + b.l + ' (' + Math.round(hit * 100) + '%) · ' + (u >= 0 ? '+' : '') + u + 'u — OK, leave alone.', sport: sport, market: market, action: null });
       } else if (hit <= 0.42) {
-        tips.push({ level: 'warn', text: label + ': ' + b.w + '-' + b.l + ' (' + Math.round(hit * 100) + '%) — cold. Tighten +1pp min edge or Elite-only.', sport: b.league, action: 'tighten' });
+        tips.push({ level: 'warn', text: label + ': ' + b.w + '-' + b.l + ' (' + Math.round(hit * 100) + '%) · ' + (u >= 0 ? '+' : '') + u + 'u — cold. Tighten +1pp edge or pause bucket.', sport: sport, market: market, action: 'tighten' });
       } else {
-        tips.push({ level: 'ok', text: label + ': ' + b.w + '-' + b.l + ' (' + Math.round(hit * 100) + '%) — neutral. Hold filters.' });
+        tips.push({ level: 'ok', text: label + ': ' + b.w + '-' + b.l + ' (' + Math.round(hit * 100) + '%) · hold filters.', sport: sport, market: market });
       }
+    }
+    Object.keys(stats.byMarket || {}).forEach(function (mt) {
+      pushBucket('Market · ' + mt, stats.byMarket[mt], null, mt);
     });
-    if (!tips.length) tips.push({ level: 'info', text: 'No settled Elite paper yet. Scan → track Elites → after games end: Journal → ESPN settle.' });
+    Object.keys(stats.bySport || {}).forEach(function (lg) {
+      pushBucket('Sport · ' + lg.toUpperCase(), stats.bySport[lg], lg, null);
+    });
+    Object.keys(stats.byBook || {}).forEach(function (bk) {
+      pushBucket('Book · ' + bk, stats.byBook[bk], null, null);
+    });
+    if (stats.bySide && (stats.bySide.over || stats.bySide.under)) {
+      if (stats.bySide.over) pushBucket('Totals · Over', stats.bySide.over, null, 'total');
+      if (stats.bySide.under) pushBucket('Totals · Under', stats.bySide.under, null, 'total');
+    }
+    if (!tips.length) tips.push({ level: 'info', text: 'No settled Elite paper yet. Scan → Elites auto-log → ESPN settle after finals.' });
+    // Sort warns first
+    tips.sort(function (a, b) {
+      var o = { warn: 0, ok: 1, good: 2, info: 3 };
+      return (o[a.level] || 9) - (o[b.level] || 9);
+    });
     return tips;
+  }
+  function coachSuggest(buckets, minN) {
+    return coachSuggestFromStats(coachDashboardStats(eliteLedger(), 0), minN);
+  }
+  function coachFmtBucketTable(map, labelFn) {
+    var keys = Object.keys(map || {});
+    if (!keys.length) return '<p class="text-bb-muted text-[10px]">No settled data yet.</p>';
+    keys.sort(function (a, b) { return map[b].n - map[a].n; });
+    return '<div class="space-y-1">' + keys.map(function (k) {
+      var b = map[k];
+      var d = b.w + b.l;
+      var hit = d ? Math.round(b.w / d * 100) : null;
+      var u = Math.round((b.units || 0) * 10) / 10;
+      var flag = d < 5 ? 'text-bb-muted' : (hit != null && hit <= 42 ? 'text-bb-red' : (hit != null && hit >= 55 ? 'text-bb-green' : 'text-amber-200'));
+      var name = labelFn ? labelFn(k) : k;
+      return '<div class="flex justify-between gap-2 ' + flag + '"><span>' + name + ' · n' + b.n + '</span><span class="font-mono">' + b.w + '-' + b.l + (hit != null ? ' · ' + hit + '%' : '') + ' · ' + (u >= 0 ? '+' : '') + u + 'u</span></div>';
+    }).join('') + '</div>';
   }
   async function runCoach(opts) {
     opts = opts || {};
     var out = $('coach-out');
     if (!out) return;
-    var minN = parseInt(($('coach-min-n') && $('coach-min-n').value) || '10', 10) || 10;
-    var win = parseInt(($('coach-window') && $('coach-window').value) || '20', 10);
-    if (isNaN(win)) win = 20;
-    var buckets = coachBucketStats(eliteLedger(), win);
-    var tips = coachSuggest(buckets, minN);
-    var openB = eliteOpenBreakdown();
+    var minN = parseInt(($('coach-min-n') && $('coach-min-n').value) || '8', 10) || 8;
+    var win = parseInt(($('coach-window') && $('coach-window').value) || '50', 10);
+    if (isNaN(win)) win = 50;
+    var stats = coachDashboardStats(eliteLedger(), win);
+    var tips = coachSuggestFromStats(stats, minN);
+    var openB = stats.open || eliteOpenBreakdown();
+
+    // Open queue panel
+    var oq = $('coach-open-queue');
+    if (oq) {
+      oq.innerHTML = '<div class="flex flex-wrap items-center justify-between gap-2">' +
+        '<div><strong class="text-white">Open queue</strong> · <span class="text-white">' + openB.total + '</span> open Elites</div>' +
+        '<button type="button" id="btn-coach-settle-inline" class="px-2 py-1 rounded border border-bb-green/40 text-bb-green text-[10px]">Run ESPN settle</button></div>' +
+        '<div class="mt-1.5 grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[10px]">' +
+        '<div class="rounded bg-black/30 px-2 py-1"><span class="text-violet-200">' + openB.future + '</span> not started</div>' +
+        '<div class="rounded bg-black/30 px-2 py-1"><span class="text-amber-200">' + openB.due + '</span> live / due</div>' +
+        '<div class="rounded bg-black/30 px-2 py-1"><span class="text-bb-orange">' + openB.pastNoSettle + '</span> past start → settle</div>' +
+        '<div class="rounded bg-black/30 px-2 py-1"><span class="text-bb-muted">' + (openB.unknown || 0) + '</span> no time</div></div>' +
+        '<p class="text-[10px] text-bb-muted mt-1">Far-out games stay Open on purpose. ML + FG O/U + NRFI/F5 + some props auto-settle; spreads stay manual.</p>';
+      var bi = document.getElementById('btn-coach-settle-inline');
+      if (bi) bi.onclick = function () { settleMlFromEspn({}); };
+    }
+
     var bits = [];
-    bits.push('<div class="text-white font-medium">Coach report · Elite paper</div>');
-    bits.push('<div>Open: <strong class="text-white">' + openB.total + '</strong> (' + openB.future + ' future · ' + openB.pastNoSettle + ' past start → ESPN settle · ' + openB.due + ' live)</div>');
-    tips.forEach(function (t) {
-      var col = t.level === 'good' ? 'text-bb-green' : (t.level === 'warn' ? 'text-bb-orange' : 'text-bb-muted');
-      bits.push('<div class="' + col + '">• ' + t.text + '</div>');
+    bits.push('<div class="rounded-lg border border-cyan-500/20 bg-black/25 p-2.5">');
+    bits.push('<div class="text-white font-semibold text-xs mb-1.5">Overall · Elite paper' + (win > 0 ? ' (window ' + win + ')' : ' (all)') + '</div>');
+    bits.push('<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">');
+    bits.push('<div><div class="text-[10px] text-bb-muted">Logged</div><div class="text-white font-mono">' + stats.totalLogged + '</div></div>');
+    bits.push('<div><div class="text-[10px] text-bb-muted">Settled</div><div class="text-white font-mono">' + stats.settled + '</div></div>');
+    bits.push('<div><div class="text-[10px] text-bb-muted">W–L</div><div class="text-white font-mono">' + stats.w + '–' + stats.l + (stats.hit != null ? ' · ' + stats.hit + '%' : '') + '</div></div>');
+    bits.push('<div><div class="text-[10px] text-bb-muted">Units</div><div class="font-mono ' + (stats.units >= 0 ? 'text-bb-green' : 'text-bb-red') + '">' + (stats.units >= 0 ? '+' : '') + stats.units + 'u</div></div>');
+    bits.push('</div>');
+    if (stats.streak) bits.push('<div class="text-[10px] text-bb-muted mt-1.5">Streak (oldest→newest): <span class="text-white/90 font-mono">' + stats.streak + '</span></div>');
+    bits.push('</div>');
+
+    bits.push('<div class="grid sm:grid-cols-2 gap-2">');
+    bits.push('<div class="rounded-lg border border-bb-border bg-black/20 p-2"><div class="text-[10px] uppercase tracking-wide text-bb-muted mb-1">By sport</div>' + coachFmtBucketTable(stats.bySport, function (k) { return k.toUpperCase(); }) + '</div>');
+    bits.push('<div class="rounded-lg border border-bb-border bg-black/20 p-2"><div class="text-[10px] uppercase tracking-wide text-bb-muted mb-1">By market</div>' + coachFmtBucketTable(stats.byMarket, function (k) { return k; }) + '</div>');
+    bits.push('<div class="rounded-lg border border-bb-border bg-black/20 p-2"><div class="text-[10px] uppercase tracking-wide text-bb-muted mb-1">By book</div>' + coachFmtBucketTable(stats.byBook, function (k) { return k === 'kalshi' ? 'Kalshi' : 'Polymarket'; }) + '</div>');
+    bits.push('<div class="rounded-lg border border-bb-border bg-black/20 p-2"><div class="text-[10px] uppercase tracking-wide text-bb-muted mb-1">Price band</div>' + coachFmtBucketTable(stats.byBand, function (k) { return k + '¢'; }) + '</div>');
+    bits.push('</div>');
+
+    if (stats.bySide && (stats.bySide.over || stats.bySide.under)) {
+      bits.push('<div class="rounded-lg border border-bb-border bg-black/20 p-2"><div class="text-[10px] uppercase tracking-wide text-bb-muted mb-1">Totals · Over vs Under</div>' + coachFmtBucketTable(stats.bySide, function (k) { return k; }) + '</div>');
+    }
+
+    bits.push('<div class="rounded-lg border border-amber-500/25 bg-amber-500/5 p-2.5">');
+    bits.push('<div class="text-white font-semibold text-xs mb-1">Fine-tune tips (category only)</div>');
+    tips.slice(0, 12).forEach(function (tip) {
+      var col = tip.level === 'good' ? 'text-bb-green' : (tip.level === 'warn' ? 'text-bb-orange' : 'text-bb-muted');
+      bits.push('<div class="' + col + ' text-[11px] mb-1">• ' + tip.text + '</div>');
     });
+    bits.push('</div>');
+
     window.__coachTips = tips;
+    window.__coachStats = stats;
     var applyBtn = $('btn-coach-apply');
-    if (applyBtn) applyBtn.classList.toggle('hidden', !tips.some(function (t) { return t.action === 'tighten' || t.action === 'loosen'; }));
+    if (applyBtn) applyBtn.classList.toggle('hidden', !tips.some(function (x) { return x.action === 'tighten'; }));
+
     out.innerHTML = bits.join('');
     updateOpenBreakdownUI();
+
     if ($('coach-ai') && $('coach-ai').checked) {
-      var st = settings();
-      var oai = getOpenAIKey();
+      var oai = typeof getOpenAIKey === 'function' ? getOpenAIKey() : '';
       if (!oai) {
-        out.innerHTML += '<div class="text-bb-orange mt-1">AI coach: add OpenAI key in Settings and click Save.</div>';
+        out.innerHTML += '<div class="text-bb-orange mt-1">AI: add OpenAI key in Settings + Save.</div>';
         return;
       }
-      out.innerHTML += '<div class="text-bb-muted mt-1">AI coach thinking…</div>';
+      out.innerHTML += '<div class="text-bb-muted mt-1">AI summary…</div>';
       try {
-        var prompt = 'Sports betting model coach. 4 short bullets from this Elite paper data only. Do not invent stats.\n' + tips.map(function (t) { return t.text; }).join('\n') + '\nOpen: ' + JSON.stringify(openB);
+        var prompt = 'Elite paper coach. 4 short bullets only from this data. Do not invent numbers.\n' +
+          'Overall W' + stats.w + ' L' + stats.l + ' hit ' + stats.hit + '% units ' + stats.units + '\n' +
+          tips.slice(0, 8).map(function (x) { return x.text; }).join('\n') +
+          '\nOpen: ' + JSON.stringify(openB) +
+          '\nSuggest fine-tunes only (edge/pause category), not a full model rewrite.';
         var r = await fetch('/api/tools', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'openai', openaiKey: getOpenAIKey(), prompt: prompt, max_tokens: 350 })
+          body: JSON.stringify({ action: 'openai', openaiKey: oai, prompt: prompt, max_tokens: 350 })
         });
         var d = await r.json();
         var text = (d && (d.text || d.reply || d.content)) || (d.error ? ('AI error: ' + d.error) : 'No AI reply');
-        out.innerHTML += '<div class="mt-2 p-2 rounded-lg border border-cyan-500/20 bg-black/30 text-cyan-100/90 whitespace-pre-wrap">' + String(text).replace(/</g, '') + '</div>';
+        out.innerHTML += '<div class="mt-2 p-2 rounded-lg border border-cyan-500/20 bg-black/30 text-cyan-100/90 whitespace-pre-wrap text-[11px]">' + String(text).replace(/</g, '') + '</div>';
       } catch (e) {
-        out.innerHTML += '<div class="text-bb-orange mt-1">AI coach failed: ' + (e.message || e) + '</div>';
+        out.innerHTML += '<div class="text-bb-orange mt-1">AI failed: ' + (e.message || e) + '</div>';
       }
     }
   }
+
   function applyCoachFilters() {
     var tips = window.__coachTips || [];
     var tighten = tips.filter(function (t) { return t.action === 'tighten'; }).length;
@@ -8796,7 +9035,7 @@
     if ($('cal-st-open')) $('cal-st-open').textContent = open;
     if ($('cal-st-super')) $('cal-st-super').textContent = se;
     if ($('cal-st-pnl')) {
-      $('cal-st-pnl').textContent = (pnl >= 0 ? '+' : '') + (Math.round(pnl * 10) / 10) + 'u';
+      $('cal-st-pnl').textContent = won + 'W-' + lost + 'L · ' + (pnl >= 0 ? '+' : '') + (Math.round(pnl * 10) / 10) + 'u';
       $('cal-st-pnl').style.color = pnl > 0 ? '#4ade80' : pnl < 0 ? '#f87171' : '#fff';
     }
 
@@ -8854,24 +9093,35 @@
             venue: e.venue || e.source, source: e.venue || e.source,
             model_probability: e.modelPct, market_probability: e.marketPct,
             marketType: e.marketType, url: e.url, league: e.league,
-            startTime: e.startTime, result: e.result, finalScore: e.finalScore
+            startTime: e.startTime, result: e.result, finalScore: e.finalScore,
+            settleReason: e.settleReason, finalCombined: e.finalCombined, totalLine: e.totalLine
           };
           try { window.__calGameCache = window.__calGameCache || {}; window.__calGameCache[gid2] = gPaper; } catch (eC2) {}
-          return '<div class="cal-row text-[11px]">' +
-            '<div class="text-white font-medium">' + String(e.pick || '—').replace(/</g,'') +
-            ' <span class="' + (res === 'won' ? 'text-bb-green' : res === 'lost' ? 'text-bb-red' : 'text-bb-muted') + '">' + res.toUpperCase() + '</span></div>' +
-            '<div class="text-bb-muted">' + String(e.title || '').replace(/</g,'') +
-            (e.finalScore ? ' · ' + String(e.finalScore).replace(/</g,'') : '') +
-            (res !== 'open' && res !== 'push' ? (function () {
-                var money = elitePnlMode() !== 'units';
-                if (money) {
-                  var d = eliteDollarPnl(e);
-                  return ' · ' + (d >= 0 ? '+$' : '-$') + Math.abs(d);
-                }
-                var u = eliteUnitPnl(e);
-                return ' · ' + (u >= 0 ? '+' : '') + u + 'u';
-              })() : (res === 'push' ? ' · $0' : '')) +
-            '</div>' +
+          var resLabel = res === 'won' ? '✅ WIN' : res === 'lost' ? '❌ LOSS' : res === 'push' ? '➖ PUSH' : 'OPEN';
+          var resCls = res === 'won' ? 'text-bb-green' : res === 'lost' ? 'text-bb-red' : 'text-bb-muted';
+          var border = res === 'won' ? 'border-bb-green/35' : res === 'lost' ? 'border-bb-red/30' : 'border-bb-border';
+          var moneyBit = '';
+          if (res !== 'open' && res !== 'push') {
+            if (elitePnlMode() !== 'units') {
+              var d = eliteDollarPnl(e);
+              moneyBit = ' · ' + (d >= 0 ? '+$' : '-$') + Math.abs(d);
+            } else {
+              var u = eliteUnitPnl(e);
+              moneyBit = ' · ' + (u >= 0 ? '+' : '') + u + 'u';
+            }
+          } else if (res === 'push') moneyBit = ' · $0';
+          var detailBit = e.settleReason
+            ? ('<div class="text-[10px] text-cyan-200/90 mt-0.5">📐 ' + String(e.settleReason).replace(/</g,'') + '</div>')
+            : (e.finalCombined != null
+              ? ('<div class="text-[10px] text-bb-muted mt-0.5">Combined <b class="text-white/80">' + e.finalCombined + '</b></div>')
+              : '');
+          return '<div class="cal-row text-[11px] border ' + border + ' rounded-lg p-2 mb-1.5">' +
+            '<div class="flex justify-between gap-2 items-start">' +
+            '<div class="text-white font-medium min-w-0 truncate">' + String(e.pick || '—').replace(/</g,'') + '</div>' +
+            '<div class="' + resCls + ' font-semibold shrink-0">' + resLabel + moneyBit + '</div></div>' +
+            '<div class="text-bb-muted truncate">' + String(e.title || '').replace(/</g,'') + '</div>' +
+            (e.finalScore ? '<div class="text-[10px] text-bb-muted mt-0.5">🏁 ' + String(e.finalScore).replace(/</g,'') + '</div>' : '') +
+            detailBit +
             '<div class="flex flex-wrap gap-1.5 mt-1.5">' +
             '<button type="button" class="cal-act-details text-[10px] px-2 py-1 rounded-md border border-bb-border text-bb-muted hover:text-white" data-cal-gid="' + gid2 + '">Details</button>' +
             '<button type="button" class="cal-act-share text-[10px] px-2 py-1 rounded-md border border-sky-500/40 text-sky-200" data-cal-gid="' + gid2 + '">Share</button>' +
@@ -10576,6 +10826,8 @@ function renderSlate() {
   if (wra) wra.onclick = resetAllElitePaper;
   var bc = document.getElementById('btn-run-coach');
   if (bc) bc.onclick = function () { runCoach({}); };
+  var bcs = document.getElementById('btn-coach-settle');
+  if (bcs) bcs.onclick = function () { settleMlFromEspn({}); };
   var bca = document.getElementById('btn-coach-apply');
   if (bca) bca.onclick = applyCoachFilters;
   try { updateOpenBreakdownUI(); } catch (eOpen) {}
