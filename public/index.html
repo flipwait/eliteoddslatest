@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.6.0</title>
+  <title>EliteOdds v3.7.1</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1493,6 +1493,527 @@
       }
     }
 
+  
+    /* ===== 3.7.0 EXACT MOCK LOOK ===== */
+    :root {
+      --eo-bg: #06080e;
+      --eo-elev: #0e1119;
+      --eo-card: #12161f;
+      --eo-border: rgba(148, 163, 184, 0.14);
+      --eo-muted: #8b93a7;
+      --eo-text: #f1f3f8;
+      --eo-violet: #a78bfa;
+      --eo-gold: #e8c547;
+      --eo-green: #34d399;
+      --eo-sidebar: 220px;
+    }
+    body.v3 {
+      background: #03040a !important;
+      color: var(--eo-text) !important;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif !important;
+      -webkit-font-smoothing: antialiased;
+    }
+    body.v3 > .flex.min-h-screen {
+      display: grid !important;
+      grid-template-columns: var(--eo-sidebar) 1fr !important;
+      min-height: 100vh !important;
+    }
+    @media (max-width: 767px) {
+      body.v3 > .flex.min-h-screen {
+        grid-template-columns: 1fr !important;
+      }
+    }
+    body.v3 .eo-rail {
+      width: var(--eo-sidebar) !important;
+      max-width: var(--eo-sidebar) !important;
+      background: linear-gradient(180deg, #0c0f16, #080a10) !important;
+      border-right: 1px solid var(--eo-border) !important;
+      padding: 20px 14px !important;
+      position: sticky !important;
+      top: 0 !important;
+      height: 100vh !important;
+      align-items: stretch !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0 !important;
+    }
+    @media (max-width: 767px) {
+      body.v3 .eo-rail { display: none !important; }
+    }
+    body.v3 .eo-rail .eo-logo {
+      font-size: 18px !important;
+      font-weight: 750 !important;
+      letter-spacing: -0.03em !important;
+      padding: 4px 8px 18px !important;
+      text-align: left !important;
+      width: 100% !important;
+    }
+    body.v3 .eo-rail .eo-logo span { color: var(--eo-violet) !important; }
+    body.v3 .eo-rail .eo-logo small {
+      display: block !important;
+      font-size: 10px !important;
+      color: var(--eo-muted) !important;
+      font-weight: 500 !important;
+      margin-top: 4px !important;
+      font-family: ui-monospace, monospace !important;
+    }
+    body.v3 .v3-side-nav {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 2px !important;
+      width: 100% !important;
+      margin-bottom: 16px !important;
+    }
+    body.v3 .v3-side-nav button {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      width: 100% !important;
+      padding: 10px 12px !important;
+      border-radius: 10px !important;
+      border: 1px solid transparent !important;
+      background: transparent !important;
+      color: var(--eo-muted) !important;
+      font-size: 13px !important;
+      font-weight: 550 !important;
+      text-align: left !important;
+      cursor: pointer !important;
+      margin-bottom: 2px !important;
+    }
+    body.v3 .v3-side-nav button.on {
+      background: rgba(167, 139, 250, 0.12) !important;
+      border-color: rgba(167, 139, 250, 0.35) !important;
+      color: #ede9fe !important;
+    }
+    body.v3 #sport-rail {
+      margin-top: auto !important;
+      flex-wrap: wrap !important;
+      flex-direction: row !important;
+      gap: 4px !important;
+      width: 100% !important;
+      padding-top: 12px !important;
+      border-top: 1px solid var(--eo-border) !important;
+    }
+    body.v3 #sport-rail .sport-btn {
+      width: auto !important;
+      height: auto !important;
+      flex: 1 1 40% !important;
+      padding: 6px 4px !important;
+      font-size: 9px !important;
+      border-radius: 8px !important;
+    }
+    body.v3 .flex-1.flex.flex-col {
+      background: var(--eo-bg) !important;
+      min-width: 0 !important;
+    }
+    body.v3 .eo-top {
+      background: transparent !important;
+      border-bottom: none !important;
+      padding: 16px 24px 0 !important;
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+    }
+    body.v3 .eo-top .eo-logo { display: none !important; } /* logo only in sidebar */
+    body.v3 .v3-product-nav { display: none !important; } /* use sidebar only */
+    body.v3 #panel-scanner {
+      padding: 8px 24px 48px !important;
+    }
+    body.v3 #games,
+    body.v3 #games-pm,
+    body.v3 #games-kalshi {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)) !important;
+      gap: 16px !important;
+      padding: 0 !important;
+    }
+    /* GCARD exact mock */
+    article.game-card.v3-card,
+    article.gcard {
+      background: var(--eo-card) !important;
+      border: 1px solid var(--eo-border) !important;
+      border-radius: 16px !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+      position: relative !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+    }
+    article.game-card.v3-card.rank-elite,
+    article.gcard.elite {
+      border-color: rgba(232, 197, 71, 0.32) !important;
+      box-shadow: 0 0 0 1px rgba(232, 197, 71, 0.06), 0 12px 40px rgba(0,0,0,0.25) !important;
+    }
+    article.game-card.v3-card.rank-good,
+    article.gcard.good {
+      border-color: rgba(52, 211, 153, 0.22) !important;
+    }
+    .gcard-accent, article.v3-card .v3-accent {
+      height: 3px !important;
+      width: 100% !important;
+      background: #2a2f3c !important;
+      display: block !important;
+    }
+    article.rank-elite .gcard-accent,
+    article.rank-elite .v3-accent,
+    article.gcard.elite .gcard-accent {
+      background: linear-gradient(90deg, var(--eo-gold), #b8860b 60%, transparent) !important;
+    }
+    article.rank-good .gcard-accent,
+    article.rank-good .v3-accent,
+    article.gcard.good .gcard-accent {
+      background: linear-gradient(90deg, #34d399, #059669 60%, transparent) !important;
+    }
+    .gcard-head {
+      padding: 14px 16px 10px !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      gap: 10px !important;
+      align-items: flex-start !important;
+    }
+    .gcard-head .matchup {
+      font-size: 15px !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.02em !important;
+      line-height: 1.25 !important;
+      color: var(--eo-text) !important;
+    }
+    .gcard-head .when {
+      font-size: 11px !important;
+      color: var(--eo-muted) !important;
+      margin-top: 4px !important;
+    }
+    .gcard-head .badges {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-end !important;
+      gap: 6px !important;
+    }
+    .gcard-head .rank.e, .rank-pill-e {
+      font-size: 10px !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.05em !important;
+      padding: 4px 9px !important;
+      border-radius: 999px !important;
+      background: rgba(232, 197, 71, 0.16) !important;
+      color: #f5e6a8 !important;
+      border: 1px solid rgba(232, 197, 71, 0.4) !important;
+    }
+    .gcard-head .rank.g, .rank-pill-g {
+      font-size: 10px !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.05em !important;
+      padding: 4px 9px !important;
+      border-radius: 999px !important;
+      background: rgba(52, 211, 153, 0.1) !important;
+      color: #6ee7b7 !important;
+      border: 1px solid rgba(52, 211, 153, 0.32) !important;
+    }
+    .gcard-head .venue {
+      font-size: 9px !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.06em !important;
+      color: var(--eo-violet) !important;
+      font-weight: 600 !important;
+    }
+    .gcard-head .venue.k { color: var(--eo-green) !important; }
+    .pick-block {
+      padding: 0 16px 12px !important;
+    }
+    .pick-block .pick-label {
+      font-size: 10px !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.06em !important;
+      color: var(--eo-muted) !important;
+      margin-bottom: 4px !important;
+    }
+    .pick-block .pick-main {
+      font-size: 16px !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.02em !important;
+      color: #e9d5ff !important;
+    }
+    article.kalshi-card .pick-block .pick-main { color: #bbf7d0 !important; }
+    .pick-block .market-type {
+      font-size: 12px !important;
+      color: var(--eo-muted) !important;
+      margin-top: 3px !important;
+    }
+    .strip, article.v3-card .v3-metrics {
+      margin: 0 16px 12px !important;
+      display: grid !important;
+      grid-template-columns: repeat(5, 1fr) !important;
+      gap: 6px !important;
+      background: rgba(0,0,0,0.28) !important;
+      border-radius: 10px !important;
+      padding: 10px 8px !important;
+      border: 1px solid rgba(148, 163, 184, 0.08) !important;
+    }
+    .strip .stat, article.v3-card .v3-metrics > div {
+      text-align: center !important;
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+    }
+    .strip .stat .l, article.v3-card .v3-metrics .lbl {
+      font-size: 9px !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.04em !important;
+      color: var(--eo-muted) !important;
+    }
+    .strip .stat .v, article.v3-card .v3-metrics .val {
+      font-size: 13px !important;
+      font-weight: 700 !important;
+      margin-top: 3px !important;
+      color: #fff !important;
+    }
+    .strip .stat .v.up, article.v3-card .v3-metrics .val.up {
+      color: var(--eo-green) !important;
+    }
+    .form-row {
+      padding: 0 16px 12px !important;
+      font-size: 11px !important;
+      color: var(--eo-muted) !important;
+      line-height: 1.45 !important;
+    }
+    .form-row b { color: #cbd5e1 !important; font-weight: 600 !important; }
+    .trust-line {
+      padding: 0 16px 12px !important;
+      font-size: 10px !important;
+      color: #6b7280 !important;
+    }
+    .gcard-actions, article.v3-card .v3-actions {
+      margin-top: auto !important;
+      padding: 12px 16px 14px !important;
+      border-top: 1px solid rgba(148, 163, 184, 0.1) !important;
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+      grid-template-columns: none !important;
+    }
+    .gcard-actions button, .gcard-actions a,
+    article.v3-card .v3-actions button, article.v3-card .v3-actions a {
+      font-size: 12px !important;
+      font-weight: 650 !important;
+      padding: 9px 12px !important;
+      border-radius: 10px !important;
+      border: 1px solid var(--eo-border) !important;
+      background: var(--eo-elev) !important;
+      color: var(--eo-text) !important;
+      text-decoration: none !important;
+      cursor: pointer !important;
+    }
+    .gcard-actions .btn-combo, article.v3-card .btn-combo {
+      background: rgba(52, 211, 153, 0.14) !important;
+      border-color: rgba(52, 211, 153, 0.45) !important;
+      color: #a7f3d0 !important;
+    }
+    .gcard-actions .btn-verdict, article.v3-card .btn-verdict {
+      background: rgba(232, 197, 71, 0.12) !important;
+      border-color: rgba(232, 197, 71, 0.4) !important;
+      color: #f5e6a8 !important;
+    }
+
+  
+    /* ===== 3.7.1 MOBILE = BOARDS MOCK ===== */
+    @media (max-width: 767px) {
+      body.v3 {
+        background: #07090f !important;
+      }
+      body.v3 > .flex.min-h-screen {
+        display: flex !important;
+        flex-direction: column !important;
+        grid-template-columns: none !important;
+      }
+      body.v3 .eo-rail { display: none !important; }
+      body.v3 .v3-product-nav { display: none !important; }
+      body.v3 .eo-top {
+        display: none !important; /* replaced by mobile hdr look via filter bar */
+      }
+      /* Show mobile filter bar as mock header */
+      body.v3 #mobile-filter-bar {
+        display: block !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 30 !important;
+        background: linear-gradient(180deg, #12151f 0%, #07090f 100%) !important;
+        border-bottom: 1px solid rgba(148,163,184,0.16) !important;
+        padding: 10px 12px 8px !important;
+      }
+      body.v3 #mobile-filter-bar::before {
+        content: "EliteOdds";
+        display: block;
+        font-size: 16px;
+        font-weight: 750;
+        letter-spacing: -0.02em;
+        color: #eef0f6;
+        margin-bottom: 8px;
+      }
+      body.v3 #mobile-filter-bar::after {
+        content: "";
+      }
+      body.v3 #panel-scanner {
+        padding: 8px 10px 160px !important;
+      }
+      /* Hide bulky weekly paper / discord on mobile scanner for clean boards */
+      body.v3 #panel-scanner .week-report,
+      body.v3 #panel-scanner #weekly-report {
+        display: none !important;
+      }
+      /* Dense prop rows */
+      body.v3 #games,
+      body.v3 #games-pm,
+      body.v3 #games-kalshi {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        padding: 4px 0 16px !important;
+        grid-template-columns: none !important;
+      }
+      body.v3 article.gcard,
+      body.v3 article.game-card.v3-card {
+        border-radius: 14px !important;
+        border: 1px solid rgba(148,163,184,0.16) !important;
+        background: #141824 !important;
+      }
+      body.v3 article.rank-elite,
+      body.v3 article.gcard.elite {
+        border-color: rgba(251,191,36,0.35) !important;
+        box-shadow: 0 0 0 1px rgba(251,191,36,0.08) !important;
+      }
+      body.v3 article .gcard-accent,
+      body.v3 article .v3-accent {
+        height: 3px !important;
+      }
+      body.v3 article .gcard-head {
+        padding: 10px 12px 4px !important;
+      }
+      body.v3 article .gcard-head .matchup {
+        font-size: 13px !important;
+        font-weight: 650 !important;
+      }
+      body.v3 article .gcard-head .when {
+        font-size: 10px !important;
+      }
+      body.v3 article .pick-block {
+        padding: 0 12px 6px !important;
+      }
+      body.v3 article .pick-block .pick-label {
+        display: none !important; /* denser: line is the title */
+      }
+      body.v3 article .pick-block .pick-main {
+        font-size: 12.5px !important;
+        color: #c4b5fd !important;
+        font-weight: 600 !important;
+      }
+      body.v3 article .pick-block .market-type {
+        font-size: 10px !important;
+      }
+      body.v3 article .strip,
+      body.v3 article .v3-metrics {
+        margin: 0 12px 8px !important;
+        padding: 6px 8px !important;
+        grid-template-columns: repeat(3, 1fr) !important; /* Model Mkt Edge only on mobile */
+      }
+      body.v3 article .strip .stat:nth-child(2),
+      body.v3 article .strip .stat:nth-child(5),
+      body.v3 article .v3-metrics > div:nth-child(2),
+      body.v3 article .v3-metrics > div:nth-child(5) {
+        display: none !important; /* hide no-vig + score on mobile row */
+      }
+      body.v3 article .form-row,
+      body.v3 article .trust-line {
+        display: none !important; /* density */
+      }
+      body.v3 article .gcard-actions,
+      body.v3 article .v3-actions {
+        padding: 8px 12px 10px !important;
+        gap: 6px !important;
+        border-top: 1px solid rgba(148,163,184,0.1) !important;
+      }
+      body.v3 article .gcard-actions .btn-focus,
+      body.v3 article .gcard-actions .btn-discord,
+      body.v3 article .gcard-actions .btn-discord2,
+      body.v3 article .gcard-actions .btn-log,
+      body.v3 article .gcard-actions .btn-place,
+      body.v3 article .gcard-actions .btn-books,
+      body.v3 article .gcard-actions .btn-ticket,
+      body.v3 article .gcard-actions .btn-share,
+      body.v3 article .gcard-actions .btn-verdict {
+        display: none !important; /* primary: Combo + Trade only on mobile */
+      }
+      body.v3 article .btn-combo {
+        flex: 1 !important;
+        text-align: center !important;
+      }
+      body.v3 article .btn-trade {
+        flex: 0 0 auto !important;
+      }
+      /* Sticky slip */
+      body.v3 .m-slip {
+        display: block !important;
+        position: fixed !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: calc(52px + env(safe-area-inset-bottom, 0px)) !important;
+        z-index: 45 !important;
+        background: rgba(10, 12, 18, 0.96) !important;
+        backdrop-filter: blur(12px) !important;
+        border-top: 1px solid rgba(167, 139, 250, 0.35) !important;
+        padding: 10px 12px 8px !important;
+        box-shadow: 0 -12px 40px rgba(0,0,0,0.5) !important;
+      }
+      body.v3 .v3-bottom {
+        display: flex !important;
+        z-index: 50 !important;
+        background: rgba(8, 12, 20, 0.98) !important;
+        border-top: 1px solid rgba(30,42,61,0.95) !important;
+        padding-bottom: calc(0.35rem + env(safe-area-inset-bottom, 0px)) !important;
+      }
+      body.v3 .v3-bottom button {
+        font-size: 9px !important;
+        color: #8b93a7 !important;
+      }
+      body.v3 .v3-bottom button.on {
+        color: #ddd6fe !important;
+      }
+    }
+    @media (min-width: 768px) {
+      body.v3 .m-slip { display: none !important; }
+    }
+    .m-slip { display: none; }
+    .m-slip-top {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+    }
+    .m-slip-title { font-size: 12px; font-weight: 700; color: #eef0f6; }
+    .m-slip-title em { font-style: normal; color: #a78bfa; }
+    .m-slip-sub { font-size: 10px; color: #8b93a7; }
+    .m-slip-legs {
+      display: flex; gap: 6px; overflow-x: auto; margin-bottom: 8px;
+      scrollbar-width: none;
+    }
+    .m-slip-legs::-webkit-scrollbar { display: none; }
+    .m-slip-legs .leg {
+      flex: 0 0 auto; max-width: 140px;
+      font-size: 10px; padding: 5px 8px; border-radius: 8px;
+      background: #10131c; border: 1px solid rgba(148,163,184,0.16);
+      color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .m-slip-actions {
+      display: grid; grid-template-columns: 0.8fr 1fr 1.2fr; gap: 6px;
+    }
+    .m-slip-actions button {
+      font-size: 11px; font-weight: 650; padding: 10px 6px;
+      border-radius: 10px; border: 1px solid rgba(148,163,184,0.16);
+      background: #10131c; color: #eef0f6; cursor: pointer;
+    }
+    .m-slip-actions button.pri {
+      background: rgba(52,211,153,0.18);
+      border-color: rgba(52,211,153,0.5);
+      color: #a7f3d0;
+    }
+    .m-slip-actions button.mut { color: #8b93a7; }
+
   </style>
 </head>
 <body class="v3">
@@ -1504,18 +2025,18 @@
       </div>
       <nav class="v3-side-nav" id="v3-side-nav">
         <button type="button" class="on" data-v3nav="scanner" data-tab="scanner"><span>◎</span> Scanner</button>
-        <button type="button" data-v3nav="boards"><span>▦</span> Boards</button>
-        <button type="button" data-v3nav="elite"><span>★</span> Elite</button>
-        <button type="button" data-v3nav="live"><span>◷</span> Live focus</button>
-        <button type="button" data-tab="journal"><span>☰</span> Journal</button>
-        <button type="button" data-tab="settings" id="eo-settings-rail"><span>⚙</span> Settings</button>
+        <button type="button" data-v3nav="boards" data-tab="scanner" title="Player props board"><span>▦</span> Boards</button>
+        <button type="button" data-v3nav="elite" data-tab="scanner" title="Elite only"><span>★</span> Elite</button>
+        <button type="button" data-v3nav="live" data-tab="scanner" title="Live games"><span>◷</span> Live focus</button>
+        <button type="button" data-v3nav="journal" data-tab="journal"><span>☰</span> Journal</button>
+        <button type="button" data-v3nav="settings" data-tab="settings" id="eo-settings-rail"><span>⚙</span> Settings</button>
       </nav>
       <div id="sport-rail" class="flex flex-col gap-1 items-center w-full"></div>
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.6.0</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.7.1</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -2412,7 +2933,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.6.0</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.7.1</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2526,12 +3047,23 @@
     </div>
   </div>
 
-<nav class="v3-bottom" id="v3-bottom-nav" aria-label="Primary">
-    <button type="button" data-tab="scanner" class="on"><span class="ico">▣</span>Scan</button>
-    <button type="button" data-tab="lineshop"><span class="ico">📅</span>Calendar</button>
-    <button type="button" data-tab="journal"><span class="ico">☰</span>Journal</button>
-    <button type="button" data-tab="slate"><span class="ico">⧉</span>Desk</button>
-    <button type="button" data-tab="settings"><span class="ico">⚙</span>Settings</button>
+<div id="m-slip" class="m-slip" aria-label="Combo slip">
+    <div class="m-slip-top">
+      <div class="m-slip-title">Slip · <em id="m-slip-count">0 legs</em> · PM</div>
+      <div class="m-slip-sub" id="m-slip-meta">Add with + Combo</div>
+    </div>
+    <div class="m-slip-legs" id="m-slip-legs"></div>
+    <div class="m-slip-actions">
+      <button type="button" id="m-slip-clear" class="mut">Clear</button>
+      <button type="button" id="m-slip-ai">AI check</button>
+      <button type="button" id="m-slip-build" class="pri">Build combo</button>
+    </div>
+  </div>
+  <nav class="v3-bottom" id="v3-bottom-nav" aria-label="Primary">
+    <button type="button" data-tab="scanner" data-v3nav="scanner" class="on"><span class="ico">◎</span>Scanner</button>
+    <button type="button" data-tab="scanner" data-v3nav="boards"><span class="ico">▦</span>Boards</button>
+    <button type="button" data-tab="scanner" data-v3nav="elite"><span class="ico">★</span>Elite</button>
+    <button type="button" data-tab="settings" data-v3nav="settings"><span class="ico">☰</span>More</button>
   </nav>
 <script>
 (function () {
@@ -2788,8 +3320,37 @@
   };
 
   
-  var APP_VERSION = '3.6.0';
+  var APP_VERSION = '3.7.1';
   var APP_CHANGELOG = [
+    {
+      version: '3.7.1',
+      title: 'Mobile UI matches Boards mock',
+      notes: [
+        'UI — Mobile: Scanner/Boards/Elite/More top tabs, dense prop-style rows, sticky slip.',
+        'UI — Desktop unchanged from 3.7.0 mock game cards.',
+        'Boards on mobile still sets player_props + scan.'
+      ]
+    },
+    {
+      version: '3.7.0',
+      title: 'UI matches desktop game-card mock',
+      notes: [
+        'UI — Shell and cards aligned to mock: 220px sidebar, topbar, filter chips, gcard layout.',
+        'UI — Cards use mock structure: accent, head, MODEL PICK, 5-stat strip, form, trust, actions.',
+        'FIXED — Sidebar nav from 3.6.1 still wired (Boards = player props).',
+        'Logic unchanged — scan, rank, Discord, settle, trade links.'
+      ]
+    },
+    {
+      version: '3.6.1',
+      title: 'Sidebar nav works · Boards = player props',
+      notes: [
+        'FIXED — Left sidebar buttons now call switchTab (were ignored unless .tab class).',
+        'FIXED — Boards switches to Scanner + market=player_props and reloads.',
+        'FIXED — Elite sets rank filter to elite; Live focus sets mode=live.',
+        'UI — Same mock-style cards as 3.6.0.'
+      ]
+    },
     {
       version: '3.6.0',
       title: 'UI rehaul — mock Scanner cards + sidebar',
@@ -5194,153 +5755,64 @@
     var rankMod = rankU === 'ELITE' ? 'rank-elite' : (rankU === 'GOOD' ? 'rank-good' : 'rank-pass');
     var rankPill = rankU === 'ELITE' ? 'rank-pill-e' : (rankU === 'GOOD' ? 'rank-pill-g' : '');
     var score10 = (g.score10 != null ? g.score10 : Math.max(1, Math.min(10, Math.round((g.betScore || 50) / 10))));
-    return '<article class="glass game-card v3-card min-w-0 overflow-hidden ' + rankMod + (isKalshi ? ' kalshi-card' : '') + '">' +
-      '<div class="v3-accent"></div>' +
-      '<div class="v3-card-body">' +
-      '<div class="flex justify-between gap-2 items-start">' +
-        '<div class="min-w-0">' +
-          '<p class="v3-matchup">' + title + '</p>' +
-          '<p class="v3-when">' + String(g.league || '').toUpperCase() +
+    return '<article class="gcard game-card v3-card ' + rankMod + (rankU === 'ELITE' ? ' elite' : (rankU === 'GOOD' ? ' good' : '')) + (isKalshi ? ' kalshi-card' : '') + '" data-rank="' + rankU + '">' +
+      '<div class="gcard-accent v3-accent"></div>' +
+      '<div class="gcard-head">' +
+        '<div>' +
+          '<div class="matchup">' + title + '</div>' +
+          '<div class="when">' + String(g.league || '').toUpperCase() +
             (g.ended || /final/i.test(String(g.period||'')) ? ' · FINAL' : (g.live ? ' · LIVE' : ' · Pregame')) +
             (g.period ? ' · ' + String(g.period).replace(/</g,'') : '') +
             (g.score ? ' · ' + String(g.score).replace(/</g,'') : '') +
             (g.startTime || g.live || g.ended ? ' · ' + formatGameWhen(g.startTime, !!(g.live || g.isLive), !!(g.ended || /final/i.test(String(g.period||'')))) : '') +
-          '</p>' +
+          '</div>' +
         '</div>' +
-        '<div class="flex flex-col items-end gap-1.5 shrink-0">' +
-          '<span class="' + rankPill + '">' + rankU + '</span>' +
-          '<span class="text-[9px] uppercase tracking-wide font-semibold ' + (isKalshi ? 'text-bb-green' : 'text-violet-300') + '">' + (isKalshi ? 'Kalshi' : 'Polymarket') + '</span>' +
+        '<div class="badges">' +
+          '<span class="rank ' + (rankU === 'ELITE' ? 'e' : (rankU === 'GOOD' ? 'g' : 'p')) + '">' + rankU + '</span>' +
+          '<span class="venue' + (isKalshi ? ' k' : '') + '">' + (isKalshi ? 'Kalshi' : 'Polymarket') + '</span>' +
         '</div>' +
       '</div>' +
-      '<div class="v3-pick-block mt-3"><div class="v3-pick-label">Model pick</div><div class="v3-pick-main">' + (function(){
-        var mt = String(g.marketType || '').toLowerCase();
-        var titleBlob = String(g.title || '') + ' ' + String(g.question || '');
-        // Player props must NEVER get "Full game Under X" totals formatting
-        var isPlayer = mt.indexOf('player_') === 0 || mt.indexOf('pitcher_') === 0 || mt === 'player_prop' || mt === 'prop'
-          || /[A-Za-z][A-Za-z.'\-]+(?:\s+[A-Za-z][A-Za-z.'\-]+){0,3}\s*:\s*\d+/.test(titleBlob)
-          || /will\s+[A-Z].*record\s+at\s+least/i.test(titleBlob)
-          || (g.propPlayer || g.propProjection != null);
-        if (isPlayer) {
-          var pp = String(pick).replace(/^\s*full game\s+/i, '').trim();
-          // Prefer classic "Name 20+" / "Name Under 20" wording
-          var nm = String(g.propPlayer || '').trim();
-          if (!nm) {
-            var tm = String(g.title || g.question || '').match(/will\s+([A-Z][a-zA-Z.'\-]+(?:\s+[A-Z][a-zA-Z.'\-]+){0,3})\s+record/i)
-              || String(g.title || '').match(/^\s*([^:]{3,40}?)\s*:\s*\d+/i);
-            if (tm) nm = tm[1].replace(/\s+ML$/i,'').trim();
-          }
-          var ln = g.line != null ? g.line : null;
-          if (ln == null) {
-            var lm = String(g.title || g.question || '').match(/at least\s+(\d+)/i) || String(g.title || '').match(/:\s*(\d+)/);
-            if (lm) ln = lm[1];
-          }
-          var under = /\bunder\b/i.test(pp);
-          var over = /\bover\b/i.test(pp) || /\d+\+/.test(pp);
-          if (nm && ln != null) {
-            if (under) return (nm + ' Under ' + ln).replace(/</g,'');
-            return (nm + ' ' + ln + '+').replace(/</g,'');
-          }
-          return pp.replace(/</g, '');
-        }
-        var isTot = /total|f5_total|team_total/.test(mt) || (mt.indexOf('total_') === 0);
-        // Only pure Over/Under labels — not "Player Under 25"
-        var pureOu = /^\s*(over|under)\s*\d/i.test(pick) || /^\s*(over|under)\s*$/i.test(pick);
-        if (!isTot && pureOu) isTot = true;
-        var line = g.totalLine != null ? g.totalLine : null;
-        if (line == null && isTot) {
-          var blob = String(g.title || '') + ' ' + String(g.question || '') + ' ' + String(g.eventTitle || '') + ' ' + pick;
-          var m = blob.match(/(?:o\/u|over\/under|total)\s*([0-9]+\.?[0-9]*)/i) || blob.match(/\b([0-9]{1,2}\.[05])\b/);
-          if (m) line = m[1];
-          if (line == null && g.line != null && !isPlayer) line = g.line;
-        }
-        var side = pick;
-        if (isTot && !isPlayer) {
-          var pl = pick.toLowerCase();
-          if (/under/.test(pl)) side = 'Under';
-          else if (/over/.test(pl)) side = 'Over';
-          else if (/^u\b/.test(pl)) side = 'Under';
-          else if (/^o\b/.test(pl)) side = 'Over';
-          if (/\b(full game|1st period|2nd period|3rd period|1h|2h|f5|q[1-4]|team total)\b/i.test(pick)) {
-            return String(pick).replace(/</g, '');
-          }
-          var lg = String(g.league || '').toLowerCase();
-          var scope = 'Full game';
-          if (/f5|first\s*5/.test(mt) || /f5/.test(mt)) scope = 'F5';
-          else if (lg === 'nhl' && (/_1h|1h|period|p1/.test(mt) || (line != null && Number(line) <= 2.5))) scope = '1st period';
-          else if (lg === 'nhl' && /p2|2nd period/.test(mt)) scope = '2nd period';
-          else if (lg === 'nhl' && /p3|3rd period/.test(mt)) scope = '3rd period';
-          else if (/_1h|1h/.test(mt)) scope = '1H';
-          else if (/_2h|2h/.test(mt)) scope = '2H';
-          else if (/q1/.test(mt)) scope = 'Q1';
-          else if (/q2/.test(mt)) scope = 'Q2';
-          else if (/q3/.test(mt)) scope = 'Q3';
-          else if (/q4/.test(mt)) scope = 'Q4';
-          return scope + ' ' + side + (line != null ? (' <span class="text-white/90">' + line + '</span>') : '');
-        }
-        return pick;
-      })() + '</div><div class="v3-pick-sub">' + (function(){ var mt=String(g.marketType||'').replace(/_/g,' '); if(!mt) return ''; return mt.charAt(0).toUpperCase()+mt.slice(1); })() + '</div></div>' +
-      '<p class="text-[10px] text-bb-muted">' + (g.fairSource ? ('Fair: ' + String(g.fairSource).replace(/</g,'') + (g.hasForm ? '' : ' · no form')) : (g.hasForm ? '' : 'Fair: market-only · no form')) +
-        (g.venueVerified ? ' · Venue verified' : '') + '</p>' +
-      (!g.hasForm && g.formNote ? ('<p class="text-[10px] text-amber-300/90 mt-0.5">Form: ' + String(g.formNote).replace(/</g,'').slice(0, 100) + '</p>') : '') +
-      (g.hasForm && g.formNote ? ('<p class="text-[10px] text-bb-green/80 mt-0.5">Form: ' + String(g.formNote).replace(/</g,'').slice(0, 80) + '</p>') : '') +
-      '<div class="v3-metrics">' +
-        '<div><div class="lbl">Mkt</div><div class="val">' + (mkt != null ? mkt + '%' : '—') + '</div></div>' +
-        '<div><div class="lbl">No-vig</div><div class="val">' + (nv != null ? nv + '%' : '—') + '</div></div>' +
-        '<div><div class="lbl">Model</div><div class="val">' + (mod != null ? mod + '%' : '—') + '</div></div>' +
-        '<div><div class="lbl">Edge</div><div class="val up">' + epp + '</div></div>' +
-        '<div><div class="lbl">Score</div><div class="val">' + score10 + '</div></div>' +
+      '<div class="pick-block">' +
+        '<div class="pick-label">Model pick</div>' +
+        '<div class="pick-main">' + String(pick || '—').replace(/</g,'') + '</div>' +
+        '<div class="market-type">' + (function(){
+          var mt = String(g.marketType || '').replace(/_/g, ' ');
+          if (!mt) return '';
+          return mt.replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+        })() + '</div>' +
       '</div>' +
-      '<div class="flex flex-wrap gap-1.5 text-[10px]">' +
-        (function(){
-          var mtP = String(g.marketType||'').toLowerCase();
-          var isP = mtP.indexOf('player_')===0 || mtP.indexOf('pitcher_')===0 || mtP==='player_prop' || mtP==='prop' || g.propProjection != null || g.propPlayer;
-          if (isP) {
-            var chips = '';
-            if (g.propProjection != null) chips += '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">Proj ' + g.propProjection + '</span>';
-            if (g.line != null) chips += '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">Line ' + g.line + '</span>';
-            var pp = g.playerProp || {};
-            if (pp.L5 && pp.L5.avg != null) chips += '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">L5 ' + pp.L5.avg + '</span>';
-            if (pp.L10 && pp.L10.avg != null) chips += '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">L10 ' + pp.L10.avg + (pp.L10.n ? (' n=' + pp.L10.n) : '') + '</span>';
-            if (pp.season && pp.season.avg != null) chips += '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">Season ' + pp.season.avg + '</span>';
-            if (g.propRole) chips += '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">' + String(g.propRole).replace(/</g,'') + '</span>';
-            if (!chips && form) chips = '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">' + form.replace(/</g,'') + '</span>';
-            return chips;
-          }
-          return (form ? '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">' + form.replace(/</g,'') + '</span>' : '') +
-            (g.matchupScore != null ? '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">Matchup ' + g.matchupScore + '</span>' : '');
-        })() +
-        '<span class="px-2 py-1 rounded-full bg-white/5 text-bb-muted">Score ' + (g.score10 != null ? g.score10 : Math.max(1, Math.min(10, Math.round((g.betScore||50)/10)))) + '/10</span>' +
+      '<div class="strip v3-metrics">' +
+        '<div class="stat"><div class="l">Mkt</div><div class="v">' + (mkt != null ? mkt + '%' : '—') + '</div></div>' +
+        '<div class="stat"><div class="l">No-vig</div><div class="v dim">' + (nv != null ? nv + '%' : '—') + '</div></div>' +
+        '<div class="stat"><div class="l">Model</div><div class="v">' + (mod != null ? mod + '%' : '—') + '</div></div>' +
+        '<div class="stat"><div class="l">Edge</div><div class="v up">' + epp + '</div></div>' +
+        '<div class="stat"><div class="l">Score</div><div class="v">' + score10 + '</div></div>' +
       '</div>' +
-      '<details class="details-why border-t border-bb-border pt-2">' +
-        '<summary class="cursor-pointer text-[11px] text-violet-300 list-none flex justify-between items-center">' +
-          '<span>▸ Why this pick · full breakdown</span><span class="text-bb-muted text-[10px]">Details</span></summary>' +
-        '<div class="mt-2 space-y-1 text-[10px] text-bb-muted border-l-2 border-violet-500/30 pl-2">' +
-          truthBadge(g) +
-          evalBars(g) +
-          '<div class="metric-grid rounded-lg border border-white/5 bg-bb-elev/40 px-2 py-1.5 mt-1">' +
-            '<span>No-vig <strong class="text-white">' + (nv != null ? nv + '%' : '—') + '</strong></span>' +
-            '<span>Edge <strong class="text-bb-green">' + epp + '</strong></span>' +
-            '<span>EV <strong class="text-white">' + edge + '</strong></span>' +
-            '<span>Dec <strong class="text-white">' + (dec != null ? dec : '—') + '</strong></span></div>' +
-          sizingBlock(g) +
-        '</div></details>' +
-      '<div class="v3-actions v3-actions-primary">' +
-        '<button type="button" class="btn-focus">Focus</button>' +
-        '<button type="button" class="btn-place">Place</button>' +
-        '<button type="button" class="btn-verdict">Verdict</button>' +
-        '<button type="button" class="btn-log">Log</button>' +
+      '<div class="form-row">' +
+        (g.hasForm && g.formNote ? ('<b>Form</b> · ' + String(g.formNote).replace(/</g,'').slice(0, 120)) :
+          (form ? ('<b>Form</b> · ' + String(form).replace(/</g,'').slice(0, 120)) : '<b>Form</b> · market / model only')) +
+      '</div>' +
+      '<div class="trust-line">' +
+        (g.hasForm ? 'Trust: form present · not market-only' : 'Trust: limited form · check price') +
+      '</div>' +
+      '<div class="gcard-actions v3-actions">' +
+        '<button type="button" class="btn-combo">+ Combo</button>' +
         '<a class="btn-trade" href="' + tradeHrefFor(g) + '" target="_blank" rel="noopener">Trade</a>' +
-        '<button type="button" class="btn-combo" title="Add leg to combo slip without leaving page">+ Combo</button>' +
-        '<button type="button" class="btn-books">Books</button>' +
-        '<button type="button" class="btn-ticket">Ticket</button>' +
-        '<button type="button" class="btn-share" title="Share pick">Share</button>' +
+        '<button type="button" class="btn-verdict">AI verdict</button>' +
+        '<button type="button" class="btn-focus">Details</button>' +
+        '<button type="button" class="btn-share">Share</button>' +
         '<button type="button" class="btn-discord">Discord</button>' +
         '<button type="button" class="btn-discord2">Disc 2</button>' +
+        '<button type="button" class="btn-log">Log</button>' +
+        '<button type="button" class="btn-place">Place</button>' +
+        '<button type="button" class="btn-books">Books</button>' +
+        '<button type="button" class="btn-ticket">Ticket</button>' +
       '</div>' +
-      '<div class="smart-panel hidden text-[11px] text-bb-muted bg-bb-elev/60 rounded-lg p-2 mt-1"></div>' +
-      '<div class="books-panel hidden text-[11px] text-bb-muted bg-bb-elev/60 rounded-lg p-2 mt-1"></div>' +
-      '<div class="deep-panel hidden text-[11px] text-bb-muted bg-bb-elev/60 rounded-lg p-2 mt-1 whitespace-pre-wrap max-h-64 overflow-y-auto"></div>' +
-      '<div class="verdict-panel hidden text-[11px] text-bb-muted bg-cyan-500/5 border border-cyan-500/20 rounded-lg p-2.5 mt-1 whitespace-pre-wrap max-h-72 overflow-y-auto"></div></div></article>';
+      '<div class="smart-panel hidden text-[11px] text-bb-muted bg-bb-elev/60 rounded-lg p-2 mx-4 mb-2"></div>' +
+      '<div class="books-panel hidden text-[11px] text-bb-muted bg-bb-elev/60 rounded-lg p-2 mx-4 mb-2"></div>' +
+      '<div class="deep-panel hidden text-[11px] text-bb-muted bg-bb-elev/60 rounded-lg p-2 mx-4 mb-2 whitespace-pre-wrap max-h-64 overflow-y-auto"></div>' +
+      '<div class="verdict-panel hidden text-[11px] text-bb-muted bg-cyan-500/5 border border-cyan-500/20 rounded-lg p-2.5 mx-4 mb-3 whitespace-pre-wrap max-h-72 overflow-y-auto"></div>' +
+    '</article>';
   }
 
   function buildShareText(g, opts) {
@@ -10119,6 +10591,32 @@ function renderSlate() {
     var risk = 0;
     ticket.forEach(function (x) { risk += Number(x.units) || 0; });
     if ($('ticket-risk')) $('ticket-risk').textContent = (Math.round(risk * 10) / 10) + 'u';
+    // Mobile mock slip
+    try {
+      var mc = $('m-slip-count');
+      var mm = $('m-slip-meta');
+      var ml = $('m-slip-legs');
+      if (mc) mc.textContent = ticket.length + (ticket.length === 1 ? ' leg' : ' legs');
+      if (mm) {
+        if (!ticket.length) mm.textContent = 'Add with + Combo';
+        else {
+          var combined = 1, any = false;
+          ticket.forEach(function (x) {
+            var p = x.model_probability;
+            if (p == null) return;
+            if (p > 1) p = p / 100;
+            if (p > 0 && p < 1) { combined *= p; any = true; }
+          });
+          mm.textContent = any ? ('~' + Math.round(combined * 100) + '% combined model') : (ticket.length + ' in slip');
+        }
+      }
+      if (ml) {
+        if (!ticket.length) ml.innerHTML = '';
+        else ml.innerHTML = ticket.map(function (x) {
+          return '<span class="leg">' + String(x.pick || x.title || '—').replace(/</g,'').slice(0, 28) + '</span>';
+        }).join('');
+      }
+    } catch (eM) {}
     var deskSlip = $('desk-slip');
     if (deskSlip) {
       if (!ticket.length) {
@@ -11056,6 +11554,34 @@ function renderSlate() {
   window.closeModal = function () { var m = $('modal'); if (m) m.classList.add('hidden'); };
   window.openModal = openModal;
 
+
+  // Mobile slip actions
+  (function () {
+    function clearSlip() {
+      try {
+        ticket.length = 0;
+        localStorage.setItem('bb_ticket', '[]');
+        renderTicket();
+        updateParlayMeta();
+      } catch (e) {}
+    }
+    document.addEventListener('click', function (ev) {
+      var t = ev.target;
+      if (!t || !t.id) return;
+      if (t.id === 'm-slip-clear') { clearSlip(); return; }
+      if (t.id === 'm-slip-build') {
+        switchTab('slate');
+        try { renderSlate(); } catch (e) {}
+        return;
+      }
+      if (t.id === 'm-slip-ai') {
+        if (!ticket.length) { alert('Add legs with + Combo first'); return; }
+        switchTab('slate');
+        try { renderSlate(); } catch (e) {}
+      }
+    });
+  })();
+
   function switchTab(name) {
     if (!name) return;
     document.querySelectorAll('.tab').forEach(function (b) {
@@ -11081,8 +11607,70 @@ function renderSlate() {
   }
   // Event delegation so mobile bottom nav works even if mounted after script
   document.addEventListener('click', function (ev) {
-    var btn = ev.target && ev.target.closest ? ev.target.closest('[data-tab]') : null;
+    var btn = ev.target && ev.target.closest ? ev.target.closest('[data-tab], [data-v3nav]') : null;
     if (!btn) return;
+    // Side nav product actions
+    var v3nav = btn.getAttribute('data-v3nav');
+    if (v3nav || btn.closest('#v3-side-nav') || btn.closest('.v3-side-nav') || btn.closest('#v3-product-nav') || btn.closest('.v3-product-nav')) {
+      ev.preventDefault();
+      document.querySelectorAll('#v3-side-nav button, .v3-side-nav button, .v3-nav-btn').forEach(function (b) {
+        b.classList.remove('on');
+      });
+      btn.classList.add('on');
+      if (v3nav === 'boards') {
+        switchTab('scanner');
+        try {
+          if (typeof applyMarketType === 'function') applyMarketType('player_props');
+          else {
+            marketType = 'player_props';
+            if ($('market-select')) $('market-select').value = 'player_props';
+            if ($('m-market')) $('m-market').value = 'player_props';
+            loadGames();
+          }
+        } catch (e) { try { loadGames(); } catch (e2) {} }
+        return;
+      }
+      if (v3nav === 'elite') {
+        switchTab('scanner');
+        try {
+          if ($('f-rank')) $('f-rank').value = 'elite';
+          var rankSel = document.querySelector('select#f-rank');
+          if (rankSel) {
+            rankSel.value = 'elite';
+            if (rankSel.onchange) rankSel.onchange();
+          }
+        } catch (e) {}
+        try { loadGames(); } catch (e2) {}
+        return;
+      }
+      if (v3nav === 'live') {
+        switchTab('scanner');
+        try {
+          mode = 'live';
+          document.querySelectorAll('.mode-btn').forEach(function (b) {
+            var on = b.getAttribute('data-mode') === 'live';
+            b.classList.toggle('pill-on', on);
+            b.classList.toggle('text-bb-muted', !on);
+          });
+          if ($('m-mode')) $('m-mode').value = 'live';
+        } catch (e) {}
+        try { loadGames(); } catch (e2) {}
+        return;
+      }
+      if (v3nav === 'scanner') {
+        switchTab('scanner');
+        try {
+          marketType = 'all';
+          if ($('market-select')) $('market-select').value = 'all';
+          if ($('m-market')) $('m-market').value = 'all';
+        } catch (e) {}
+        try { loadGames(); } catch (e2) {}
+        return;
+      }
+      var name2 = btn.getAttribute('data-tab');
+      if (name2) switchTab(name2);
+      return;
+    }
     var name = btn.getAttribute('data-tab');
     if (!name) return;
     // only app chrome tabs
