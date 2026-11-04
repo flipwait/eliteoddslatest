@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.4.131</title>
+  <title>EliteOdds v3.5.0</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1022,7 +1022,130 @@
       border-color: rgba(110, 231, 183, 0.5) !important;
       color: #fff !important;
     }
-</style>
+
+    /* ===== EliteOdds 3.5.0 premium game cards ===== */
+    #games, #games-pm, #games-kalshi {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+    }
+    @media (min-width: 900px) {
+      #games, #games-pm, #games-kalshi {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+      }
+    }
+    @media (min-width: 1280px) {
+      #games, #games-pm, #games-kalshi {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+    article.game-card.v3-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 1rem !important;
+      padding: 0 !important;
+      background: linear-gradient(165deg, rgba(18,22,32,0.98), rgba(8,10,16,0.99)) !important;
+      border: 1px solid rgba(148,163,184,0.14) !important;
+      display: flex;
+      flex-direction: column;
+    }
+    article.game-card.v3-card.rank-elite {
+      border-color: rgba(232,197,71,0.32) !important;
+      box-shadow: 0 0 0 1px rgba(232,197,71,0.06), 0 12px 36px rgba(0,0,0,0.28);
+    }
+    article.game-card.v3-card.rank-good {
+      border-color: rgba(52,211,153,0.22) !important;
+    }
+    article.game-card.v3-card.kalshi-card {
+      border-color: rgba(52,211,153,0.35) !important;
+    }
+    .v3-accent {
+      height: 3px;
+      width: 100%;
+      background: #2a2f3c;
+    }
+    article.rank-elite .v3-accent {
+      background: linear-gradient(90deg, #e8c547, #b8860b 55%, transparent);
+    }
+    article.rank-good .v3-accent {
+      background: linear-gradient(90deg, #34d399, #059669 55%, transparent);
+    }
+    .v3-card-body { padding: 0.9rem 1rem 0.75rem; }
+    .v3-pick-block { margin: 0.35rem 0 0.5rem; }
+    .v3-pick-label {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em;
+      color: #8b93a7; margin-bottom: 2px;
+    }
+    .v3-pick-main {
+      font-size: 15px; font-weight: 700; letter-spacing: -0.02em;
+      color: #e9d5ff;
+    }
+    article.kalshi-card .v3-pick-main { color: #bbf7d0; }
+    .v3-pick-sub { font-size: 11px; color: #8b93a7; margin-top: 2px; }
+    .v3-metrics {
+      display: grid !important;
+      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+      gap: 0.35rem !important;
+      margin: 0.55rem 0 !important;
+      padding: 0.5rem 0.35rem !important;
+      background: rgba(0,0,0,0.28) !important;
+      border-radius: 10px !important;
+      border: 1px solid rgba(148,163,184,0.08) !important;
+    }
+    .v3-metrics > div {
+      text-align: center; padding: 0.25rem 0.1rem;
+      background: transparent !important; border: none !important;
+    }
+    .v3-metrics .lbl { font-size: 8px !important; }
+    .v3-metrics .val { font-size: 12px !important; font-weight: 700; }
+    .v3-metrics .val.up { color: #34d399 !important; }
+    .v3-trust {
+      font-size: 10px; color: #6b7280; margin-top: 0.25rem;
+    }
+    .v3-actions {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 0.4rem !important;
+      margin-top: 0.65rem !important;
+      padding-top: 0.65rem;
+      border-top: 1px solid rgba(148,163,184,0.1);
+      grid-template-columns: none !important;
+    }
+    .v3-actions button, .v3-actions a {
+      font-size: 11px !important;
+      padding: 0.45rem 0.65rem !important;
+      border-radius: 0.55rem !important;
+      flex: 0 0 auto;
+    }
+    .v3-actions .btn-combo {
+      background: rgba(52,211,153,0.14) !important;
+      border-color: rgba(52,211,153,0.45) !important;
+      color: #a7f3d0 !important;
+      font-weight: 700 !important;
+    }
+    .v3-actions .btn-trade {
+      background: rgba(167,139,250,0.12) !important;
+      border-color: rgba(167,139,250,0.4) !important;
+      color: #ddd6fe !important;
+    }
+    .v3-actions .btn-verdict {
+      background: rgba(232,197,71,0.1) !important;
+      border-color: rgba(232,197,71,0.35) !important;
+      color: #f5e6a8 !important;
+    }
+    .rank-pill-e {
+      background: rgba(232,197,71,0.16) !important;
+      color: #f5e6a8 !important;
+      border: 1px solid rgba(232,197,71,0.4) !important;
+    }
+    .rank-pill-g {
+      background: rgba(52,211,153,0.1) !important;
+      color: #6ee7b7 !important;
+      border: 1px solid rgba(52,211,153,0.32) !important;
+    }
+
+  </style>
 </head>
 <body class="v3">
   <div class="flex min-h-screen">
@@ -1035,7 +1158,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.4.131</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.5.0</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1801,6 +1924,28 @@
             <label class="block text-xs">Smart$ worker URL <span class="text-bb-muted">(optional Railway)</span>
               <input id="worker-url" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-3 py-2 font-mono text-xs" placeholder="https://your-worker.up.railway.app" />
             </label>
+            <div class="border border-amber-500/30 rounded-lg p-2.5 space-y-2 bg-amber-500/5">
+              <p class="text-[11px] font-medium text-amber-200">Sports filters (Elite edge add-ons)</p>
+              <p class="text-[10px] text-bb-muted">Extra pp required on top of model Elite floors for that sport. Pause = hide/downrank Elite for that sport. Does not rewrite the model — selection only. Coach “+1pp” tips can write into these fields.</p>
+              <label class="flex items-center gap-2 text-xs cursor-pointer">
+                <input type="checkbox" id="sport-filters-on" class="rounded" />
+                Use sports filters (when off, hardcode ranks only)
+              </label>
+              <div class="grid grid-cols-3 gap-1.5 text-[10px] text-bb-muted">
+                <span>Sport</span><span>Extra edge pp</span><span>Pause Elite</span>
+              </div>
+              <div id="sport-filters-rows" class="space-y-1.5 text-xs">
+                <div class="grid grid-cols-3 gap-1.5 items-center" data-sf="nba"><span class="text-white">NBA</span><input type="number" step="0.5" min="0" max="15" value="0" class="sf-edge w-full bg-bb-bg border border-bb-border rounded px-1.5 py-1" /><input type="checkbox" class="sf-pause rounded" /></div>
+                <div class="grid grid-cols-3 gap-1.5 items-center" data-sf="cfb"><span class="text-white">CFB</span><input type="number" step="0.5" min="0" max="15" value="0" class="sf-edge w-full bg-bb-bg border border-bb-border rounded px-1.5 py-1" /><input type="checkbox" class="sf-pause rounded" /></div>
+                <div class="grid grid-cols-3 gap-1.5 items-center" data-sf="nfl"><span class="text-white">NFL</span><input type="number" step="0.5" min="0" max="15" value="0" class="sf-edge w-full bg-bb-bg border border-bb-border rounded px-1.5 py-1" /><input type="checkbox" class="sf-pause rounded" /></div>
+                <div class="grid grid-cols-3 gap-1.5 items-center" data-sf="nhl"><span class="text-white">NHL</span><input type="number" step="0.5" min="0" max="15" value="0" class="sf-edge w-full bg-bb-bg border border-bb-border rounded px-1.5 py-1" /><input type="checkbox" class="sf-pause rounded" /></div>
+                <div class="grid grid-cols-3 gap-1.5 items-center" data-sf="mlb"><span class="text-white">MLB</span><input type="number" step="0.5" min="0" max="15" value="0" class="sf-edge w-full bg-bb-bg border border-bb-border rounded px-1.5 py-1" /><input type="checkbox" class="sf-pause rounded" /></div>
+                <div class="grid grid-cols-3 gap-1.5 items-center" data-sf="cbb"><span class="text-white">CBB</span><input type="number" step="0.5" min="0" max="15" value="0" class="sf-edge w-full bg-bb-bg border border-bb-border rounded px-1.5 py-1" /><input type="checkbox" class="sf-pause rounded" /></div>
+                <div class="grid grid-cols-3 gap-1.5 items-center" data-sf="soccer"><span class="text-white">Soccer</span><input type="number" step="0.5" min="0" max="15" value="0" class="sf-edge w-full bg-bb-bg border border-bb-border rounded px-1.5 py-1" /><input type="checkbox" class="sf-pause rounded" /></div>
+                <div class="grid grid-cols-3 gap-1.5 items-center" data-sf="esports"><span class="text-white">Esports</span><input type="number" step="0.5" min="0" max="15" value="0" class="sf-edge w-full bg-bb-bg border border-bb-border rounded px-1.5 py-1" /><input type="checkbox" class="sf-pause rounded" /></div>
+              </div>
+              <p class="text-[10px] text-bb-muted">Example: NBA +1.0 pp → Elite must clear normal floor <strong class="text-white">+1</strong>. Save settings after changes.</p>
+            </div>
             <div class="border border-bb-border rounded-lg p-2.5 space-y-2">
               <p class="text-[11px] font-medium text-violet-200">Esports &amp; soccer ranks</p>
               <p class="text-[10px] text-bb-muted">These sports usually have no L10/H2H form. Without the toggles below they stay <strong class="text-white">Pass</strong>.</p>
@@ -1899,7 +2044,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.4.131</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.5.0</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2275,8 +2420,38 @@
   };
 
   
-  var APP_VERSION = '3.4.131';
+  var APP_VERSION = '3.5.0';
   var APP_CHANGELOG = [
+    {
+      version: '3.5.0',
+      title: 'Premium game cards · desktop polish',
+      notes: [
+        'UI — Premium Scanner cards: gold Elite / green Good accent, conviction strip (Mkt · No-vig · Model · Edge · Score).',
+        'UI — Clearer model-pick block, trust/form line, + Combo primary with Trade.',
+        'UI — Desktop responsive card grid; Kalshi green venue styling preserved.',
+        'Logic — Ranking, EV, settle, Discord, auto unchanged from 3.4.133 — visual layer only.'
+      ]
+    },
+    {
+      version: '3.4.133',
+      title: 'NHL game totals vs team totals · Kalshi Trade URLs',
+      notes: [
+        'FIXED — Polymarket sportsMarketType team_*_total no longer classified as game total (was hiding real NHL O/U).',
+        'FIXED — Kalshi Trade links use /markets/{series}/{event} so they open the correct game.',
+        'FIXED — NHL low lines: team totals stay team totals; period label only when not team total.'
+      ]
+    },
+    {
+      version: '3.4.132',
+      title: 'Sports filters · Coach View bets · NBA totals guard · Add to combo · Verdict v2',
+      notes: [
+        'ADDED — Settings → Sports filters: per-sport Elite edge add-on (pp) + pause Elite for NBA/CFB/etc.',
+        'ADDED — Coach tips: View bets lists settled Elite paper for that sport/market bucket.',
+        'FIXED — NBA/CBB low totals (e.g. Over 52.5) no longer labeled Full game or scored with FG projection → fake Elite.',
+        'ADDED — Card button + Combo adds leg to slip without leaving page (Trade still opens PM/Kalshi).',
+        'UPGRADED — AI Verdict: structured audit (supports / challenges / gaps / rank check) using full card payload.'
+      ]
+    },
     {
       version: '3.4.131',
       title: 'Coach Dashboard · Elite paper by category',
@@ -3532,14 +3707,30 @@
     if (!g) return 'https://polymarket.us';
     var isK = g.venue === 'kalshi' || g.source === 'kalshi';
     if (isK) {
-      if (g.marketUrl && /kalshi\.com/i.test(String(g.marketUrl))) return g.marketUrl;
-      var tick = g.marketTicker || g.marketSlug || g.slug || '';
-      if (tick && !/^https?:/i.test(String(tick))) {
-        // Kalshi series/event pages work better with browse + ticker when full path unknown
-        return 'https://kalshi.com/markets/' + encodeURIComponent(String(tick).split('/').pop());
+      // Prefer full series/event URLs already built by the API
+      if (g.marketUrl && /kalshi\.com\/markets\/[^/]+\/[^/?#]+/i.test(String(g.marketUrl))) return g.marketUrl;
+      if (g.url && /kalshi\.com\/markets\/[^/]+\/[^/?#]+/i.test(String(g.url))) return g.url;
+      var et = String(g.eventTicker || '').trim();
+      var mt = String(g.marketTicker || g.marketSlug || g.slug || '').trim();
+      var ser = String(g.series || g.seriesTicker || '').trim();
+      if (!ser && et) ser = et.split('-')[0] || '';
+      if (!ser && mt) ser = mt.split('-')[0] || '';
+      // Kalshi needs /markets/{series}/{event} — bare /markets/{TICKER} often 404s
+      if (ser && et) {
+        return 'https://kalshi.com/markets/' + encodeURIComponent(ser.toLowerCase()) + '/' + encodeURIComponent(et.toLowerCase());
       }
+      if (ser && mt) {
+        return 'https://kalshi.com/markets/' + encodeURIComponent(ser.toLowerCase()) + '/' + encodeURIComponent(mt.toLowerCase());
+      }
+      if (et) {
+        var s2 = et.split('-')[0].toLowerCase();
+        return 'https://kalshi.com/markets/' + encodeURIComponent(s2) + '/' + encodeURIComponent(et.toLowerCase());
+      }
+      if (g.marketUrl && /kalshi\.com/i.test(String(g.marketUrl))) return g.marketUrl;
       if (g.url && /kalshi\.com/i.test(String(g.url))) return g.url;
-      return g.url || 'https://kalshi.com/browse/sports';
+      var title = g.eventTitle || g.title || '';
+      if (title) return 'https://kalshi.com/browse?search=' + encodeURIComponent(title);
+      return 'https://kalshi.com/browse/sports';
     }
 
     // Polymarket US: /market/{slug} REDIRECTS TO HOME (broken).
@@ -4601,7 +4792,9 @@
     var form = (g.evaluate && g.evaluate.matchup && g.evaluate.matchup.detail) ? String(g.evaluate.matchup.detail).replace(/</g, '') : '';
 
     var isKalshi = String(g.venue || g.source || '').toLowerCase().indexOf('kalshi') >= 0;
-    return '<article class="glass game-card p-3.5 space-y-2.5 min-w-0 overflow-hidden' + (isKalshi ? ' kalshi-card' : '') + '">' +
+    return '<article class="glass game-card v3-card min-w-0 overflow-hidden ' + rankMod + (isKalshi ? ' kalshi-card' : '') + '">' +
+      '<div class="v3-accent"></div>' +
+      '<div class="v3-card-body space-y-2.5">' +
       '<div class="flex justify-between gap-2">' +
         '<div class="min-w-0"><p class="text-[9px] uppercase tracking-wide mb-0.5 ' + (isKalshi ? 'text-bb-green' : 'text-violet-300') + '">' + (isKalshi ? 'Kalshi' : 'Polymarket') + '</p>' +'<p class="font-medium text-sm leading-snug">' + title + '</p>' +
         '<p class="text-[10px] text-bb-muted mt-0.5">' + String(g.league || '').toUpperCase() +
@@ -4612,7 +4805,7 @@
         '</p></div>' +
         '<div class="flex flex-col items-end gap-0.5 shrink-0">' +
         '<div class="flex items-center gap-1.5">' +
-        '<span class="' + rankClass(g.rank) + ' text-[10px] font-bold px-2.5 py-1 rounded-full h-fit tracking-wide">' + String(g.rank || 'PASS').toUpperCase() + '</span>' +
+        '<span class="' + rankClass(g.rank) + ' ' + rankPill + ' text-[10px] font-bold px-2.5 py-1 rounded-full h-fit tracking-wide">' + rankU + '</span>' +
         '<span class="text-[9px] text-bb-muted">' + (g.score10 != null ? g.score10 : Math.max(1, Math.min(10, Math.round((g.betScore||50)/10)))) + '/10</span></div>' +
         '<div class="flex items-center gap-1.5">' +
         (function(){ var c = confidenceOf(g); return '<span class="text-[9px] px-1.5 py-0.5 rounded border ' + c.cls + '">' + c.label + ' conf</span>'; })() +
@@ -4690,22 +4883,11 @@
       (!g.hasForm && g.formNote ? ('<p class="text-[10px] text-amber-300/90 mt-0.5">Form: ' + String(g.formNote).replace(/</g,'').slice(0, 100) + '</p>') : '') +
       (g.hasForm && g.formNote ? ('<p class="text-[10px] text-bb-green/80 mt-0.5">Form: ' + String(g.formNote).replace(/</g,'').slice(0, 80) + '</p>') : '') +
       '<div class="v3-metrics">' +
+        '<div><div class="lbl">Mkt</div><div class="val">' + (mkt != null ? mkt + '%' : '—') + '</div></div>' +
+        '<div><div class="lbl">No-vig</div><div class="val">' + (nv != null ? nv + '%' : '—') + '</div></div>' +
         '<div><div class="lbl">Model</div><div class="val">' + (mod != null ? mod + '%' : '—') + '</div></div>' +
-        '<div><div class="lbl">' + (isKalshi ? 'Market' : 'Market') + '</div><div class="val">' + (mkt != null ? mkt + '%' : '—') + '</div></div>' +
-        '<div><div class="lbl">' + (isKalshi ? 'Price' : 'Odds') + '</div><div class="val">' + (function(){
-          if (isKalshi && mkt != null) {
-            var cents = Math.round(Number(mkt));
-            var p = mkt/100;
-            var a = p >= 0.5 ? Math.round(-100*p/(1-p)) : Math.round(100*(1-p)/p);
-            return cents + '¢';
-          }
-          var a = null;
-          if (mkt != null && mkt > 0 && mkt < 100) {
-            var p2 = mkt/100;
-            a = p2 >= 0.5 ? Math.round(-100*p2/(1-p2)) : Math.round(100*(1-p2)/p2);
-          }
-          return a != null ? (a > 0 ? '+' + a : String(a)) : (dec != null ? dec : '—');
-        })() + '</div></div>' +
+        '<div><div class="lbl">Edge</div><div class="val up">' + epp + '</div></div>' +
+        '<div><div class="lbl">Score</div><div class="val">' + score10 + '</div></div>' +
       '</div>' +
       '<div class="flex flex-wrap gap-1.5 text-[10px]">' +
         (function(){
@@ -4747,6 +4929,7 @@
         '<button type="button" class="btn-verdict">Verdict</button>' +
         '<button type="button" class="btn-log">Log</button>' +
         '<a class="btn-trade" href="' + tradeHrefFor(g) + '" target="_blank" rel="noopener">Trade</a>' +
+        '<button type="button" class="btn-combo" title="Add leg to combo slip without leaving page">+ Combo</button>' +
         '<button type="button" class="btn-books">Books</button>' +
         '<button type="button" class="btn-ticket">Ticket</button>' +
         '<button type="button" class="btn-share" title="Share pick">Share</button>' +
@@ -4756,7 +4939,7 @@
       '<div class="smart-panel hidden text-[11px] text-bb-muted bg-bb-elev/60 rounded-lg p-2 mt-1"></div>' +
       '<div class="books-panel hidden text-[11px] text-bb-muted bg-bb-elev/60 rounded-lg p-2 mt-1"></div>' +
       '<div class="deep-panel hidden text-[11px] text-bb-muted bg-bb-elev/60 rounded-lg p-2 mt-1 whitespace-pre-wrap max-h-64 overflow-y-auto"></div>' +
-      '<div class="verdict-panel hidden text-[11px] text-bb-muted bg-cyan-500/5 border border-cyan-500/20 rounded-lg p-2.5 mt-1 whitespace-pre-wrap max-h-72 overflow-y-auto"></div></article>';
+      '<div class="verdict-panel hidden text-[11px] text-bb-muted bg-cyan-500/5 border border-cyan-500/20 rounded-lg p-2.5 mt-1 whitespace-pre-wrap max-h-72 overflow-y-auto"></div></div></article>';
   }
 
   function buildShareText(g, opts) {
@@ -5776,6 +5959,15 @@
         var u = prompt('Units?', String(g.rank).toLowerCase() === 'elite' ? '1' : '0.5');
         if (u === null) return;
         addTicket(g, u);
+      };
+      var cmb = art.querySelector('.btn-combo');
+      if (cmb) cmb.onclick = function () {
+        addTicket(g, String(g.rank).toLowerCase() === 'elite' ? 1 : 0.5);
+        try { status('+ Combo: leg added (' + ticket.length + ' in slip)'); } catch (e0) {}
+        try {
+          cmb.textContent = 'Added ✓';
+          setTimeout(function () { cmb.textContent = '+ Combo'; }, 1200);
+        } catch (e1) {}
       };
       if (d) d.onclick = function () { sendDiscord(g, {}); }; // auto: Kalshi→2, Poly→1
       var d2 = art.querySelector('.btn-discord2');
@@ -7278,10 +7470,18 @@
 
     bits.push('<div class="rounded-lg border border-amber-500/25 bg-amber-500/5 p-2.5">');
     bits.push('<div class="text-white font-semibold text-xs mb-1">Fine-tune tips (category only)</div>');
-    tips.slice(0, 12).forEach(function (tip) {
+    tips.slice(0, 12).forEach(function (tip, ti) {
       var col = tip.level === 'good' ? 'text-bb-green' : (tip.level === 'warn' ? 'text-bb-orange' : 'text-bb-muted');
-      bits.push('<div class="' + col + ' text-[11px] mb-1">• ' + tip.text + '</div>');
+      var acts = '';
+      if (tip.sport || tip.market) {
+        acts = ' <button type="button" class="coach-view-bets text-[10px] px-1.5 py-0.5 rounded border border-cyan-400/40 text-cyan-200" data-ti="' + ti + '">View bets</button>';
+        if (tip.action === 'tighten' && tip.sport) {
+          acts += ' <button type="button" class="coach-apply-sport text-[10px] px-1.5 py-0.5 rounded border border-amber-400/40 text-amber-200" data-ti="' + ti + '">+1pp sport</button>';
+        }
+      }
+      bits.push('<div class="' + col + ' text-[11px] mb-1.5">• ' + tip.text + acts + '</div>');
     });
+    bits.push('<div id="coach-bets-panel" class="hidden mt-2 max-h-48 overflow-y-auto text-[10px] border border-bb-border rounded-lg p-2 bg-black/30"></div>');
     bits.push('</div>');
 
     window.__coachTips = tips;
@@ -7291,6 +7491,18 @@
 
     out.innerHTML = bits.join('');
     updateOpenBreakdownUI();
+    out.querySelectorAll('.coach-view-bets').forEach(function (btn) {
+      btn.onclick = function () {
+        var tip = tips[Number(btn.getAttribute('data-ti'))];
+        showCoachBucketBets(tip);
+      };
+    });
+    out.querySelectorAll('.coach-apply-sport').forEach(function (btn) {
+      btn.onclick = function () {
+        var tip = tips[Number(btn.getAttribute('data-ti'))];
+        applyCoachSportPlusOne(tip);
+      };
+    });
 
     if ($('coach-ai') && $('coach-ai').checked) {
       var oai = typeof getOpenAIKey === 'function' ? getOpenAIKey() : '';
@@ -7317,6 +7529,73 @@
         out.innerHTML += '<div class="text-bb-orange mt-1">AI failed: ' + (e.message || e) + '</div>';
       }
     }
+  }
+
+  function showCoachBucketBets(tip) {
+    var panel = $('coach-bets-panel');
+    if (!panel || !tip) return;
+    var win = parseInt(($('coach-window') && $('coach-window').value) || '50', 10);
+    if (isNaN(win)) win = 50;
+    var list = eliteLedger().filter(function (e) {
+      var r = eliteNormResult(e.result);
+      return r === 'won' || r === 'lost' || r === 'push';
+    }).sort(function (a, b) {
+      return new Date(b.settledAt || b.at || 0) - new Date(a.settledAt || a.at || 0);
+    });
+    if (win > 0) list = list.slice(0, win * 3);
+    if (tip.sport) {
+      var sp = String(tip.sport).toLowerCase();
+      list = list.filter(function (e) {
+        var lg = String(e.league || '').toLowerCase();
+        if (sp === 'cfb') return lg === 'cfb' || lg === 'ncaaf';
+        if (sp === 'cbb') return lg === 'cbb' || lg === 'ncaab';
+        return lg === sp;
+      });
+    }
+    if (tip.market) {
+      list = list.filter(function (e) {
+        return (e.marketBucket || coachMarketBucket(e.marketType, e.pick)) === tip.market;
+      });
+    }
+    list = list.slice(0, 40);
+    if (!list.length) {
+      panel.classList.remove('hidden');
+      panel.innerHTML = '<span class="text-bb-muted">No settled Elite paper rows for this bucket (check window / sport tags).</span>';
+      return;
+    }
+    panel.classList.remove('hidden');
+    panel.innerHTML = '<div class="text-white text-[11px] mb-1">' + list.length + ' settled rows · ' + (tip.text || '') + '</div>' +
+      list.map(function (e) {
+        var res = eliteNormResult(e.result);
+        var col = res === 'won' ? 'text-bb-green' : (res === 'lost' ? 'text-bb-red' : 'text-bb-muted');
+        return '<div class="border-b border-bb-border/40 py-1 ' + col + '">' +
+          '<span class="font-mono uppercase text-[9px]">' + res + '</span> · ' +
+          String(e.pick || e.modelPick || '—').replace(/</g, '') +
+          ' · ' + String(e.title || e.eventTitle || '').replace(/</g, '').slice(0, 42) +
+          (e.entryPrice != null ? ' · ' + e.entryPrice + '¢' : '') +
+          (e.settleDetail ? ' · <span class="text-bb-muted">' + String(e.settleDetail).replace(/</g, '').slice(0, 48) + '</span>' : '') +
+          '</div>';
+      }).join('');
+  }
+
+  function applyCoachSportPlusOne(tip) {
+    if (!tip || !tip.sport) return alert('No sport on this tip');
+    var sp = String(tip.sport).toLowerCase();
+    if ($('sport-filters-on')) $('sport-filters-on').checked = true;
+    var row = document.querySelector('#sport-filters-rows [data-sf="' + sp + '"]');
+    if (!row) return alert('No sports-filter row for ' + sp + ' — open Settings');
+    var edgeInp = row.querySelector('.sf-edge');
+    if (edgeInp) {
+      var cur = Number(edgeInp.value) || 0;
+      edgeInp.value = String(Math.min(15, cur + 1));
+    }
+    try {
+      var st = settings();
+      st.sportFiltersOn = true;
+      st.sportFilters = readSportFiltersFromDom();
+      localStorage.setItem('bb_settings', JSON.stringify(st));
+    } catch (e) {}
+    alert('Sports filter: ' + sp.toUpperCase() + ' Elite extra edge → ' + (edgeInp && edgeInp.value) + ' pp. Save Settings if needed, then re-scan / Apply filters.');
   }
 
   function applyCoachFilters() {
@@ -7492,7 +7771,54 @@
         return true;
       });
     }
+    // Sports filters (Settings): pause Elite / require extra edge pp for Elite on that sport
+    list = applySportFiltersToList(list);
     return list;
+  }
+
+  function readSportFiltersFromDom() {
+    var map = {};
+    var box = $('sport-filters-rows');
+    if (!box) return map;
+    box.querySelectorAll('[data-sf]').forEach(function (row) {
+      var k = String(row.getAttribute('data-sf') || '').toLowerCase();
+      var edgeInp = row.querySelector('.sf-edge');
+      var pauseInp = row.querySelector('.sf-pause');
+      map[k] = {
+        edgeAdd: Number(edgeInp && edgeInp.value) || 0,
+        pause: !!(pauseInp && pauseInp.checked)
+      };
+    });
+    return map;
+  }
+
+  function applySportFiltersToList(list) {
+    var st = settings();
+    if (!st.sportFiltersOn && !($('sport-filters-on') && $('sport-filters-on').checked)) return list;
+    var sf = st.sportFilters || readSportFiltersFromDom() || {};
+    return (list || []).filter(function (g) {
+      var lg = String(g.league || g.sport || '').toLowerCase();
+      if (lg === 'ncaaf' || lg === 'ncaafb') lg = 'cfb';
+      if (lg === 'ncaab') lg = 'cbb';
+      if (/cs2|lol|val|dota|esport/.test(lg)) lg = 'esports';
+      if (/soccer|epl|mls|liga|serie|bundes/.test(lg)) lg = 'soccer';
+      var conf = sf[lg];
+      if (!conf) return true;
+      var rk = String(g.rank || '').toLowerCase();
+      var isElite = rk === 'elite' || rk === 'potd' || rk === 'super elite' || rk === 'super_elite';
+      if (!isElite) return true;
+      if (conf.pause) return false;
+      var add = Number(conf.edgeAdd) || 0;
+      if (add <= 0) return true;
+      var edge = Number(g.probability_edge != null ? g.probability_edge : (g.edgePp != null ? g.edgePp : g.netEdge));
+      if (edge != null && edge > 1) edge = edge; // already pp
+      if (edge != null && edge <= 1 && edge >= -1) edge = edge * 100; // fraction → pp
+      if (edge == null || isNaN(edge)) return true;
+      // Model Elite already cleared base floor; require base-implied + add ≈ edge >= add beyond typical skinny
+      // Practical: keep Elite only if edge >= add + 2.5 (soft floor) when filters on
+      var need = 2.5 + add;
+      return edge >= need;
+    });
   }
   function apiMode() {
     // UI: pregame | live | both  →  API: upcoming | live | all
@@ -10659,7 +10985,9 @@ function renderSlate() {
       bankroll: Number(($('bankroll') && $('bankroll').value) || 0) || 0,
       unitSize: Number(($('unit-size') && $('unit-size').value) || 0) || 0,
       kellyMode: ($('kelly-mode') && $('kelly-mode').value) || 'off',
-      maxUnits: Number(($('max-units') && $('max-units').value) || 1) || 1
+      maxUnits: Number(($('max-units') && $('max-units').value) || 1) || 1,
+      sportFiltersOn: !!($('sport-filters-on') && $('sport-filters-on').checked),
+      sportFilters: (typeof readSportFiltersFromDom === 'function' ? readSportFiltersFromDom() : {})
     }));
     alert('Settings saved');
     loadGames();
@@ -10739,6 +11067,18 @@ function renderSlate() {
   if ($('worker-url')) $('worker-url').value = st.workerUrl || '';
   if ($('allow-thin-form-good')) $('allow-thin-form-good').checked = st.allowThinFormGood !== false && st.allowThinFormGood !== 0;
   if ($('allow-thin-form-elite')) $('allow-thin-form-elite').checked = !!st.allowThinFormElite;
+  if ($('sport-filters-on')) $('sport-filters-on').checked = !!st.sportFiltersOn;
+  if (st.sportFilters && $('sport-filters-rows')) {
+    Object.keys(st.sportFilters).forEach(function (k) {
+      var row = document.querySelector('#sport-filters-rows [data-sf="' + k + '"]');
+      if (!row) return;
+      var conf = st.sportFilters[k] || {};
+      var edgeInp = row.querySelector('.sf-edge');
+      var pauseInp = row.querySelector('.sf-pause');
+      if (edgeInp && conf.edgeAdd != null) edgeInp.value = conf.edgeAdd;
+      if (pauseInp) pauseInp.checked = !!conf.pause;
+    });
+  }
   if ($('auto-discord-elite')) $('auto-discord-elite').checked = !!st.autoDiscordElite;
   if ($('auto-discord-gap')) $('auto-discord-gap').value = st.autoDiscordGapSec != null ? st.autoDiscordGapSec : '5';
   if ($('auto-log-on-discord')) $('auto-log-on-discord').checked = !!st.autoLogOnDiscord;

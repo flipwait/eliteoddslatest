@@ -222,7 +222,13 @@ function classifyMarket(m) {
     if (/full_game_spread|team_full_game_spread|spread/.test(smt) && /first_half|1h/.test(smt)) return 'spread_1h';
     if (/full_game_spread|team_.*_spread/.test(smt)) return 'spread';
     if (/first_half_total|game_first_half_total/.test(smt)) return 'total_1h';
-    if (/full_game_total|game_total|team_.*_total|points_full_game_total/.test(smt)) return 'total';
+    // Team totals MUST not be classified as game total (was matching team_.*_total → total)
+    if (/team_total|team_points|team_.*_team_total|(?:home|away)_team_total/.test(smt) && !/game_total|combined_total|full_game_total/.test(smt)) {
+      if (/first_half|1st_half|1h/.test(smt)) return 'team_total_1h';
+      if (/second_half|2nd_half|2h/.test(smt)) return 'team_total_2h';
+      return 'team_total_fg';
+    }
+    if (/full_game_total|game_total|points_full_game_total|combined_total/.test(smt)) return 'total';
     if (/full_game_winner|team_full_game_winner/.test(smt)) return 'moneyline';
     if (/first_half_winner/.test(smt)) return 'moneyline_1h';
   }

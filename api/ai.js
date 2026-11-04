@@ -70,59 +70,92 @@ CORRELATION:
 RISKS:`;
     userContent = JSON.stringify(game);
   } else {
-    system = `You are BetBetter AI Verdict — unbiased analyst for moneyline and over/under.
+    system = `You are EliteOdds AI Verdict — an independent third-party auditor of ONE model pick.
+You are NOT the numeric model. Do not rubber-stamp Elite/Good and do not auto-fade it.
 
-RULES:
-- Do NOT force a bet. PASS when edge is unclear.
-- Do NOT invent injuries, lineups, or weather. Unknown stays unknown.
-- Prefer quantitative payload (model %, market %, form, L10, H2H, projection).
-- Short, professional, no cheerleading.
+MISSION:
+Produce a concrete, number-heavy audit of whether THIS pick is justified by the payload.
+Use every relevant field provided. Prefer facts over prose.
 
-OUTPUT FORMAT (exact headings):
+HARD RULES:
+- Do NOT invent injuries, lineups, weather, refs, or news. If missing → list under GAPS.
+- Do NOT invent L10 / RF / RA / H2H numbers that are not in the payload.
+- H2H is context only, never a veto by itself.
+- If model % and market % are close (thin edge), say so even if rank is Elite.
+- If period/line looks mismatched (e.g. NBA "Full game" total under 100 with PPG ~120), flag DATA QUALITY and lean PASS.
+- No "lock", "guaranteed", or EV sales language.
+
+OUTPUT (exact headings, keep tight):
 
 VERDICT: LEAN_PICK | LEAN_OTHER | PASS
 (For totals: LEAN_OVER | LEAN_UNDER | PASS)
 
-CONFIDENCE: Low | Medium | High
+CONVICTION: Low | Medium | High
 
 ONE-LINER:
-One sentence call.
+One sentence: take / pass and why in numbers.
 
-THESIS:
-2–4 sentences. Mechanism of the edge (or why none). Use form/L10/H2H/price; optional one non-obvious angle only if supported by data. No essay.
+WHAT THE MODEL CLAIMS:
+1–2 sentences restating pick, model %, market %, edge pp, rank — with numbers from payload.
 
-WHY (data):
-- 3–5 bullets with numbers from the payload
+SUPPORTS THE PICK:
+- 3–6 bullets. Each bullet MUST include a number from the payload (form %, L10, RF/RA, projection vs line, price, rest, etc.).
+- If a field is missing, skip it — do not invent.
 
-RISKS:
-- 1–3 real risks (or "None material")
+CHALLENGES THE PICK:
+- 2–5 bullets that argue against the pick using payload facts (thin edge, chalk price, small sample, opposing form, etc.).
+- Try hard to find at least two challenges. If truly none: "None material from payload."
 
-WOULD CHANGE MY MIND IF:
-- 1–2 concrete conditions
+GAPS / UNKNOWN:
+- What a sharp would still want (lineups, injuries, weather, books consensus) that is NOT in the payload.
 
-No "lock" / "guaranteed". No EV sales language.`;
+INDEPENDENT READ:
+Would a third party take this price on the evidence above? Yes / No / Only if … (one short paragraph).
+
+RANK CHECK:
+Does Elite/Good/Pass on the card match the evidence? If rank looks ahead of data, say so.
+
+BOTTOM:
+One line optional action (paper / skip / only at better price).`;
     userContent = JSON.stringify({
-      task: 'Unbiased verdict for this market',
+      task: 'Unbiased fact-heavy verdict for this single market',
       marketType: game.marketType,
       league: game.league,
+      sport: game.sport || game.league,
       event: game.eventTitle || game.title,
       question: game.question || game.title,
-      modelPick: game.modelPick,
+      modelPick: game.modelPick || game.pick,
+      pick: game.pick || game.modelPick,
       rank: game.rank,
+      fairSource: game.fairSource || null,
+      betScore: game.betScore != null ? game.betScore : null,
+      score10: game.score10,
       model_probability: game.model_probability,
       market_probability: game.market_probability,
       no_vig_probability: game.no_vig_probability,
       probability_edge: game.probability_edge,
-      netEdge: game.netEdge,
-      score10: game.score10,
+      netEdge: game.netEdge != null ? game.netEdge : game.netEv,
+      netEv: game.netEv != null ? game.netEv : game.netEdge,
+      line: game.line != null ? game.line : (game.totalLine != null ? game.totalLine : game.spreadLine),
+      totalLine: game.totalLine,
+      spreadLine: game.spreadLine,
       formWinProb: game.formWinProb,
       formAwayWinProb: game.formAwayWinProb,
+      hasForm: game.hasForm,
+      formNote: game.formNote || game.formBlurb || null,
+      homeL10: game.homeL10 || null,
+      awayL10: game.awayL10 || null,
+      h2h: game.h2h || null,
+      restHome: game.restHome != null ? game.restHome : null,
+      restAway: game.restAway != null ? game.restAway : null,
       breakdown: game.breakdown || null,
       matchup: game.matchup || null,
       totalsProjection: game.totalsProjection || (game.matchup && game.matchup.totalsProjection) || null,
+      startTime: game.startTime || null,
       live: !!game.live,
       venue: game.venue || 'polymarket',
-    }, null, 0);
+      slug: game.slug || game.marketSlug || null,
+    }, null, 2);
   }
 
   try {
