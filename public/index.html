@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.5.0</title>
+  <title>EliteOdds v3.5.1</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1145,6 +1145,69 @@
       border: 1px solid rgba(52,211,153,0.32) !important;
     }
 
+  
+    /* 3.5.1 — force visible premium card chrome */
+    article.game-card.v3-card {
+      border-radius: 16px !important;
+      background: linear-gradient(165deg, #141824 0%, #0a0c12 100%) !important;
+    }
+    article.game-card.v3-card.rank-elite {
+      border: 1.5px solid rgba(232,197,71,0.55) !important;
+      box-shadow: 0 0 24px rgba(232,197,71,0.12), 0 8px 32px rgba(0,0,0,0.35) !important;
+    }
+    article.game-card.v3-card.rank-good {
+      border: 1.5px solid rgba(52,211,153,0.4) !important;
+    }
+    article.game-card.v3-card .v3-accent {
+      height: 4px !important;
+      display: block !important;
+    }
+    article.game-card.v3-card.rank-elite .v3-accent {
+      background: linear-gradient(90deg, #f5d76e, #e8c547 40%, transparent) !important;
+    }
+    article.game-card.v3-card.rank-good .v3-accent {
+      background: linear-gradient(90deg, #34d399, #10b981 40%, transparent) !important;
+    }
+    article.game-card.v3-card .v3-card-body {
+      padding: 14px 16px 12px !important;
+    }
+    article.game-card.v3-card .v3-metrics {
+      display: grid !important;
+      grid-template-columns: repeat(5, minmax(0,1fr)) !important;
+      gap: 4px !important;
+      margin: 10px 0 !important;
+      padding: 10px 6px !important;
+      background: rgba(0,0,0,0.35) !important;
+      border-radius: 10px !important;
+      border: 1px solid rgba(148,163,184,0.12) !important;
+    }
+    article.game-card.v3-card .v3-metrics .lbl {
+      font-size: 8px !important;
+      text-transform: uppercase !important;
+      color: #8b93a7 !important;
+      letter-spacing: 0.04em !important;
+    }
+    article.game-card.v3-card .v3-metrics .val {
+      font-size: 13px !important;
+      font-weight: 700 !important;
+      color: #fff !important;
+      margin-top: 2px !important;
+    }
+    article.game-card.v3-card .v3-metrics .val.up {
+      color: #34d399 !important;
+    }
+    article.game-card.v3-card .v3-actions .btn-combo {
+      background: rgba(52,211,153,0.18) !important;
+      border: 1px solid rgba(52,211,153,0.5) !important;
+      color: #a7f3d0 !important;
+      font-weight: 700 !important;
+    }
+    article.game-card.v3-card .v3-actions .btn-trade {
+      background: rgba(167,139,250,0.15) !important;
+      border: 1px solid rgba(167,139,250,0.45) !important;
+      color: #e9d5ff !important;
+    }
+
   </style>
 </head>
 <body class="v3">
@@ -1158,7 +1221,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.5.0</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.5.1</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -2044,7 +2107,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.5.0</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.5.1</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2420,8 +2483,17 @@
   };
 
   
-  var APP_VERSION = '3.5.0';
+  var APP_VERSION = '3.5.1';
   var APP_CHANGELOG = [
+    {
+      version: '3.5.1',
+      title: 'Premium cards actually apply',
+      notes: [
+        'FIXED — rankMod / score10 were referenced but never defined (cards threw and UI looked unchanged).',
+        'FIXED — Stronger Elite gold / Good green borders + 4px accent bar + 5-stat conviction strip.',
+        'Deploy 3.5.1 and hard-refresh; header should read v3.5.1.'
+      ]
+    },
     {
       version: '3.5.0',
       title: 'Premium game cards · desktop polish',
@@ -4792,6 +4864,10 @@
     var form = (g.evaluate && g.evaluate.matchup && g.evaluate.matchup.detail) ? String(g.evaluate.matchup.detail).replace(/</g, '') : '';
 
     var isKalshi = String(g.venue || g.source || '').toLowerCase().indexOf('kalshi') >= 0;
+    var rankU = String(g.rank || 'PASS').toUpperCase();
+    var rankMod = rankU === 'ELITE' ? 'rank-elite' : (rankU === 'GOOD' ? 'rank-good' : 'rank-pass');
+    var rankPill = rankU === 'ELITE' ? 'rank-pill-e' : (rankU === 'GOOD' ? 'rank-pill-g' : '');
+    var score10 = (g.score10 != null ? g.score10 : Math.max(1, Math.min(10, Math.round((g.betScore || 50) / 10))));
     return '<article class="glass game-card v3-card min-w-0 overflow-hidden ' + rankMod + (isKalshi ? ' kalshi-card' : '') + '">' +
       '<div class="v3-accent"></div>' +
       '<div class="v3-card-body space-y-2.5">' +
