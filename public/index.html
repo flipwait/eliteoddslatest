@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.8.0</title>
+  <title>EliteOdds v3.8.2</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -2235,6 +2235,37 @@
     #calendar-desk .cal-head h2 { font-size: 18px; }
     #calendar-desk .cal-head p { color: #8b93a7; }
 
+  
+    /* 3.8.1 — hide mobile filter card entirely */
+    #mobile-filter-bar { display: none !important; }
+    /* Dual board visibility */
+    #games-dual.eo-dual { display: none; }
+    body.theme-both #games-dual.eo-dual {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    body.theme-both #games { display: none !important; }
+    body:not(.theme-both) #games-dual { display: none !important; }
+    body:not(.theme-both) #games { display: grid !important; }
+    @media (max-width: 1099px) {
+      body.theme-both #games-dual.eo-dual {
+        grid-template-columns: 1fr;
+      }
+    }
+    .eo-col-head {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+      margin-bottom: 8px; padding: 6px 10px; border-radius: 8px;
+    }
+    .eo-col-head.poly {
+      color: #ddd6fe; background: rgba(167,139,250,0.12);
+      border: 1px solid rgba(167,139,250,0.25);
+    }
+    .eo-col-head.kal {
+      color: #a7f3d0; background: rgba(52,211,153,0.1);
+      border: 1px solid rgba(52,211,153,0.25);
+    }
+
   </style>
 </head>
 <body class="v3">
@@ -2259,7 +2290,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.8.0</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.8.2</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -2477,30 +2508,12 @@
                 <option value="wta">WTA</option>
               </select>
               <select id="sc-market" title="Market">
-                <optgroup label="Main lines">
-                  <option value="all">All markets</option>
-                  <option value="moneyline" selected>Moneyline (ML)</option>
-                  <option value="spread">Spreads</option>
-                  <option value="total">Over / Under (game totals)</option>
-                  <option value="team_total_fg">Team totals</option>
-                </optgroup>
-                <optgroup label="Halves / periods">
-                  <option value="spread_1h">1H spreads</option>
-                  <option value="total_1h">1H totals</option>
-                  <option value="moneyline_1h">1H / period winner</option>
-                </optgroup>
-                <optgroup label="MLB specials">
-                  <option value="nrfi">NRFI / YRFI</option>
-                  <option value="f5">F5 winner</option>
-                  <option value="f5_total">F5 Over / Under</option>
-                  <option value="f5_spread">F5 spreads</option>
-                </optgroup>
-                <optgroup label="Props & other">
-                  <option value="player_props">Player props</option>
-                  <option value="map_1">Esports Map 1</option>
-                  <option value="map_2">Esports Map 2</option>
-                  <option value="map_total">Map totals</option>
-                </optgroup>
+                <option value="all">All markets</option>
+                <option value="bucket_ml" selected>Moneyline (ML · 1H · 2H · F5 winners)</option>
+                <option value="bucket_spread">Spreads (FG · 1H · Q · F5)</option>
+                <option value="bucket_ou">Over / Under (FG · 1H · 2H · F5)</option>
+                <option value="bucket_tt">Team totals (FG · 1H · 2H)</option>
+                <option value="bucket_special">Special (NRFI/YRFI · Maps)</option>
               </select>
               <select id="sc-layout" title="Layout">
                 <option value="classic" selected>Classic</option>
@@ -3339,6 +3352,29 @@
               </div>
             </details>
 
+
+            <details class="set-box" open>
+              <summary>Edge display</summary>
+              <div class="set-body">
+                <p class="text-[10px] text-bb-muted leading-snug">Controls how edge appears on cards. Does <b class="text-white/80">not</b> rewrite rank math — try these before changing the model.</p>
+                <label class="flex items-center gap-2 text-xs">
+                  <input type="checkbox" id="edge-require-form" />
+                  Require form for edge (no form → edge shows —)
+                </label>
+                <label class="flex items-center gap-2 text-xs">
+                  <input type="checkbox" id="edge-net-fees" />
+                  Show net edge after fees (~2pp haircut)
+                </label>
+                <label class="flex items-center gap-2 text-xs">
+                  <input type="checkbox" id="edge-cap" checked />
+                  Cap displayed edge at
+                  <input type="number" id="edge-cap-pp" value="12" min="5" max="30" step="1" class="w-14 bg-bb-bg border border-bb-border rounded px-1.5 py-0.5 text-xs" />
+                  pp
+                </label>
+                <p class="text-[10px] text-bb-muted">High raw edges still exist under the hood; the card just won’t show “+40pp” style noise when capped.</p>
+              </div>
+            </details>
+
         <details class="set-box" open>
           <summary>About &amp; release notes</summary>
           <div class="set-body">
@@ -3348,7 +3384,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.8.0</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.8.2</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -3735,8 +3771,26 @@
   };
 
   
-  var APP_VERSION = '3.8.0';
+  var APP_VERSION = '3.8.2';
   var APP_CHANGELOG = [
+    {
+      version: '3.8.2',
+      title: 'Edge display toggles (Settings)',
+      notes: [
+        'Settings → Edge display: require form for edge, show net edge after fees, cap extreme edge on cards.',
+        'Does not rewrite the ranking model — only how edge is shown on cards so you can test honesty without a full rebuild.'
+      ]
+    },
+    {
+      version: '3.8.1',
+      title: 'Mobile chrome clean · Scanner market buckets · dual venue',
+      notes: [
+        'Mobile — Removed WHEN/DAYS/SPORT/BOOK/MARKET filter card (use Scanner toolbar + bottom nav).',
+        'Desktop Scanner — Polymarket-only / Kalshi-only single column; Both = side-by-side dual board.',
+        'Scanner markets — 5 buckets: Moneyline · Spreads · Over/Under · Team totals · Special (NRFI/maps).',
+        'Kalshi Trade links — stronger series/event URL build + search fallback.'
+      ]
+    },
     {
       version: '3.8.0',
       title: 'Auto PM · Live Focus · Desk/Coach · cleaner Settings',
@@ -5127,11 +5181,24 @@
       // Prefer full series/event URLs already built by the API
       if (g.marketUrl && /kalshi\.com\/markets\/[^/]+\/[^/?#]+/i.test(String(g.marketUrl))) return g.marketUrl;
       if (g.url && /kalshi\.com\/markets\/[^/]+\/[^/?#]+/i.test(String(g.url))) return g.url;
-      var et = String(g.eventTicker || '').trim();
-      var mt = String(g.marketTicker || g.marketSlug || g.slug || '').trim();
-      var ser = String(g.series || g.seriesTicker || '').trim();
-      if (!ser && et) ser = et.split('-')[0] || '';
+      var et = String(g.eventTicker || g.event_ticker || '').trim();
+      var mt = String(g.marketTicker || g.ticker || g.marketSlug || g.slug || '').trim();
+      var ser = String(g.series || g.seriesTicker || g.series_ticker || '').trim();
+      // Strip outcome suffixes like -YES -NO from tickers
+      mt = mt.replace(/-(YES|NO|yes|no)$/,'');
+      if (et) et = et.replace(/-(YES|NO|yes|no)$/,'');
+      if (!ser && et) {
+        // KXNBAGAME-... or NBA-... → series prefix before first long segment
+        var parts = et.split('-');
+        ser = parts[0] || '';
+        if (/^KX/i.test(ser) && parts.length > 1) ser = parts[0];
+      }
       if (!ser && mt) ser = mt.split('-')[0] || '';
+      if (!et && mt && mt.indexOf('-') > 0) {
+        // market ticker often SERIES-EVENT-OUTCOME — use SERIES-EVENT as event path
+        var segs = mt.split('-');
+        if (segs.length >= 2) et = segs.slice(0, Math.min(4, segs.length)).join('-');
+      }
       // Kalshi needs /markets/{series}/{event} — bare /markets/{TICKER} often 404s
       if (ser && et) {
         return 'https://kalshi.com/markets/' + encodeURIComponent(ser.toLowerCase()) + '/' + encodeURIComponent(et.toLowerCase());
@@ -5632,6 +5699,61 @@
     return dayLabel + ' · ' + timeStr;
   }
 
+
+  function edgeDisplayOpts() {
+    var st = settings();
+    var req = false, net = false, capOn = true, cap = 12;
+    try {
+      if ($('edge-require-form')) req = !!$('edge-require-form').checked;
+      else req = !!st.edgeRequireForm;
+      if ($('edge-net-fees')) net = !!$('edge-net-fees').checked;
+      else net = !!st.edgeNetFees;
+      if ($('edge-cap')) capOn = !!$('edge-cap').checked;
+      else capOn = st.edgeCapOn !== false;
+      if ($('edge-cap-pp') && $('edge-cap-pp').value !== '') cap = Number($('edge-cap-pp').value);
+      else if (st.edgeCapPp != null) cap = Number(st.edgeCapPp);
+    } catch (e) {}
+    if (!(cap >= 5 && cap <= 40)) cap = 12;
+    return { requireForm: req, netFees: net, capOn: capOn, cap: cap };
+  }
+
+  function resolveEdgeForCard(g) {
+    var opt = edgeDisplayOpts();
+    var re = (g && g.evaluate && g.evaluate.edge) ? g.evaluate.edge : {};
+    var eppRaw = g.probability_edge != null ? g.probability_edge : (re.probability_edge != null ? re.probability_edge : (g.netEdge != null ? g.netEdge : null));
+    if (eppRaw == null || eppRaw === '') return { text: '—', num: null, raw: null };
+    var n = Number(eppRaw);
+    if (!isFinite(n)) return { text: '—', num: null, raw: null };
+    var raw = n;
+    // Require form
+    if (opt.requireForm) {
+      var has = !!(g.hasForm || (g.fairSource && String(g.fairSource).toLowerCase().indexOf('form') >= 0) ||
+        (g.evaluate && g.evaluate.matchup && (g.evaluate.matchup.hasForm || g.evaluate.matchup.detail)));
+      if (!has) return { text: '—', num: null, raw: raw, note: 'no form' };
+    }
+    // Net after fees (~2pp haircut as simple honest display)
+    if (opt.netFees) n = n - 2;
+    // Cap display
+    if (opt.capOn && Math.abs(n) > opt.cap) {
+      var sign = n >= 0 ? '+' : '';
+      return { text: sign + opt.cap + 'pp+', num: n, raw: raw, capped: true };
+    }
+    var sign2 = n >= 0 ? '+' : '';
+    return { text: sign2 + (Math.round(n * 10) / 10) + 'pp', num: n, raw: raw };
+  }
+
+  function persistEdgeDisplaySettings() {
+    try {
+      var st = settings();
+      st.edgeRequireForm = !!( $('edge-require-form') && $('edge-require-form').checked );
+      st.edgeNetFees = !!( $('edge-net-fees') && $('edge-net-fees').checked );
+      st.edgeCapOn = !!( $('edge-cap') && $('edge-cap').checked );
+      st.edgeCapPp = ($('edge-cap-pp') && $('edge-cap-pp').value) ? Number($('edge-cap-pp').value) : 12;
+      try { persistEdgeDisplaySettings(); } catch (ePe) {}
+      localStorage.setItem('bb_settings', JSON.stringify(st));
+    } catch (e) {}
+  }
+
   function settings() {
     try { return JSON.parse(localStorage.getItem('bb_settings') || '{}'); } catch (e) { return {}; }
   }
@@ -5793,6 +5915,36 @@
     } catch (e) {
       alert('Auto: ' + (e.message || e));
     }
+  }
+
+
+  function marketBucketMatch(marketType, g) {
+    var tt = String(g.marketType || g.scanType || '').toLowerCase();
+    var q = String(g.question || g.title || g.modelPick || '').toLowerCase();
+    var mt = String(marketType || 'all').toLowerCase();
+    if (!mt || mt === 'all') return true;
+    // Scanner 5 buckets
+    if (mt === 'bucket_ml' || mt === 'moneyline' || mt === 'ml') {
+      return tt === 'moneyline' || tt === 'ml' || tt === 'moneyline_1h' || tt === 'moneyline_2h' ||
+        tt === 'f5' || tt === 'f5_winner' || tt === 'period_winner' ||
+        /winner|moneyline|ml\b|to win|1h win|2h win|first five|f5 win/.test(q) && !/spread|over|under|total|nrfi|yrfi/.test(tt);
+    }
+    if (mt === 'bucket_spread' || mt === 'spread' || mt === 'spread_fg') {
+      return tt.indexOf('spread') >= 0 || /spread|puck line|handicap|\-\d|cover/.test(tt + ' ' + q);
+    }
+    if (mt === 'bucket_ou' || mt === 'total' || mt === 'total_fg') {
+      if (tt.indexOf('team_total') >= 0) return false;
+      return tt.indexOf('total') >= 0 || tt === 'f5_total' ||
+        ((/over|under/.test(q) || /total/.test(tt)) && !/team total|map/.test(tt + q));
+    }
+    if (mt === 'bucket_tt' || mt === 'team_total_fg') {
+      return tt.indexOf('team_total') >= 0 || /team total/.test(q);
+    }
+    if (mt === 'bucket_special') {
+      return tt === 'nrfi' || tt === 'yrfi' || tt.indexOf('nrfi') >= 0 ||
+        tt.indexOf('map') >= 0 || /nrfi|yrfi|no run first|yes run first|map\s*[12]|map total/.test(q);
+    }
+    return tt === mt || tt.indexOf(mt) >= 0;
   }
 
   function applyMarketType(val) {
@@ -6204,8 +6356,9 @@
     }
     var dec = g.decimal_odds != null ? g.decimal_odds : re.decimal_odds;
     if (dec == null && mkt != null && mkt > 0) dec = Math.round((100 / mkt) * 100) / 100;
-    var eppRaw = g.probability_edge != null ? g.probability_edge : (re.probability_edge != null ? re.probability_edge : (g.evaluate && g.evaluate.edge && g.evaluate.edge.probability_edge));
-    var epp = eppRaw != null ? ((Number(eppRaw) >= 0 ? '+' : '') + Number(eppRaw) + 'pp') : '—';
+    var _edge = resolveEdgeForCard(g);
+    var eppRaw = _edge.raw;
+    var epp = _edge.text || '—';
     var form = (g.evaluate && g.evaluate.matchup && g.evaluate.matchup.detail) ? String(g.evaluate.matchup.detail).replace(/</g, '') : '';
 
     var isKalshi = String(g.venue || g.source || '').toLowerCase().indexOf('kalshi') >= 0;
@@ -9008,46 +9161,21 @@
     });
     if (marketType && marketType !== 'all') {
       list = list.filter(function (g) {
+        // Scanner buckets (ML / Spread / O-U / Team totals / Special)
+        if (String(marketType).indexOf('bucket_') === 0 ||
+            marketType === 'moneyline' || marketType === 'ml' ||
+            marketType === 'spread' || marketType === 'total' ||
+            marketType === 'team_total_fg' || marketType === 'nrfi') {
+          return marketBucketMatch(marketType, g);
+        }
         var tt = String(g.marketType || g.scanType || '').toLowerCase();
         var q = String(g.question || g.title || g.modelPick || '').toLowerCase();
-        if (marketType === 'spread' || marketType === 'spread_fg') return tt === 'spread';
-        if (marketType === 'f5_spread') return tt === 'f5_spread';
-        if (marketType === 'total' || marketType === 'total_fg') return tt === 'total';
-        if (marketType === 'total_1h') return tt === 'total_1h' || /1st period|first period/.test(q);
-        if (marketType === 'total_p2') return tt === 'total_p2' || /2nd period|second period/.test(q);
-        if (marketType === 'total_p3') return tt === 'total_p3' || /3rd period|third period/.test(q);
-        if (marketType === 'f5_total') return tt === 'f5_total' || (tt.indexOf('f5') >= 0 && /over|under|total/.test(q));
-        if (marketType === 'f5') return tt === 'f5';
-        if (marketType === 'moneyline' || marketType === 'ml') return tt === 'moneyline' || tt === 'moneyline_1h' || !tt;
-        if (marketType === 'player_pass_yds') return tt === 'player_pass_yds' || /pass(ing)?\s*yards/.test(q);
-        if (marketType === 'player_rush_yds') return tt === 'player_rush_yds' || /rush(ing)?\s*yards/.test(q);
-        if (marketType === 'player_rec_yds') return tt === 'player_rec_yds' || /receiv(ing)?\s*yards/.test(q);
-        if (marketType === 'player_receptions') return tt === 'player_receptions' || /receptions/.test(q);
-        if (marketType === 'player_atd') return tt === 'player_atd' || /anytime\s*td|touchdown/.test(q);
-        if (marketType === 'moneyline_1h') return tt === 'moneyline_1h';
-        if (marketType === 'player_hr') return tt === 'player_hr' || /home\s*run|\bhr\b|homer/.test(q);
-        if (marketType === 'player_k') return tt === 'player_k' || /strikeout/.test(q);
-        if (marketType === 'player_hits') return tt === 'player_hits' || (/\bhits\b/.test(q) && !/hits allowed/.test(q));
-        if (marketType === 'player_tb') return tt === 'player_tb' || /total bases/.test(q);
-        if (marketType === 'player_hrr') return tt === 'player_hrr' || /h\+r\+rbi|hits.*runs.*rbi/.test(q);
-        if (marketType === 'pitcher_outs') return tt === 'pitcher_outs' || /outs recorded/.test(q);
-        if (marketType === 'pitcher_er') return tt === 'pitcher_er' || /earned run/.test(q);
-        if (marketType === 'pitcher_ha') return tt === 'pitcher_ha' || /hits allowed/.test(q);
-        if (marketType === 'pitcher_bb') return tt === 'pitcher_bb' || /walks allowed/.test(q);
-        if (marketType === 'player_pass_yds') return tt === 'player_pass_yds' || /pass(ing)? yards/.test(q);
-        if (marketType === 'player_rush_yds') return tt === 'player_rush_yds' || /rush(ing)? yards/.test(q);
-        if (marketType === 'player_rec_yds') return tt === 'player_rec_yds' || /receiv(ing)? yards/.test(q);
-        if (marketType === 'player_receptions') return tt === 'player_receptions' || /receptions/.test(q);
-        if (marketType === 'player_atd') return tt === 'player_atd' || /anytime|touchdown/.test(q);
-        if (marketType === 'player_props') return tt.indexOf('player_') === 0 || tt.indexOf('pitcher_') === 0 || tt === 'player_prop' || tt === 'prop';
-        if (marketType === 'player_pra') return tt === 'player_pra' || tt === 'player_pts' || tt === 'player_reb' || tt === 'player_ast' || /pts\s*\+\s*reb|pra/i.test(q);
-        if (marketType === 'player_pts') return tt === 'player_pts' || /\bpoints\b|\bpts\b/.test(q);
-        if (marketType === 'player_reb') return tt === 'player_reb' || /rebound/.test(q);
-        if (marketType === 'player_ast') return tt === 'player_ast' || /assist/.test(q);
-        if (marketType === 'player_threes') return tt === 'player_threes' || /three|3\s*-?pt/.test(q);
-        if (marketType === 'nrfi') return tt === 'nrfi' || tt === 'yrfi';
-        return tt === marketType || tt.indexOf(marketType) >= 0;
+        if (marketType === 'player_props' || String(marketType).indexOf('player_') === 0) {
+          return tt.indexOf('player_') === 0 || tt.indexOf('pitcher_') === 0 || /player|prop|points|rebounds|assists|strikeout|hits|yards/.test(tt + ' ' + q);
+        }
+        return marketBucketMatch(marketType, g) || tt === marketType || tt.indexOf(marketType) >= 0;
       });
+    }
     }
     var fairF = ($('f-fair') && $('f-fair').value) || 'any';
     if (fairF === 'form') {
@@ -9506,6 +9634,8 @@
     if ($('meta')) $('meta').textContent = 'Loading…';
     try {
       var mt = marketType === 'spreads' ? 'spread' : marketType;
+      // Scanner buckets: fetch broad set from API, filter client-side into family
+      if (String(mt).indexOf('bucket_') === 0) mt = 'all';
       var rankF = ($('f-rank') && $('f-rank').value) || 'good';
       var minEv = ($('f-min-ev') && $('f-min-ev').value) || '0';
       var minEdge = ($('f-min-edge') && $('f-min-edge').value) || '0';
@@ -12278,6 +12408,25 @@ function renderSlate() {
     }
   });
 
+
+  function loadEdgeDisplayIntoForm() {
+    try {
+      var st = settings();
+      if ($('edge-require-form')) $('edge-require-form').checked = !!st.edgeRequireForm;
+      if ($('edge-net-fees')) $('edge-net-fees').checked = !!st.edgeNetFees;
+      if ($('edge-cap')) $('edge-cap').checked = st.edgeCapOn !== false;
+      if ($('edge-cap-pp') && st.edgeCapPp != null) $('edge-cap-pp').value = String(st.edgeCapPp);
+    } catch (e) {}
+  }
+  document.addEventListener('change', function (ev) {
+    if (!ev.target) return;
+    var id = ev.target.id || '';
+    if (id === 'edge-require-form' || id === 'edge-net-fees' || id === 'edge-cap' || id === 'edge-cap-pp') {
+      persistEdgeDisplaySettings();
+      try { loadGames(); } catch (e) {}
+    }
+  });
+
   function switchTab(name) {
     if (!name) return;
     document.querySelectorAll('.tab').forEach(function (b) {
@@ -12535,9 +12684,13 @@ function renderSlate() {
         if (dual) {
           var polyG = games.filter(function (g) { return String(g.venue||g.source||'') !== 'kalshi'; });
           var kalG = games.filter(function (g) { return String(g.venue||g.source||'') === 'kalshi'; });
+          if ($('games-dual')) $('games-dual').style.display = 'grid';
+          if ($('games')) $('games').style.display = 'none';
           if ($('games-poly')) renderGameList($('games-poly'), polyG);
           if ($('games-kal')) renderGameList($('games-kal'), kalG);
         } else if ($('games')) {
+          if ($('games-dual')) $('games-dual').style.display = 'none';
+          $('games').style.display = '';
           renderGameList($('games'), games);
         }
       } else {
