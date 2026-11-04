@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.8.2</title>
+  <title>EliteOdds v3.8.3</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -2266,6 +2266,14 @@
       border: 1px solid rgba(52,211,153,0.25);
     }
 
+  
+    /* 3.8.3 hide legacy header mode/day/auto strip on desktop + mobile */
+    #mode-row { display: none !important; }
+    header.eo-top #venue-toggle { display: none !important; }
+    header.eo-top #btn-scan-auto { display: none !important; }
+    header.eo-top #btn-load { display: none !important; }
+    /* keep logo + version only in top bar */
+
   </style>
 </head>
 <body class="v3">
@@ -2290,7 +2298,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.8.2</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.8.3</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -3384,7 +3392,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.8.2</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.8.3</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -3401,6 +3409,8 @@
           </details>
           <p class="text-[10px] text-bb-muted">Tip: after each deploy, confirm this version matches the zip you uploaded (Settings → About).</p>
         </div>
+              </div>
+            </details>
 
         </section>
         </div><!-- /.eo-center -->
@@ -3771,8 +3781,17 @@
   };
 
   
-  var APP_VERSION = '3.8.2';
+  var APP_VERSION = '3.8.3';
   var APP_CHANGELOG = [
+    {
+      version: '3.8.3',
+      title: 'Fix broken page · hide desktop mode pills · Kalshi links',
+      notes: [
+        'Fix — Closed unclosed Settings About details that could break the whole UI.',
+        'UI — Removed desktop Pregame/Live/day/Auto header strip (Scanner toolbar owns filters).',
+        'Kalshi — Trade URL path hardened again for series/event tickers.'
+      ]
+    },
     {
       version: '3.8.2',
       title: 'Edge display toggles (Settings)',
@@ -5179,6 +5198,8 @@
     var isK = g.venue === 'kalshi' || g.source === 'kalshi';
     if (isK) {
       // Prefer full series/event URLs already built by the API
+      if (g.kalshiUrl && /kalshi\.com/i.test(String(g.kalshiUrl))) return g.kalshiUrl;
+      if (g.tradeUrl && /kalshi\.com/i.test(String(g.tradeUrl))) return g.tradeUrl;
       if (g.marketUrl && /kalshi\.com\/markets\/[^/]+\/[^/?#]+/i.test(String(g.marketUrl))) return g.marketUrl;
       if (g.url && /kalshi\.com\/markets\/[^/]+\/[^/?#]+/i.test(String(g.url))) return g.url;
       var et = String(g.eventTicker || g.event_ticker || '').trim();
@@ -5718,6 +5739,7 @@
   }
 
   function resolveEdgeForCard(g) {
+    if (!g) return { text: '—', num: null, raw: null };
     var opt = edgeDisplayOpts();
     var re = (g && g.evaluate && g.evaluate.edge) ? g.evaluate.edge : {};
     var eppRaw = g.probability_edge != null ? g.probability_edge : (re.probability_edge != null ? re.probability_edge : (g.netEdge != null ? g.netEdge : null));
@@ -6356,9 +6378,9 @@
     }
     var dec = g.decimal_odds != null ? g.decimal_odds : re.decimal_odds;
     if (dec == null && mkt != null && mkt > 0) dec = Math.round((100 / mkt) * 100) / 100;
-    var _edge = resolveEdgeForCard(g);
-    var eppRaw = _edge.raw;
-    var epp = _edge.text || '—';
+    var _edge = (typeof resolveEdgeForCard === 'function') ? resolveEdgeForCard(g) : { text: '—', raw: null };
+    var eppRaw = _edge && _edge.raw;
+    var epp = (_edge && _edge.text) || '—';
     var form = (g.evaluate && g.evaluate.matchup && g.evaluate.matchup.detail) ? String(g.evaluate.matchup.detail).replace(/</g, '') : '';
 
     var isKalshi = String(g.venue || g.source || '').toLowerCase().indexOf('kalshi') >= 0;
@@ -9175,7 +9197,6 @@
         }
         return marketBucketMatch(marketType, g) || tt === marketType || tt.indexOf(marketType) >= 0;
       });
-    }
     }
     var fairF = ($('f-fair') && $('f-fair').value) || 'any';
     if (fairF === 'form') {
