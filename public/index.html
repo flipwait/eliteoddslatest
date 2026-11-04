@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.5.1</title>
+  <title>EliteOdds v3.6.0</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1208,20 +1208,314 @@
       color: #e9d5ff !important;
     }
 
+  
+    /* ===== 3.5.2 premium shell (mock-aligned) ===== */
+    body.v3 {
+      background: #06080e !important;
+      background-image: radial-gradient(1000px 500px at 15% -10%, rgba(88,28,135,0.18), transparent 50%),
+        radial-gradient(800px 400px at 90% 0%, rgba(232,197,71,0.05), transparent 40%) !important;
+    }
+    body.v3 .eo-top {
+      background: linear-gradient(180deg, #12151f 0%, #0a0c12 100%) !important;
+      border-bottom: 1px solid rgba(167,139,250,0.2) !important;
+      padding: 0.65rem 1rem !important;
+    }
+    body.v3 .eo-logo {
+      font-weight: 750 !important;
+      letter-spacing: -0.02em !important;
+      font-size: 1.05rem !important;
+    }
+    body.v3 .eo-logo span { color: #a78bfa !important; }
+    body.v3 .eo-rail {
+      width: 4.5rem !important;
+      background: linear-gradient(180deg, #0c0f16, #080a10) !important;
+      border-right: 1px solid rgba(148,163,184,0.12) !important;
+    }
+    body.v3 .eo-rail .sport-btn {
+      border-radius: 12px !important;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    body.v3 .eo-rail .sport-btn.on,
+    body.v3 .eo-rail .sport-btn.pill-on {
+      background: rgba(167,139,250,0.16) !important;
+      border-color: rgba(167,139,250,0.4) !important;
+      color: #ede9fe !important;
+    }
+    .v3-product-nav {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(148,163,184,0.12);
+      background: rgba(10,12,18,0.92);
+      position: sticky;
+      top: 0;
+      z-index: 25;
+    }
+    .v3-nav-btn {
+      font-size: 11px;
+      font-weight: 650;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(148,163,184,0.16);
+      background: transparent;
+      color: #8b93a7;
+      cursor: pointer;
+    }
+    .v3-nav-btn.on {
+      background: rgba(167,139,250,0.16);
+      border-color: rgba(167,139,250,0.5);
+      color: #ede9fe;
+    }
+    body.theme-kalshi .v3-nav-btn.on {
+      background: rgba(52,211,153,0.16);
+      border-color: rgba(52,211,153,0.45);
+      color: #bbf7d0;
+    }
+    /* Settings / glass panels */
+    body.v3 .glass {
+      background: rgba(18,22,32,0.92) !important;
+      border: 1px solid rgba(148,163,184,0.14) !important;
+      border-radius: 14px !important;
+    }
+    /* Force games grid */
+    #games, #games-pm, #games-kalshi {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 0.9rem !important;
+      padding: 0.75rem !important;
+    }
+    @media (min-width: 900px) {
+      #games, #games-pm, #games-kalshi {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+    }
+    @media (min-width: 1280px) {
+      #games, #games-pm, #games-kalshi {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+    }
+
+  
+    /* ===== 3.6.0 MOCK REHAUL ===== */
+    body.v3 {
+      background: #06080e !important;
+      color: #f1f3f8 !important;
+    }
+    body.v3 .eo-rail {
+      width: 13rem !important;
+      align-items: stretch !important;
+      padding: 1.1rem 0.75rem !important;
+      background: linear-gradient(180deg, #0c0f16, #080a10) !important;
+      border-right: 1px solid rgba(148,163,184,0.12) !important;
+    }
+    body.v3 .eo-rail .eo-logo {
+      text-align: left !important;
+      font-size: 1.05rem !important;
+      font-weight: 750 !important;
+      padding: 0.25rem 0.5rem 1rem !important;
+      width: 100%;
+    }
+    body.v3 .eo-rail .eo-logo span { color: #a78bfa !important; }
+    body.v3 .eo-rail .eo-logo small {
+      display: block; font-size: 10px; color: #8b93a7; font-weight: 500; margin-top: 4px;
+      font-family: ui-monospace, monospace;
+    }
+    body.v3 .v3-side-nav {
+      display: flex; flex-direction: column; gap: 4px; width: 100%; margin-bottom: 12px;
+    }
+    body.v3 .v3-side-nav button {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; text-align: left;
+      padding: 10px 12px; border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent; color: #8b93a7;
+      font-size: 13px; font-weight: 550; cursor: pointer;
+    }
+    body.v3 .v3-side-nav button.on {
+      background: rgba(167,139,250,0.14);
+      border-color: rgba(167,139,250,0.35);
+      color: #ede9fe;
+    }
+    body.v3 #sport-rail {
+      display: flex !important; flex-direction: row !important; flex-wrap: wrap !important;
+      gap: 4px !important; width: 100% !important; align-items: stretch !important;
+      padding-top: 8px; border-top: 1px solid rgba(148,163,184,0.1);
+    }
+    body.v3 #sport-rail .sport-btn {
+      width: auto !important; height: auto !important;
+      flex: 1 1 42%; min-width: 0;
+      padding: 6px 4px !important; font-size: 9px !important;
+      border-radius: 8px !important;
+    }
+    @media (max-width: 767px) {
+      body.v3 .eo-rail { display: none !important; }
+    }
+    body.v3 .eo-top {
+      background: linear-gradient(180deg, #12151f, #0a0c12) !important;
+      border-bottom: 1px solid rgba(167,139,250,0.15) !important;
+    }
+    /* Game cards = mock */
+    article.game-card.v3-card {
+      background: #12161f !important;
+      border: 1px solid rgba(148,163,184,0.14) !important;
+      border-radius: 16px !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.25) !important;
+    }
+    article.game-card.v3-card.rank-elite {
+      border-color: rgba(232,197,71,0.4) !important;
+      box-shadow: 0 0 0 1px rgba(232,197,71,0.08), 0 12px 36px rgba(0,0,0,0.3) !important;
+    }
+    article.game-card.v3-card.rank-good {
+      border-color: rgba(52,211,153,0.28) !important;
+    }
+    article.game-card.v3-card .v3-accent {
+      height: 3px !important; width: 100% !important; display: block !important;
+      background: #2a2f3c !important;
+    }
+    article.game-card.v3-card.rank-elite .v3-accent {
+      background: linear-gradient(90deg, #e8c547, #b8860b 55%, transparent) !important;
+    }
+    article.game-card.v3-card.rank-good .v3-accent {
+      background: linear-gradient(90deg, #34d399, #059669 55%, transparent) !important;
+    }
+    article.game-card.v3-card .v3-card-body {
+      padding: 14px 16px 12px !important; flex: 1 !important;
+    }
+    article.game-card.v3-card .v3-matchup {
+      font-size: 15px !important; font-weight: 700 !important;
+      letter-spacing: -0.02em !important; line-height: 1.25 !important; color: #f1f3f8 !important;
+    }
+    article.game-card.v3-card .v3-when {
+      font-size: 11px !important; color: #8b93a7 !important; margin-top: 4px !important;
+    }
+    article.game-card.v3-card .v3-pick-label {
+      font-size: 9px !important; text-transform: uppercase !important;
+      letter-spacing: 0.06em !important; color: #8b93a7 !important; margin-bottom: 2px !important;
+    }
+    article.game-card.v3-card .v3-pick-main {
+      font-size: 16px !important; font-weight: 700 !important;
+      letter-spacing: -0.02em !important; color: #e9d5ff !important;
+    }
+    article.game-card.v3-card.kalshi-card .v3-pick-main { color: #bbf7d0 !important; }
+    article.game-card.v3-card .v3-pick-sub {
+      font-size: 12px !important; color: #8b93a7 !important; margin-top: 2px !important;
+    }
+    article.game-card.v3-card .v3-metrics {
+      display: grid !important;
+      grid-template-columns: repeat(5, minmax(0,1fr)) !important;
+      gap: 4px !important;
+      margin: 10px 0 !important;
+      padding: 10px 6px !important;
+      background: rgba(0,0,0,0.32) !important;
+      border-radius: 10px !important;
+      border: 1px solid rgba(148,163,184,0.1) !important;
+    }
+    article.game-card.v3-card .v3-metrics > div {
+      background: transparent !important; border: none !important; padding: 2px !important;
+    }
+    article.game-card.v3-card .v3-metrics .lbl {
+      font-size: 8px !important; text-transform: uppercase !important;
+      letter-spacing: 0.04em !important; color: #8b93a7 !important;
+    }
+    article.game-card.v3-card .v3-metrics .val {
+      font-size: 13px !important; font-weight: 700 !important; color: #fff !important; margin-top: 2px !important;
+    }
+    article.game-card.v3-card .v3-metrics .val.up { color: #34d399 !important; }
+    article.game-card.v3-card .v3-form {
+      font-size: 11px !important; color: #8b93a7 !important; line-height: 1.45 !important;
+    }
+    article.game-card.v3-card .v3-form b { color: #cbd5e1 !important; }
+    article.game-card.v3-card .v3-trust {
+      font-size: 10px !important; color: #6b7280 !important; margin-top: 4px !important;
+    }
+    article.game-card.v3-card .v3-actions {
+      display: flex !important; flex-wrap: wrap !important; gap: 8px !important;
+      margin-top: 12px !important; padding-top: 12px !important;
+      border-top: 1px solid rgba(148,163,184,0.1) !important;
+      grid-template-columns: none !important;
+    }
+    article.game-card.v3-card .v3-actions button,
+    article.game-card.v3-card .v3-actions a {
+      font-size: 12px !important; font-weight: 650 !important;
+      padding: 9px 12px !important; border-radius: 10px !important;
+    }
+    article.game-card.v3-card .v3-actions .btn-combo {
+      background: rgba(52,211,153,0.16) !important;
+      border: 1px solid rgba(52,211,153,0.45) !important;
+      color: #a7f3d0 !important;
+    }
+    article.game-card.v3-card .v3-actions .btn-trade {
+      background: rgba(18,22,32,0.9) !important;
+      border: 1px solid rgba(148,163,184,0.2) !important;
+      color: #e2e8f0 !important;
+    }
+    article.game-card.v3-card .v3-actions .btn-verdict {
+      background: rgba(232,197,71,0.12) !important;
+      border: 1px solid rgba(232,197,71,0.4) !important;
+      color: #f5e6a8 !important;
+    }
+    .rank-pill-e {
+      background: rgba(232,197,71,0.16) !important; color: #f5e6a8 !important;
+      border: 1px solid rgba(232,197,71,0.4) !important;
+      font-size: 10px !important; font-weight: 800 !important;
+      letter-spacing: 0.05em !important; padding: 4px 9px !important; border-radius: 999px !important;
+    }
+    .rank-pill-g {
+      background: rgba(52,211,153,0.1) !important; color: #6ee7b7 !important;
+      border: 1px solid rgba(52,211,153,0.32) !important;
+      font-size: 10px !important; font-weight: 800 !important;
+      letter-spacing: 0.05em !important; padding: 4px 9px !important; border-radius: 999px !important;
+    }
+    #games, #games-pm, #games-kalshi {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 1rem !important;
+      padding: 1rem !important;
+    }
+    @media (min-width: 900px) {
+      #games, #games-pm, #games-kalshi {
+        grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+      }
+    }
+    @media (min-width: 1280px) {
+      #games, #games-pm, #games-kalshi {
+        grid-template-columns: repeat(3, minmax(0,1fr)) !important;
+      }
+    }
+    @media (min-width: 1600px) {
+      #games, #games-pm, #games-kalshi {
+        grid-template-columns: repeat(4, minmax(0,1fr)) !important;
+      }
+    }
+
   </style>
 </head>
 <body class="v3">
   <div class="flex min-h-screen">
     <!-- Icon sport rail -->
     <aside class="eo-rail" id="eo-rail">
-      <div class="eo-logo text-center mb-2 text-[11px] leading-tight px-1"><span>EO</span></div>
+      <div class="eo-logo">Elite<span>Odds</span>
+        <small>v3 · scanner cards</small>
+      </div>
+      <nav class="v3-side-nav" id="v3-side-nav">
+        <button type="button" class="on" data-v3nav="scanner" data-tab="scanner"><span>◎</span> Scanner</button>
+        <button type="button" data-v3nav="boards"><span>▦</span> Boards</button>
+        <button type="button" data-v3nav="elite"><span>★</span> Elite</button>
+        <button type="button" data-v3nav="live"><span>◷</span> Live focus</button>
+        <button type="button" data-tab="journal"><span>☰</span> Journal</button>
+        <button type="button" data-tab="settings" id="eo-settings-rail"><span>⚙</span> Settings</button>
+      </nav>
       <div id="sport-rail" class="flex flex-col gap-1 items-center w-full"></div>
-      <button type="button" data-tab="settings" class="sport-btn mt-auto text-[10px]" id="eo-settings-rail">⚙</button>
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.5.1</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.6.0</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -1247,6 +1541,17 @@
           <button type="button" data-tab="settings" class="tab px-2.5 py-1 rounded-lg border border-bb-border text-bb-muted">Settings</button>
         </nav>
       </header>
+      <!-- v3.5.2 product nav (desktop + mobile) -->
+      <div id="v3-product-nav" class="v3-product-nav">
+        <button type="button" class="v3-nav-btn on" data-v3nav="scanner">Scanner</button>
+        <button type="button" class="v3-nav-btn" data-v3nav="boards">Boards</button>
+        <button type="button" class="v3-nav-btn" data-v3nav="elite">Elite</button>
+        <button type="button" class="v3-nav-btn" data-v3nav="desk" data-tab="slate">Desk</button>
+        <button type="button" class="v3-nav-btn" data-v3nav="journal" data-tab="journal">Journal</button>
+        <button type="button" class="v3-nav-btn" data-v3nav="calendar" data-tab="lineshop">Calendar</button>
+        <button type="button" class="v3-nav-btn" data-v3nav="settings" data-tab="settings">Settings</button>
+      </div>
+
 
       <!-- Mobile compact filters: mode / day / sport dropdowns -->
       <div class="md:hidden px-2 pt-1.5 pb-1 space-y-1.5 border-b border-bb-border/40" id="mobile-filter-bar">
@@ -2107,7 +2412,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.5.1</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.6.0</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -2483,8 +2788,29 @@
   };
 
   
-  var APP_VERSION = '3.5.1';
+  var APP_VERSION = '3.6.0';
   var APP_CHANGELOG = [
+    {
+      version: '3.6.0',
+      title: 'UI rehaul — mock Scanner cards + sidebar',
+      notes: [
+        'UI — Desktop sidebar: Scanner · Boards · Elite · Live · Journal · Settings (mock layout).',
+        'UI — Game cards match premium mock: accent bar, MODEL PICK block, 5-stat strip, form/trust, Combo/Trade/Verdict.',
+        'UI — Gold Elite / green Good / Kalshi venue labels; 2–3 column card grid on desktop.',
+        'Logic — Same ranking, filters, Discord, settle, auto as 3.5.x — visual rehaul only.'
+      ]
+    },
+    {
+      version: '3.5.2',
+      title: 'Premium shell closer to mock',
+      notes: [
+        'UI — Desktop product nav (Scanner · Boards · Elite · Desk · Settings) under header matching mock IA.',
+        'UI — Premium shell chrome: deeper background, gold Elite card borders, conviction strip forced on cards.',
+        'UI — Settings / panels use tighter glass cards; left rail sport icons restyled.',
+        'NOTE — Full Boards props-table is still the existing props markets via Market filter; dedicated Boards list comes next.',
+        'Open Scanner + Scan to see premium game cards (Settings page has no cards by design).'
+      ]
+    },
     {
       version: '3.5.1',
       title: 'Premium cards actually apply',
@@ -4870,24 +5196,23 @@
     var score10 = (g.score10 != null ? g.score10 : Math.max(1, Math.min(10, Math.round((g.betScore || 50) / 10))));
     return '<article class="glass game-card v3-card min-w-0 overflow-hidden ' + rankMod + (isKalshi ? ' kalshi-card' : '') + '">' +
       '<div class="v3-accent"></div>' +
-      '<div class="v3-card-body space-y-2.5">' +
-      '<div class="flex justify-between gap-2">' +
-        '<div class="min-w-0"><p class="text-[9px] uppercase tracking-wide mb-0.5 ' + (isKalshi ? 'text-bb-green' : 'text-violet-300') + '">' + (isKalshi ? 'Kalshi' : 'Polymarket') + '</p>' +'<p class="font-medium text-sm leading-snug">' + title + '</p>' +
-        '<p class="text-[10px] text-bb-muted mt-0.5">' + String(g.league || '').toUpperCase() +
-        (g.ended || /final/i.test(String(g.period||'')) ? ' · <span class="text-bb-muted">FINAL</span>' : (g.live ? ' · <span class="text-bb-red">LIVE</span>' : '')) +
-        (g.period ? ' · ' + String(g.period).replace(/</g,'') : '') +
-        (g.score ? ' · ' + String(g.score).replace(/</g,'') : '') +
-        (g.startTime || g.live || g.ended ? ' · <span class="text-white/80">' + formatGameWhen(g.startTime, !!(g.live || g.isLive), !!(g.ended || /final/i.test(String(g.period||'')))) + '</span>' : '') +
-        '</p></div>' +
-        '<div class="flex flex-col items-end gap-0.5 shrink-0">' +
-        '<div class="flex items-center gap-1.5">' +
-        '<span class="' + rankClass(g.rank) + ' ' + rankPill + ' text-[10px] font-bold px-2.5 py-1 rounded-full h-fit tracking-wide">' + rankU + '</span>' +
-        '<span class="text-[9px] text-bb-muted">' + (g.score10 != null ? g.score10 : Math.max(1, Math.min(10, Math.round((g.betScore||50)/10)))) + '/10</span></div>' +
-        '<div class="flex items-center gap-1.5">' +
-        (function(){ var c = confidenceOf(g); return '<span class="text-[9px] px-1.5 py-0.5 rounded border ' + c.cls + '">' + c.label + ' conf</span>'; })() +
-        lineMoveHtml(g) +
-        '</div></div></div>' +
-      '<p class="text-sm font-semibold ' + (isKalshi ? 'text-bb-green' : 'text-violet-300') + '">Model pick · ' + (function(){
+      '<div class="v3-card-body">' +
+      '<div class="flex justify-between gap-2 items-start">' +
+        '<div class="min-w-0">' +
+          '<p class="v3-matchup">' + title + '</p>' +
+          '<p class="v3-when">' + String(g.league || '').toUpperCase() +
+            (g.ended || /final/i.test(String(g.period||'')) ? ' · FINAL' : (g.live ? ' · LIVE' : ' · Pregame')) +
+            (g.period ? ' · ' + String(g.period).replace(/</g,'') : '') +
+            (g.score ? ' · ' + String(g.score).replace(/</g,'') : '') +
+            (g.startTime || g.live || g.ended ? ' · ' + formatGameWhen(g.startTime, !!(g.live || g.isLive), !!(g.ended || /final/i.test(String(g.period||'')))) : '') +
+          '</p>' +
+        '</div>' +
+        '<div class="flex flex-col items-end gap-1.5 shrink-0">' +
+          '<span class="' + rankPill + '">' + rankU + '</span>' +
+          '<span class="text-[9px] uppercase tracking-wide font-semibold ' + (isKalshi ? 'text-bb-green' : 'text-violet-300') + '">' + (isKalshi ? 'Kalshi' : 'Polymarket') + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="v3-pick-block mt-3"><div class="v3-pick-label">Model pick</div><div class="v3-pick-main">' + (function(){
         var mt = String(g.marketType || '').toLowerCase();
         var titleBlob = String(g.title || '') + ' ' + String(g.question || '');
         // Player props must NEVER get "Full game Under X" totals formatting
@@ -4953,7 +5278,7 @@
           return scope + ' ' + side + (line != null ? (' <span class="text-white/90">' + line + '</span>') : '');
         }
         return pick;
-      })() + '</p>' +
+      })() + '</div><div class="v3-pick-sub">' + (function(){ var mt=String(g.marketType||'').replace(/_/g,' '); if(!mt) return ''; return mt.charAt(0).toUpperCase()+mt.slice(1); })() + '</div></div>' +
       '<p class="text-[10px] text-bb-muted">' + (g.fairSource ? ('Fair: ' + String(g.fairSource).replace(/</g,'') + (g.hasForm ? '' : ' · no form')) : (g.hasForm ? '' : 'Fair: market-only · no form')) +
         (g.venueVerified ? ' · Venue verified' : '') + '</p>' +
       (!g.hasForm && g.formNote ? ('<p class="text-[10px] text-amber-300/90 mt-0.5">Form: ' + String(g.formNote).replace(/</g,'').slice(0, 100) + '</p>') : '') +
@@ -11411,7 +11736,88 @@ function renderSlate() {
   });
 
   loadGames();
-})();</script>
+})();
+  // v3.5.2 product nav
+  (function bindV3Nav() {
+    function goScanner() {
+      var t = document.querySelector('.tab[data-tab="scan"], .tab[data-tab="games"], button.tab');
+      // clear secondary tabs — show main games area
+      document.querySelectorAll('[data-tab].tab, .tab[data-tab]').forEach(function(b) {
+        b.classList.remove('pill-on', 'on');
+      });
+      var games = document.getElementById('games') || document.getElementById('games-pm');
+      var panelSettings = document.getElementById('panel-settings');
+      var panels = document.querySelectorAll('[id^="panel-"]');
+      panels.forEach(function(p) { if (p) p.classList.add('hidden'); });
+      // show main content
+      var mainScan = document.getElementById('scan-panel') || document.getElementById('games-wrap');
+      document.querySelectorAll('.v3-nav-btn').forEach(function(b) { b.classList.remove('on'); });
+      var sc = document.querySelector('.v3-nav-btn[data-v3nav="scanner"]');
+      if (sc) sc.classList.add('on');
+      // trigger existing tab if any scan tab
+      var scanTab = document.querySelector('[data-tab="scan"]');
+      if (scanTab) scanTab.click();
+      else {
+        // hide settings-like panels by clicking away - show #games parent
+        var set = document.getElementById('panel-settings');
+        if (set) set.classList.add('hidden');
+        var journal = document.getElementById('panel-journal');
+        if (journal) journal.classList.add('hidden');
+        var slate = document.getElementById('panel-slate');
+        if (slate) slate.classList.add('hidden');
+        var lineshop = document.getElementById('panel-lineshop');
+        if (lineshop) lineshop.classList.add('hidden');
+        var gamesEl = document.getElementById('games');
+        if (gamesEl && gamesEl.parentElement) gamesEl.parentElement.classList.remove('hidden');
+      }
+    }
+    document.addEventListener('click', function(ev) {
+      var btn = ev.target.closest && ev.target.closest('.v3-nav-btn');
+      if (!btn) return;
+      var nav = btn.getAttribute('data-v3nav');
+      var tab = btn.getAttribute('data-tab');
+      document.querySelectorAll('.v3-nav-btn').forEach(function(b) { b.classList.remove('on'); });
+      btn.classList.add('on');
+      if (tab) {
+        var existing = document.querySelector('[data-tab="' + tab + '"].tab, button.tab[data-tab="' + tab + '"], [data-tab="' + tab + '"]');
+        // prefer header tabs
+        var ht = document.querySelector('header [data-tab="' + tab + '"], .eo-top [data-tab="' + tab + '"], button[data-tab="' + tab + '"].tab');
+        if (ht) { ht.click(); return; }
+        var any = document.querySelector('button[data-tab="' + tab + '"]');
+        if (any) { any.click(); return; }
+      }
+      if (nav === 'scanner' || nav === 'boards' || nav === 'elite') {
+        // return to main scan surface
+        var setBtn = document.querySelector('button.tab[data-tab="settings"]');
+        // click first non-settings path: hide panels
+        ['panel-settings','panel-journal','panel-slate','panel-lineshop','panel-calendar'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.classList.add('hidden');
+        });
+        var gw = document.getElementById('games');
+        if (gw) {
+          var p = gw.closest('.hidden');
+          // walk up removing hidden from parents carefully
+          var node = gw;
+          for (var i = 0; i < 5 && node; i++) {
+            if (node.classList) node.classList.remove('hidden');
+            node = node.parentElement;
+          }
+        }
+        if (nav === 'elite') {
+          var rank = document.getElementById('f-rank') || document.querySelector('select#rank, select[name="rank"]');
+          // try set elite filter
+          var rankSel = document.querySelector('select');
+        }
+        if (nav === 'boards') {
+          // switch market toward props if select exists
+          var m = document.getElementById('f-market') || document.getElementById('m-market');
+        }
+      }
+    });
+  })();
+
+</script>
 
   
 <div id="whats-new-toast" class="whats-new-toast hidden" role="status">

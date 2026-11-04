@@ -1,8 +1,1 @@
-{
-  "name": "eliteodds",
-  "private": true,
-  "version": "3.5.1",
-  "engines": {
-    "node": "24.x"
-  }
-}
+{"name":"eliteodds","private":true,"version":"3.6.0","engines":{"node":"24.x"}}
