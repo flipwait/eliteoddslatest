@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.8.3</title>
+  <title>EliteOdds v3.8.4</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -2274,6 +2274,21 @@
     header.eo-top #btn-load { display: none !important; }
     /* keep logo + version only in top bar */
 
+  
+    /* 3.8.4 */
+    #mobile-filter-bar { display: none !important; height: 0 !important; overflow: hidden !important; }
+    #meta-board-line, .meta-board-line, #board-streak-line { display: none !important; }
+    #games.eo-mobile-games, #games {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+      gap: 14px !important;
+    }
+    body.theme-both #games { display: none !important; }
+    body.theme-both #games-dual.eo-dual { display: grid !important; }
+    article.gcard, article.game-card.v3-card {
+      min-height: 0;
+    }
+
   </style>
 </head>
 <body class="v3">
@@ -2298,7 +2313,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.8.3</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.8.4</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -2337,50 +2352,7 @@
 
 
       <!-- Mobile compact filters: mode / day / sport dropdowns -->
-      <div class="md:hidden px-2 pt-1.5 pb-1 space-y-1.5 border-b border-bb-border/40" id="mobile-filter-bar">
-        <div class="grid grid-cols-3 gap-1.5">
-          <label class="block min-w-0">
-            <span class="text-[9px] text-bb-muted uppercase tracking-wide">When</span>
-            <select id="m-mode" class="mt-0.5 w-full bg-bb-bg border border-bb-border rounded-lg px-1.5 py-1.5 text-[11px] text-white">
-              <option value="pregame">Pregame</option>
-              <option value="live">Live</option>
-              <option value="both" selected>Live + Pregame</option>
-            </select>
-          </label>
-          <label class="block min-w-0">
-            <span class="text-[9px] text-bb-muted uppercase tracking-wide">Days</span>
-            <select id="m-day" class="mt-0.5 w-full bg-bb-bg border border-bb-border rounded-lg px-1.5 py-1.5 text-[11px] text-white">
-              <option value="next3" selected>Next 3 days</option>
-              <option value="today">Today</option>
-              <option value="tomorrow">Tomorrow</option>
-              <option value="all">All days</option>
-            </select>
-          </label>
-          <label class="block min-w-0">
-            <span class="text-[9px] text-bb-muted uppercase tracking-wide">Sport</span>
-            <select id="m-sport" class="mt-0.5 w-full bg-bb-bg border border-bb-border rounded-lg px-1.5 py-1.5 text-[11px] text-white"></select>
-          </label>
-        </div>
-        <div class="grid grid-cols-2 gap-1.5">
-          <label class="block min-w-0">
-            <span class="text-[9px] text-bb-muted uppercase tracking-wide">Book</span>
-            <select id="m-venue" class="mt-0.5 w-full bg-bb-bg border border-bb-border rounded-lg px-1.5 py-1.5 text-[11px] text-white">
-              <option value="polymarket" selected>Polymarket</option>
-              <option value="kalshi">Kalshi</option>
-              <option value="both">Both</option>
-            </select>
-          </label>
-          <label class="block min-w-0">
-            <span class="text-[9px] text-bb-muted uppercase tracking-wide">Market</span>
-            <select id="m-market" class="mt-0.5 w-full bg-bb-bg border border-bb-border rounded-lg px-1.5 py-1.5 text-[11px] text-white"></select>
-          </label>
-        </div>
-        <div class="flex gap-1.5">
-          <button type="button" id="m-btn-load" class="flex-1 px-2 py-1.5 rounded-lg border border-bb-border text-[11px] text-bb-muted">↻ Refresh</button>
-          <button type="button" id="m-btn-auto" class="flex-1 px-2 py-1.5 rounded-lg border border-violet-400/50 text-[11px] text-violet-200 font-semibold">Auto</button>
-          <button type="button" id="m-btn-scan-elites" class="flex-1 px-2 py-1.5 rounded-lg border border-amber-400/40 text-[11px] text-amber-200 font-semibold" title="Scan all sports for Elite paper">Elites</button>
-        </div>
-      </div>
+      
       <div class="hidden" id="sport-rail-mobile"></div>
 
       <div class="eo-main-wrap">
@@ -2466,7 +2438,7 @@
             </div>
             <p id="wr-detail" class="text-[10px] text-bb-muted mt-1.5 leading-snug"></p>
           </div>
-          <div id="board-status" class="flex flex-wrap items-center gap-2 mb-2 text-[10px] text-bb-muted">
+          <div id="board-status" class="hidden flex flex-wrap items-center gap-2 mb-2 text-[10px] text-bb-muted" style="display:none!important">
             <span id="board-fresh" class="board-fresh">Board · —</span>
             <span class="text-bb-muted/40">·</span>
             <span id="elite-streak" class="streak-strip" title="Last 10 settled Elite paper (all books)">Streak · —</span>
@@ -3392,7 +3364,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.8.3</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.8.4</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -3781,8 +3753,17 @@
   };
 
   
-  var APP_VERSION = '3.8.3';
+  var APP_VERSION = '3.8.4';
   var APP_CHANGELOG = [
+    {
+      version: '3.8.4',
+      title: 'Remove mobile filter card · stable PM board',
+      notes: [
+        'Mobile — Removed WHEN/DAYS/SPORT/BOOK filter card from DOM (not just CSS).',
+        'Desktop — Force single board when Polymarket-only; clear stuck dual theme that hid cards.',
+        'UI — Board-style game grid + stronger gcard layout for Scanner.'
+      ]
+    },
     {
       version: '3.8.3',
       title: 'Fix broken page · hide desktop mode pills · Kalshi links',
@@ -9632,6 +9613,17 @@
   }
 
   async function loadGames() {
+    // Venue display: PM or Kalshi = single board; both = dual
+    try {
+      var vNow = venue || 'polymarket';
+      document.body.classList.toggle('theme-both', vNow === 'both');
+      document.body.classList.toggle('theme-poly', vNow === 'polymarket');
+      document.body.classList.toggle('theme-kalshi', vNow === 'kalshi');
+      if (vNow !== 'both') {
+        if ($('games-dual')) $('games-dual').style.display = 'none';
+        if ($('games')) $('games').style.display = 'grid';
+      }
+    } catch (eV) {}
     // Sync mobile dropdowns → global filters (fixes Refresh after selection)
     try {
       if ($('m-mode') && $('m-mode').value) mode = $('m-mode').value;
