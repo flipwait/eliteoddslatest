@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.7.1</title>
+  <title>EliteOdds v3.7.3</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -2014,6 +2014,129 @@
     }
     .m-slip-actions button.mut { color: #8b93a7; }
 
+  
+    /* ===== 3.7.2 cleaner chrome ===== */
+    body.v3 nav.eo-main-nav { display: none !important; }
+    body.v3 #sport-rail { display: none !important; }
+    body.v3 #sport-rail-mobile { display: none !important; }
+    body.v3 #super-elite-box { display: none !important; }
+    body.v3 .se-mobile-only { display: none !important; }
+    body.v3 #eo-desk {
+      /* keep desk slip area if needed; hide potd only via #super-elite-box */
+    }
+    body.v3 .eo-top .eo-logo {
+      display: inline-flex !important; /* show small brand in header when sidebar logo also present */
+    }
+    /* Boards toolbar */
+    #boards-toolbar {
+      display: none;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(148,163,184,0.14);
+      background: rgba(14,17,25,0.9);
+    }
+    body.boards-mode #boards-toolbar { display: flex !important; }
+    #boards-toolbar .bt-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em;
+      color: #8b93a7; width: 100%; margin-bottom: 2px;
+    }
+    #boards-toolbar .bt-sports {
+      display: flex; flex-wrap: wrap; gap: 6px; width: 100%;
+    }
+    #boards-toolbar .bt-sport {
+      font-size: 11px; font-weight: 650; padding: 6px 10px;
+      border-radius: 999px; border: 1px solid rgba(148,163,184,0.16);
+      background: transparent; color: #8b93a7; cursor: pointer;
+    }
+    #boards-toolbar .bt-sport.on {
+      background: rgba(167,139,250,0.16);
+      border-color: rgba(167,139,250,0.45);
+      color: #ede9fe;
+    }
+    #boards-toolbar select {
+      font-size: 12px; padding: 7px 10px; border-radius: 9px;
+      border: 1px solid rgba(148,163,184,0.16);
+      background: #0e1119; color: #f1f3f8;
+    }
+    body.boards-mode article .form-row { display: none !important; }
+
+  
+    /* ===== 3.7.3 Scanner mock filter bar ===== */
+    #scanner-toolbar {
+      margin-bottom: 14px;
+      padding: 4px 0 12px;
+    }
+    #scanner-toolbar .sc-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    #scanner-toolbar .sc-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #f1f3f8;
+    }
+    #scanner-toolbar .sc-title em {
+      font-style: normal;
+      color: #8b93a7;
+      font-weight: 500;
+      font-size: 14px;
+      margin-left: 8px;
+    }
+    #scanner-toolbar .sc-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    #scanner-toolbar .sc-chip {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.16);
+      background: #0e1119;
+      color: #8b93a7;
+      cursor: pointer;
+    }
+    #scanner-toolbar .sc-chip.on {
+      background: rgba(167,139,250,0.16);
+      border-color: rgba(167,139,250,0.4);
+      color: #ddd6fe;
+    }
+    #scanner-toolbar .sc-chip.kalshi.on {
+      background: rgba(52,211,153,0.14);
+      border-color: rgba(52,211,153,0.4);
+      color: #a7f3d0;
+    }
+    #scanner-toolbar .sc-filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    #scanner-toolbar .sc-filters select {
+      font-size: 12px;
+      padding: 8px 12px;
+      border-radius: 9px;
+      border: 1px solid rgba(148,163,184,0.16);
+      background: #0e1119;
+      color: #f1f3f8;
+      min-width: 0;
+    }
+    body.boards-mode #scanner-toolbar { display: none !important; }
+    @media (max-width: 767px) {
+      #scanner-toolbar .sc-title { font-size: 16px; }
+      #scanner-toolbar .sc-title em { font-size: 12px; }
+    }
+
   </style>
 </head>
 <body class="v3">
@@ -2028,15 +2151,17 @@
         <button type="button" data-v3nav="boards" data-tab="scanner" title="Player props board"><span>▦</span> Boards</button>
         <button type="button" data-v3nav="elite" data-tab="scanner" title="Elite only"><span>★</span> Elite</button>
         <button type="button" data-v3nav="live" data-tab="scanner" title="Live games"><span>◷</span> Live focus</button>
+        <button type="button" data-v3nav="calendar" data-tab="lineshop"><span>📅</span> Calendar</button>
+        <button type="button" data-v3nav="desk" data-tab="slate"><span>⧉</span> Desk</button>
         <button type="button" data-v3nav="journal" data-tab="journal"><span>☰</span> Journal</button>
         <button type="button" data-v3nav="settings" data-tab="settings" id="eo-settings-rail"><span>⚙</span> Settings</button>
       </nav>
-      <div id="sport-rail" class="flex flex-col gap-1 items-center w-full"></div>
+      <div id="sport-rail" class="hidden" aria-hidden="true"></div>
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.7.1</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.7.3</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -2215,6 +2340,73 @@
           </div>
 
 <section id="panel-scanner">
+          <div id="scanner-toolbar">
+            <div class="sc-top">
+              <h1 class="sc-title">Scanner <em>Game cards</em></h1>
+              <div class="sc-chips">
+                <button type="button" class="sc-chip on" data-sc-venue="polymarket">Polymarket</button>
+                <button type="button" class="sc-chip kalshi" data-sc-venue="kalshi">Kalshi</button>
+                <button type="button" class="sc-chip" data-sc-venue="both">Both</button>
+                <button type="button" class="sc-chip" id="sc-refresh" title="Refresh">↻ Scan</button>
+              </div>
+            </div>
+            <div class="sc-filters">
+              <select id="sc-rank" title="Rank">
+                <option value="good_potd">Good + Elite + POTD</option>
+                <option value="good" selected>Good + Elite</option>
+                <option value="elite">Elite only</option>
+                <option value="all">All ranks</option>
+              </select>
+              <select id="sc-day" title="Day window">
+                <option value="today">Today</option>
+                <option value="next3" selected>Next 3 days</option>
+                <option value="tomorrow">Tomorrow</option>
+                <option value="all">All days</option>
+              </select>
+              <select id="sc-sport" title="Sport">
+                <option value="all" selected>All sports</option>
+                <option value="nba">NBA</option>
+                <option value="nfl">NFL</option>
+                <option value="mlb">MLB</option>
+                <option value="nhl">NHL</option>
+                <option value="cfb">CFB</option>
+                <option value="cbb">CBB</option>
+                <option value="wnba">WNBA</option>
+                <option value="ufc">UFC</option>
+                <option value="soccer">Soccer</option>
+                <option value="esports">Esports</option>
+                <option value="atp">ATP</option>
+                <option value="wta">WTA</option>
+              </select>
+              <select id="sc-market" title="Market">
+                <optgroup label="Main lines">
+                  <option value="all">All markets</option>
+                  <option value="moneyline" selected>Moneyline (ML)</option>
+                  <option value="spread">Spreads</option>
+                  <option value="total">Over / Under (game totals)</option>
+                  <option value="team_total_fg">Team totals</option>
+                </optgroup>
+                <optgroup label="Halves / periods">
+                  <option value="spread_1h">1H spreads</option>
+                  <option value="total_1h">1H totals</option>
+                  <option value="moneyline_1h">1H / period winner</option>
+                </optgroup>
+                <optgroup label="MLB specials">
+                  <option value="nrfi">NRFI / YRFI</option>
+                  <option value="f5">F5 winner</option>
+                  <option value="f5_total">F5 Over / Under</option>
+                  <option value="f5_spread">F5 spreads</option>
+                </optgroup>
+                <optgroup label="Props & other">
+                  <option value="player_props">Player props</option>
+                  <option value="map_1">Esports Map 1</option>
+                  <option value="map_2">Esports Map 2</option>
+                  <option value="map_total">Map totals</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+
           <div class="se-box se-mobile-only" id="super-elite-box-scan" data-se-root="1">
 
             <div class="flex items-center justify-between gap-2 mb-1">
@@ -2286,6 +2478,35 @@
 
           </div>
 
+          <div id="boards-toolbar">
+            <div class="bt-label">Boards · player props · all sports</div>
+            <div class="bt-sports" id="boards-sports">
+              <button type="button" class="bt-sport on" data-bsport="all">All</button>
+              <button type="button" class="bt-sport" data-bsport="nba">NBA</button>
+              <button type="button" class="bt-sport" data-bsport="nfl">NFL</button>
+              <button type="button" class="bt-sport" data-bsport="mlb">MLB</button>
+              <button type="button" class="bt-sport" data-bsport="nhl">NHL</button>
+              <button type="button" class="bt-sport" data-bsport="cfb">CFB</button>
+              <button type="button" class="bt-sport" data-bsport="cbb">CBB</button>
+              <button type="button" class="bt-sport" data-bsport="wnba">WNBA</button>
+            </div>
+            <label class="text-[11px] text-bb-muted">Sort
+              <select id="boards-sort">
+                <option value="edge">Edge (high → low)</option>
+                <option value="model">Model % (high → low)</option>
+                <option value="rank">Rank (Elite → Good)</option>
+                <option value="time">Game time</option>
+                <option value="name">Player / pick name</option>
+              </select>
+            </label>
+            <label class="text-[11px] text-bb-muted">Rank
+              <select id="boards-rank">
+                <option value="good">Good + Elite</option>
+                <option value="elite">Elite only</option>
+                <option value="all">All ranks</option>
+              </select>
+            </label>
+          </div>
           <div id="games" class="grid gap-3 eo-mobile-games"></div>
           <div id="games-dual" class="eo-dual">
             <div>
@@ -2933,7 +3154,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.7.1</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.7.3</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -3320,8 +3541,28 @@
   };
 
   
-  var APP_VERSION = '3.7.1';
+  var APP_VERSION = '3.7.3';
   var APP_CHANGELOG = [
+    {
+      version: '3.7.3',
+      title: 'Scanner filter bar (mock-style)',
+      notes: [
+        'UI — Scanner top bar: title + venue chips + rank/day/sport/market dropdowns.',
+        'Markets grouped: Main lines (ML, Spreads, Totals O/U) then Specials (NRFI/YRFI, F5, team totals, maps).',
+        'Rank includes Good+Elite+POTD option; day Today / Next 3 / All; all listed sports.'
+      ]
+    },
+    {
+      version: '3.7.2',
+      title: 'Clean header · sidebar nav · Boards props',
+      notes: [
+        'UI — Removed Scan/Calendar/Journal/Desk/Settings tabs from top header.',
+        'UI — Sidebar: Scanner, Boards, Elite, Live, Calendar, Desk, Journal, Settings.',
+        'UI — Sport logos removed from left rail (use filter sport select instead).',
+        'UI — Pick of the Day side panel hidden; POTD still auto-runs when criteria met.',
+        'Boards — Hardwired player props for all sports; sport chips + sort (edge, time, rank, model).'
+      ]
+    },
     {
       version: '3.7.1',
       title: 'Mobile UI matches Boards mock',
@@ -8864,6 +9105,9 @@
     } catch (eNP) {}
 
     if (!box) return;
+    if (document.body.classList.contains('boards-mode') && typeof sortBoardsList === 'function') {
+      list = sortBoardsList(list);
+    }
     if (!list.length) {
       var rk = ($('f-rank') && $('f-rank').value) || 'good';
       var mt = String(marketType || 'all');
@@ -11582,6 +11826,148 @@ function renderSlate() {
     });
   })();
 
+
+  // Boards toolbar: sport chips + sort
+  window.__boardsSort = 'edge';
+  document.addEventListener('click', function (ev) {
+    var b = ev.target && ev.target.closest && ev.target.closest('.bt-sport');
+    if (!b) return;
+    document.querySelectorAll('.bt-sport').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    sport = b.getAttribute('data-bsport') || 'all';
+    if ($('m-sport')) $('m-sport').value = sport;
+    marketType = 'player_props';
+    if ($('market-select')) $('market-select').value = 'player_props';
+    if ($('m-market')) $('m-market').value = 'player_props';
+    document.body.classList.add('boards-mode');
+    try { loadGames(); } catch (e) {}
+  });
+  document.addEventListener('change', function (ev) {
+    if (!ev.target) return;
+    if (ev.target.id === 'boards-sort') {
+      window.__boardsSort = ev.target.value || 'edge';
+      try { loadGames(); } catch (e) {}
+    }
+    if (ev.target.id === 'boards-rank') {
+      var rv = ev.target.value || 'good';
+      if ($('f-rank')) $('f-rank').value = rv;
+      try { loadGames(); } catch (e) {}
+    }
+  });
+  function sortBoardsList(list) {
+    if (!list || !list.length) return list;
+    var mode = window.__boardsSort || 'edge';
+    var rankW = { elite: 3, good: 2, pass: 1 };
+    var arr = list.slice();
+    arr.sort(function (a, b) {
+      if (mode === 'edge') {
+        var ea = Number(a.netEdge != null ? a.netEdge : (a.evaluate && a.evaluate.edge && a.evaluate.edge.probability_edge)) || -999;
+        var eb = Number(b.netEdge != null ? b.netEdge : (b.evaluate && b.evaluate.edge && b.evaluate.edge.probability_edge)) || -999;
+        return eb - ea;
+      }
+      if (mode === 'model') {
+        var ma = Number(a.model_probability) || 0; if (ma <= 1) ma *= 100;
+        var mb = Number(b.model_probability) || 0; if (mb <= 1) mb *= 100;
+        return mb - ma;
+      }
+      if (mode === 'rank') {
+        return (rankW[String(b.rank || '').toLowerCase()] || 0) - (rankW[String(a.rank || '').toLowerCase()] || 0);
+      }
+      if (mode === 'time') {
+        return (Date.parse(a.startTime || 0) || 0) - (Date.parse(b.startTime || 0) || 0);
+      }
+      if (mode === 'name') {
+        return String(a.modelPick || a.pick || a.title || '').localeCompare(String(b.modelPick || b.pick || b.title || ''));
+      }
+      return 0;
+    });
+    return arr;
+  }
+
+
+  // Scanner toolbar (mock-style filters)
+  (function () {
+    function syncScFromState() {
+      try {
+        if ($('sc-day') && dayFilter) $('sc-day').value = dayFilter;
+        if ($('sc-sport') && sport) $('sc-sport').value = sport === 'all' ? 'all' : sport;
+        if ($('sc-market') && marketType) {
+          var opts = $('sc-market').options;
+          var ok = false;
+          for (var i = 0; i < opts.length; i++) if (opts[i].value === marketType) ok = true;
+          if (ok) $('sc-market').value = marketType;
+        }
+        document.querySelectorAll('#scanner-toolbar .sc-chip[data-sc-venue]').forEach(function (c) {
+          c.classList.toggle('on', c.getAttribute('data-sc-venue') === (venue || 'polymarket'));
+        });
+      } catch (e) {}
+    }
+    document.addEventListener('change', function (ev) {
+      var t = ev.target;
+      if (!t || !t.id) return;
+      if (t.id === 'sc-rank') {
+        var v = t.value;
+        if (v === 'good_potd') {
+          if ($('f-rank')) $('f-rank').value = 'good';
+          // POTD still auto when criteria met; rank filter stays good+
+        } else if ($('f-rank')) {
+          $('f-rank').value = v;
+        }
+        try { loadGames(); } catch (e) {}
+        return;
+      }
+      if (t.id === 'sc-day') {
+        dayFilter = t.value || 'next3';
+        document.querySelectorAll('.day-btn').forEach(function (b) {
+          var on = b.getAttribute('data-day') === dayFilter;
+          b.classList.toggle('pill-on', on);
+          b.classList.toggle('text-bb-muted', !on);
+        });
+        if ($('m-day')) $('m-day').value = dayFilter;
+        try { loadGames(); } catch (e) {}
+        return;
+      }
+      if (t.id === 'sc-sport') {
+        sport = t.value || 'all';
+        if ($('m-sport')) $('m-sport').value = sport;
+        try { loadGames(); } catch (e) {}
+        return;
+      }
+      if (t.id === 'sc-market') {
+        var mt = t.value || 'all';
+        if (typeof applyMarketType === 'function') applyMarketType(mt);
+        else {
+          marketType = mt;
+          if ($('market-select')) $('market-select').value = mt;
+          try { loadGames(); } catch (e) {}
+        }
+        return;
+      }
+    });
+    document.addEventListener('click', function (ev) {
+      var chip = ev.target && ev.target.closest && ev.target.closest('#scanner-toolbar .sc-chip[data-sc-venue]');
+      if (chip) {
+        var v = chip.getAttribute('data-sc-venue') || 'polymarket';
+        venue = v;
+        document.querySelectorAll('#scanner-toolbar .sc-chip[data-sc-venue]').forEach(function (c) {
+          c.classList.toggle('on', c.getAttribute('data-sc-venue') === v);
+        });
+        document.querySelectorAll('.venue-btn').forEach(function (b) {
+          var on = b.getAttribute('data-venue') === v;
+          b.classList.toggle('pill-on', on);
+        });
+        if ($('m-venue')) $('m-venue').value = v;
+        try { loadGames(); } catch (e) {}
+        return;
+      }
+      if (ev.target && ev.target.id === 'sc-refresh') {
+        try { loadGames(); } catch (e) {}
+      }
+    });
+    // initial sync after DOM
+    setTimeout(syncScFromState, 50);
+  })();
+
   function switchTab(name) {
     if (!name) return;
     document.querySelectorAll('.tab').forEach(function (b) {
@@ -11619,7 +12005,10 @@ function renderSlate() {
       btn.classList.add('on');
       if (v3nav === 'boards') {
         switchTab('scanner');
+        document.body.classList.add('boards-mode');
         try {
+          sport = 'all';
+          if ($('m-sport')) $('m-sport').value = 'all';
           if (typeof applyMarketType === 'function') applyMarketType('player_props');
           else {
             marketType = 'player_props';
@@ -11628,6 +12017,19 @@ function renderSlate() {
             loadGames();
           }
         } catch (e) { try { loadGames(); } catch (e2) {} }
+        return;
+      }
+      if (v3nav === 'scanner' || v3nav === 'elite' || v3nav === 'live') {
+        document.body.classList.remove('boards-mode');
+      }
+      if (v3nav === 'calendar') {
+        document.body.classList.remove('boards-mode');
+        switchTab('lineshop');
+        return;
+      }
+      if (v3nav === 'desk') {
+        document.body.classList.remove('boards-mode');
+        switchTab('slate');
         return;
       }
       if (v3nav === 'elite') {
