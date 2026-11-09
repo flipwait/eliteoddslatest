@@ -7,6 +7,9 @@
     }
   },
   "rewrites": [
+    { "source": "/api/kalshi-games", "destination": "/api/venues?v=kalshi" },
+    { "source": "/api/novig-games", "destination": "/api/venues?v=novig" },
+    { "source": "/api/potd", "destination": "/api/misc?action=potd" },
     { "source": "/api/discord", "destination": "/api/misc?action=discord" },
     { "source": "/api/combo", "destination": "/api/misc?action=combo" },
     { "source": "/api/feed", "destination": "/api/misc?action=feed" },

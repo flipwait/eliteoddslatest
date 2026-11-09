@@ -1,20 +1,30 @@
-# EliteOdds v3.9.5 (Vercel Hobby safe)
+# EliteOdds v3.9.6 — Vercel Hobby (max 12 functions)
 
-**8 serverless functions** (Hobby limit is 12).
+This build has **exactly 6** files in `api/`:
 
-| Function | Role |
-|----------|------|
-| `/api/health` | Health check |
-| `/api/games` | Polymarket board |
-| `/api/kalshi-games` | Kalshi board |
-| `/api/novig-games` | Novig board |
-| `/api/potd` | Pick of the Day |
-| `/api/trade` | Trade / auto |
-| `/api/ai` | AI verdict |
-| `/api/misc` | Discord, combo, feed, settle, tools (rewrites) |
+```
+api/health.js
+api/games.js
+api/venues.js
+api/trade.js
+api/ai.js
+api/misc.js
+```
 
-## Deploy
-1. Upload **repo root**: `api/`, `lib/`, `public/`, `package.json`, `vercel.json`
-2. Vercel Root Directory = empty
-3. Output Directory = `public`
-4. After deploy: `/api/health` → `ok: true`
+## CRITICAL — if you still see “No more than 12 Serverless Functions”
+
+Your GitHub repo still has **old** `api/*.js` files from earlier versions.
+
+### Fix on GitHub (phone or desktop)
+1. Open repo → **api** folder  
+2. **Delete every file** that is NOT one of the 6 names above  
+   Especially delete: `combo.js`, `discord.js`, `feed.js`, `placed.js`, `settle-ml.js`, `tools.js`, `kalshi-games.js`, `novig-games.js`, `potd.js` if they still exist  
+3. Upload this zip’s `api/` folder (replace)  
+4. Confirm `api/` shows **only 6** `.js` files  
+5. Redeploy  
+
+Also delete any old `vercel.json` that contains `"installCommand": "echo 'no deps'"` — use this zip’s `vercel.json`.
+
+### Check after deploy
+- `/api/health` → ok  
+- Repo `api/` file count = 6  

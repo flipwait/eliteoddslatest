@@ -1,6 +1,6 @@
 {
   "name": "eliteodds",
   "private": true,
-  "version": "3.9.5",
-  "description": "EliteOdds — Hobby plan safe (≤12 serverless functions)"
+  "version": "3.9.6",
+  "description": "EliteOdds — 6 serverless functions (Hobby safe)"
 }
