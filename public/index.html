@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.9.0</title>
+  <title>EliteOdds v3.9.2</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -2323,6 +2323,36 @@
     article.novig-card .gcard-accent { background: linear-gradient(90deg,#22d3ee,#a78bfa) !important; }
     .venue.n { color: #67e8f9 !important; }
 
+  
+    /* 3.9.2 single-venue boards */
+    .v3-venue-bar, #venue-toggle { display: flex !important; }
+    body.v3 .venue-btn.pill-on[data-venue="novig"] {
+      background: rgba(34,211,238,0.18) !important;
+      border-color: rgba(34,211,238,0.55) !important;
+      color: #a5f3fc !important;
+    }
+    body.v3 .venue-btn.pill-on[data-venue="compare"] {
+      background: rgba(167,139,250,0.2) !important;
+      border-color: rgba(167,139,250,0.5) !important;
+    }
+    .novig-setup-card {
+      max-width: 420px; margin: 1.5rem auto; padding: 1.25rem;
+      border-radius: 16px; border: 1px solid rgba(34,211,238,0.35);
+      background: rgba(34,211,238,0.06); color: #cbd5e1; font-size: 12px; line-height: 1.5;
+    }
+    .novig-setup-card h3 { color: #a5f3fc; font-size: 14px; margin: 0 0 0.5rem; }
+    .compare-row {
+      display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 8px;
+      padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(139,92,246,0.25);
+      background: rgba(15,18,28,0.8); margin-bottom: 8px; font-size: 11px;
+    }
+    .compare-row .match { color: #e2e8f0; font-weight: 600; }
+    .compare-row .bk { text-align: center; color: #94a3b8; }
+    .compare-row .bk b { display: block; color: #f8fafc; font-size: 13px; }
+    @media (max-width: 700px) {
+      .compare-row { grid-template-columns: 1fr; }
+    }
+
   </style>
 </head>
 <body class="v3">
@@ -2347,7 +2377,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.9.0</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.9.2</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -2358,10 +2388,11 @@
           <button type="button" data-day="tomorrow" class="day-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Tomorrow</button>
           <button type="button" data-day="all" class="day-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">All days</button>
         </div>
-        <div id="venue-toggle" class="eo-mobile-only-venue flex gap-1 items-center ml-auto sm:ml-2">
-          <button type="button" data-venue="polymarket" class="venue-btn pill-on px-3 py-1.5 rounded-full border border-bb-border text-[11px]">Polymarket</button>
-          <button type="button" data-venue="kalshi" class="venue-btn px-3 py-1.5 rounded-full border border-bb-green/50 text-[11px] text-bb-green">Kalshi</button>
-          <button type="button" data-venue="both" class="venue-btn px-3 py-1.5 rounded-full border border-violet-400/40 text-[11px] text-violet-200">Both</button>
+        <div id="venue-toggle" class="flex flex-wrap gap-1 items-center ml-auto sm:ml-2">
+          <button type="button" data-venue="polymarket" class="venue-btn pill-on px-3 py-1.5 rounded-full border border-bb-border text-[11px]" title="Polymarket board only">Polymarket</button>
+          <button type="button" data-venue="kalshi" class="venue-btn px-3 py-1.5 rounded-full border border-bb-green/50 text-[11px] text-bb-green" title="Kalshi board only">Kalshi</button>
+          <button type="button" data-venue="novig" class="venue-btn px-3 py-1.5 rounded-full border border-cyan-400/50 text-[11px] text-cyan-300" title="Novig board only">Novig</button>
+          <button type="button" data-venue="compare" class="venue-btn px-3 py-1.5 rounded-full border border-violet-400/40 text-[11px] text-violet-200" title="Odds checker — compare prices across books">Compare</button>
         </div>
         <button type="button" id="btn-load" class="px-2.5 py-1.5 rounded-full border border-bb-border text-bb-muted text-[11px]" title="Refresh">↻</button><button type="button" id="btn-scan-auto" class="px-2.5 py-1.5 rounded-full border border-violet-400/50 text-violet-200 text-[11px]" title="Scan for Auto only">Auto</button>
         <button type="button" id="btn-snap" class="hidden">LM</button>
@@ -3452,7 +3483,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.9.0</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.9.2</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -3843,8 +3874,17 @@
   };
 
   
-  var APP_VERSION = '3.9.0';
+  var APP_VERSION = '3.9.2';
   var APP_CHANGELOG = [
+    {
+      version: '3.9.2',
+      title: 'Per-venue boards · Compare · Novig sign fix',
+      notes: [
+        'Boards — Polymarket | Kalshi | Novig one at a time; Compare is opt-in odds checker.',
+        'Novig — NOVIG-V3 signature fixed so catalog can return markets with valid keys.',
+        'Empty state — Setup card when Novig keys missing.'
+      ]
+    },
     {
       version: '3.9.0',
       title: 'Novig venue · Auto PM+Kalshi · performance gates',
@@ -9755,14 +9795,59 @@ function kalQuery(mt, strict, allowMkt) {
     }
   }
 
-  async function loadGames() {
+  
+  function renderCompareBoard(box, list) {
+    if (!box) return;
+    list = list || [];
+    // Group by rough matchup key
+    var groups = {};
+    list.forEach(function (g) {
+      var title = String(g.eventTitle || g.title || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+      var mt = String(g.marketType || '').toLowerCase();
+      var key = title.slice(0, 48) + '|' + mt;
+      if (!groups[key]) groups[key] = { title: g.eventTitle || g.title || '—', mt: mt, books: {} };
+      var v = String(g.venue || g.source || 'pm').toLowerCase();
+      var pct = g.market_probability != null ? g.market_probability : (g.sides && g.sides[0] && g.sides[0].pct);
+      groups[key].books[v] = {
+        pick: g.modelPick || '—',
+        pct: pct,
+        rank: g.rank || '—',
+        url: (typeof tradeHrefFor === 'function' ? tradeHrefFor(g) : (g.marketUrl || g.url || '#'))
+      };
+    });
+    var keys = Object.keys(groups).slice(0, 40);
+    if (!keys.length) {
+      box.innerHTML = '<p class="text-bb-muted text-sm p-4">No overlapping lines to compare. Try All sports / Moneyline.</p>';
+      return;
+    }
+    var html = '<p class="text-[11px] text-bb-muted mb-2 px-1">Odds checker — same board filters, prices by venue. Open a book to trade.</p>';
+    keys.forEach(function (k) {
+      var g = groups[k];
+      var pm = g.books.polymarket || g.books.poly || {};
+      var kal = g.books.kalshi || {};
+      var nv = g.books.novig || {};
+      function cell(b, label) {
+        if (!b || b.pct == null && !b.pick) return '<div class="bk"><span>' + label + '</span><b>—</b></div>';
+        var p = b.pct != null ? (Math.round(Number(b.pct) * 10) / 10) + '%' : '—';
+        return '<div class="bk"><span>' + label + '</span><b>' + p + '</b><span style="font-size:10px">' + String(b.pick || '').slice(0, 18) + '</span></div>';
+      }
+      html += '<div class="compare-row">' +
+        '<div class="match">' + String(g.title).replace(/</g, '') + '<div style="opacity:.7;font-weight:400;font-size:10px">' + g.mt + '</div></div>' +
+        cell(pm, 'PM') + cell(kal, 'Kalshi') + cell(nv, 'Novig') +
+        '</div>';
+    });
+    box.innerHTML = html;
+  }
+
+async function loadGames() {
     // Venue display: PM or Kalshi = single board; both = dual
     try {
       var vNow = venue || 'polymarket';
-      document.body.classList.toggle('theme-both', vNow === 'both');
+      document.body.classList.toggle('theme-both', vNow === 'both' || vNow === 'compare');
       document.body.classList.toggle('theme-poly', vNow === 'polymarket');
       document.body.classList.toggle('theme-kalshi', vNow === 'kalshi');
       document.body.classList.toggle('theme-novig', vNow === 'novig');
+      document.body.classList.toggle('theme-compare', vNow === 'compare');
       if (vNow !== 'both') {
         if ($('games-dual')) $('games-dual').style.display = 'none';
         if ($('games')) $('games').style.display = 'grid';
@@ -9866,17 +9951,50 @@ function kalQuery(mt, strict, allowMkt) {
             $('meta').textContent = 'BOTH · PM ' + polyG2.length + ' + Kal ' + kalG2.length + ' · Elite ' + eN2 + ' · Good ' + gN2 + ' · Pass ' + pN2;
           }
         } else if (venue === 'novig') {
+          var stN = settings();
           var dataN = await fetchJsonTimeout(novigQuery(mt, rankF), tMs2);
-          if (!dataN.ok && !(dataN.games && dataN.games.length)) {
-            throw new Error(dataN.error || dataN.hint || 'Novig failed — save Paper keys in Settings');
+          list = (dataN && dataN.games) ? dataN.games : [];
+          if ((!dataN.ok && !list.length) || (dataN.error === 'missing_keys')) {
+            if (box) box.innerHTML = '<div class="novig-setup-card"><h3>Novig board</h3>' +
+              '<p>No markets yet — keys required (free Paper API).</p>' +
+              '<ol style="margin:8px 0 0 16px;padding:0">' +
+              '<li>Open <b>paper.novig.com</b> → Profile → Settings → Novig API</li>' +
+              '<li>Create key → copy <b>Key ID</b> + <b>PEM</b></li>' +
+              '<li>EliteOdds → Settings → Novig → Save → Test</li>' +
+              '<li>Stay on this <b>Novig</b> board and Refresh</li></ol>' +
+              '<p style="margin-top:10px;opacity:.85">' + (dataN.error || dataN.hint || '') + '</p></div>';
+            if ($('meta')) $('meta').textContent = 'Novig · setup keys';
+            if (boxP) boxP.innerHTML = '';
+            if (boxK) boxK.innerHTML = '';
+          } else {
+            games = filterGamesClient(dedupeGameCards(list));
+            games.forEach(function (g) { g.venue = 'novig'; g.source = 'novig'; });
+            renderGameList(box, games);
+            if (boxP) boxP.innerHTML = '';
+            if (boxK) boxK.innerHTML = '';
+            if ($('meta')) $('meta').textContent = 'Novig board · ' + (dataN.host || 'paper') + ' · ' + games.length + ' mkts';
           }
-          list = dataN.games || [];
-          games = filterGamesClient(dedupeGameCards(list));
-          games.forEach(function (g) { g.venue = 'novig'; g.source = 'novig'; });
-          renderGameList(box, games);
+        } else if (venue === 'compare') {
+          // Odds checker: pull PM + Kalshi (+ Novig if keys) and show price rows
+          if ($('meta')) $('meta').textContent = 'Compare · loading books…';
+          var parts = [];
+          try {
+            var dP = await fetchJsonTimeout(polyQuery(mt, rankF, minEv, minEdge, minSc, strict, allowMkt), tMs2);
+            (dP.games || []).forEach(function (g) { g.venue = 'polymarket'; parts.push(g); });
+          } catch (eP) {}
+          try {
+            var dK = await fetchJsonTimeout(kalQuery(mt, strict, allowMkt), tMs2);
+            (dK.games || []).forEach(function (g) { g.venue = 'kalshi'; parts.push(g); });
+          } catch (eK) {}
+          try {
+            var dNv = await fetchJsonTimeout(novigQuery(mt, rankF), Math.min(tMs2, 12000));
+            if (dNv && dNv.games) (dNv.games || []).forEach(function (g) { g.venue = 'novig'; parts.push(g); });
+          } catch (eN) {}
+          games = filterGamesClient(dedupeGameCards(parts));
+          renderCompareBoard(box, games);
           if (boxP) boxP.innerHTML = '';
           if (boxK) boxK.innerHTML = '';
-          if ($('meta')) $('meta').textContent = 'Novig · ' + (dataN.host || '') + ' · ' + games.length + ' mkts';
+          if ($('meta')) $('meta').textContent = 'Compare · ' + games.length + ' lines across books';
         } else if (venue === 'kalshi') {
           var dataK = await fetchJsonTimeout(kalQuery(mt, strict, allowMkt), tMs2);
           if (!dataK.ok && !(dataK.games && dataK.games.length)) throw new Error(dataK.error || 'Kalshi failed');
