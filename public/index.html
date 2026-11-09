@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.9.8</title>
+  <title>EliteOdds v3.10.0</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -2365,6 +2365,122 @@
       border-color: rgba(167,139,250,0.5) !important;
     }
 
+  
+    /* ===== EliteOdds Board (mockup #2) ===== */
+    .eo-board {
+      margin: 0.5rem 0 1.25rem;
+      border: 1px solid rgba(30,42,61,0.95);
+      border-radius: 14px;
+      background: linear-gradient(180deg, #0c1220 0%, #0a0e18 100%);
+      overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(139,92,246,0.08), 0 12px 40px rgba(0,0,0,0.35);
+    }
+    .eo-board-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(30,42,61,0.9);
+      background: rgba(12,16,28,0.9);
+    }
+    .eo-board-title {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.12em;
+      color: #c4b5fd; text-transform: uppercase;
+    }
+    .eo-board-live { color: #4ade80; font-size: 10px; letter-spacing: 0.08em; margin-left: 0.5rem; }
+    .eo-board-meta { font-size: 11px; color: #8b9bb4; }
+    .eo-board-body {
+      display: grid;
+      grid-template-columns: 1fr minmax(280px, 340px);
+      min-height: 420px;
+    }
+    @media (max-width: 960px) {
+      .eo-board-body { grid-template-columns: 1fr; }
+      .eo-board-detail { border-left: none !important; border-top: 1px solid rgba(30,42,61,0.9); max-height: 320px; }
+    }
+    .eo-board-table-wrap { overflow: auto; max-height: 70vh; }
+    .eo-board-table {
+      width: 100%; border-collapse: collapse; font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+    .eo-board-table thead th {
+      position: sticky; top: 0; z-index: 2;
+      background: #0e1524;
+      color: #7b8ba5;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+      text-align: left; padding: 0.65rem 0.75rem;
+      border-bottom: 1px solid rgba(30,42,61,0.95);
+      white-space: nowrap;
+    }
+    .eo-board-table tbody tr {
+      cursor: pointer; border-bottom: 1px solid rgba(20,28,42,0.9);
+      transition: background 0.12s;
+    }
+    .eo-board-table tbody tr:hover { background: rgba(139,92,246,0.06); }
+    .eo-board-table tbody tr.on {
+      background: rgba(139,92,246,0.12);
+      box-shadow: inset 2px 0 0 #a78bfa;
+    }
+    .eo-board-table td {
+      padding: 0.7rem 0.75rem; color: #d1d9e6; vertical-align: middle;
+      white-space: nowrap;
+    }
+    .eo-board-table td.mu { white-space: normal; min-width: 160px; }
+    .eo-board-table .mu-sub { display: block; font-size: 10px; color: #6b7c94; margin-top: 2px; }
+    .eo-rank-pill {
+      display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+    }
+    .eo-rank-pill.elite { background: rgba(34,197,94,0.18); color: #86efac; border: 1px solid rgba(74,222,128,0.35); }
+    .eo-rank-pill.good { background: rgba(250,204,21,0.12); color: #fde68a; border: 1px solid rgba(250,204,21,0.3); }
+    .eo-rank-pill.pass { background: rgba(100,116,139,0.15); color: #94a3b8; border: 1px solid rgba(100,116,139,0.25); }
+    .eo-rank-pill.potd { background: rgba(167,139,250,0.2); color: #ddd6fe; border: 1px solid rgba(167,139,250,0.4); }
+    .eo-edge-pos { color: #4ade80; font-weight: 700; }
+    .eo-edge-neg { color: #f87171; }
+    .eo-edge-zero { color: #8b9bb4; }
+    .eo-venue-tag {
+      font-size: 10px; padding: 0.12rem 0.4rem; border-radius: 4px;
+      background: rgba(30,42,61,0.8); color: #a5b4c8;
+    }
+    .eo-venue-tag.pm { color: #c4b5fd; }
+    .eo-venue-tag.kal { color: #86efac; }
+    .eo-venue-tag.nv { color: #67e8f9; }
+    .eo-board-detail {
+      border-left: 1px solid rgba(30,42,61,0.95);
+      background: #0b101c;
+      padding: 1rem;
+      overflow: auto;
+    }
+    .bd-empty { color: #6b7c94; font-size: 12px; padding: 2rem 0.5rem; text-align: center; }
+    .bd-head { margin-bottom: 0.75rem; }
+    .bd-match { font-size: 15px; font-weight: 700; color: #f1f5f9; }
+    .bd-sub { font-size: 11px; color: #8b9bb4; margin-top: 4px; }
+    .bd-live { color: #4ade80; font-size: 10px; font-weight: 700; }
+    .bd-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem;
+      margin: 0.75rem 0;
+    }
+    .bd-stat {
+      background: rgba(15,23,42,0.8); border: 1px solid rgba(30,42,61,0.9);
+      border-radius: 8px; padding: 0.5rem; text-align: center;
+    }
+    .bd-stat b { display: block; font-size: 14px; color: #e2e8f0; }
+    .bd-stat span { font-size: 9px; color: #7b8ba5; letter-spacing: 0.05em; }
+    .bd-pick {
+      background: rgba(139,92,246,0.12); border: 1px solid rgba(167,139,250,0.35);
+      border-radius: 10px; padding: 0.65rem 0.75rem; margin: 0.5rem 0;
+      font-size: 13px; color: #e9d5ff;
+    }
+    .bd-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.75rem; }
+    .bd-actions button, .bd-actions a {
+      font-size: 11px; padding: 0.4rem 0.7rem; border-radius: 8px;
+      border: 1px solid rgba(30,42,61,0.9); background: rgba(15,23,42,0.9); color: #cbd5e1;
+      cursor: pointer; text-decoration: none;
+    }
+    .bd-actions .pri { background: rgba(139,92,246,0.25); border-color: rgba(167,139,250,0.5); color: #ede9fe; }
+    body.layout-board #games,
+    body.layout-board #games-dual { display: none !important; }
+    body.layout-board #board-shell { display: block !important; }
+    body:not(.layout-board) #board-shell { display: none !important; }
+
   </style>
 </head>
 <body class="v3">
@@ -2389,7 +2505,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.9.8</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.10.0</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -2528,7 +2644,7 @@
 <section id="panel-scanner">
           <div id="scanner-toolbar">
             <div class="sc-top">
-              <h1 class="sc-title">Scanner <em>Game cards</em></h1>
+              <h1 class="sc-title">Scanner <em>Board</em></h1>
               <div class="sc-chips">
                 <button type="button" class="sc-chip on" data-sc-venue="polymarket">Polymarket</button>
                 <button type="button" class="sc-chip kalshi" data-sc-venue="kalshi">Kalshi</button>
@@ -2574,7 +2690,8 @@
                 <option value="bucket_special">Special (NRFI/YRFI · Maps)</option>
               </select>
               <select id="sc-layout" title="Layout">
-                <option value="classic" selected>Classic</option>
+                <option value="board" selected>Board</option>
+                <option value="classic">Classic cards</option>
                 <option value="hub">By game</option>
               </select>
               <select id="sc-fair" title="Fair">
@@ -2584,7 +2701,36 @@
             </div>
           </div>
 
-          
+          <div id="board-shell" class="eo-board" style="display:none">
+            <div class="eo-board-head">
+              <div class="eo-board-title">ELITEODDS BOARD <span class="eo-board-live">● LIVE</span></div>
+              <div class="eo-board-meta" id="board-meta">—</div>
+            </div>
+            <div class="eo-board-body">
+              <div class="eo-board-table-wrap">
+                <table class="eo-board-table" id="board-table">
+                  <thead>
+                    <tr>
+                      <th>TIME</th>
+                      <th>MATCHUP</th>
+                      <th>MARKET</th>
+                      <th>PICK</th>
+                      <th>MKT%</th>
+                      <th>MODEL%</th>
+                      <th>EDGE</th>
+                      <th>RANK</th>
+                      <th>VENUE</th>
+                    </tr>
+                  </thead>
+                  <tbody id="board-tbody"></tbody>
+                </table>
+              </div>
+              <aside class="eo-board-detail" id="board-detail">
+                <div class="bd-empty">Select a row for game detail</div>
+              </aside>
+            </div>
+          </div>
+
           <div id="auto-pm-bar">
             <strong>Auto PM</strong> — tight Polymarket pipeline for automated entries (paper or live). Only ranks that pass your gates.
             <div class="apm-grid">
@@ -3499,7 +3645,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.9.8</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.10.0</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -3890,8 +4036,26 @@
   };
 
   
-  var APP_VERSION = '3.9.8';
+  var APP_VERSION = '3.10.0';
   var APP_CHANGELOG = [
+    {
+      version: '3.10.0',
+      title: 'Board view (mockup #2) + richer Novig',
+      notes: [
+        'Scanner Board layout: terminal table TIME·MATCHUP·MARKET·PICK·MKT%·MODEL%·EDGE·RANK·VENUE + detail drawer.',
+        'Default layout = Board (Classic cards still available).',
+        'Novig: broader catalog + ESPN team names / L10 form when matched.'
+      ]
+    },
+    {
+      version: '3.9.9',
+      title: 'Novig catalog — stop 0-market false empty',
+      notes: [
+        'Broader Novig catalog queries + events fallback.',
+        'Rank filters no longer hide entire Novig board when all lines are Pass.',
+        'Meta shows catalog count for debugging.'
+      ]
+    },
     {
       version: '3.9.8',
       title: 'Live Novig keys + fixed Kalshi/Novig board routes',
@@ -9690,17 +9854,252 @@ function kalQuery(mt, strict, allowMkt) {
     } catch (e) {}
     return kq;
   }
+  
+  /* ===== Board layout (mockup #2) ===== */
+  window.__lastBoardGames = [];
+  function escapeHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  window.__boardSelectedId = null;
+
+  function currentLayout() {
+    try {
+      var el = $('sc-layout');
+      return (el && el.value) || 'board';
+    } catch (e) { return 'board'; }
+  }
+
+  function applyLayoutMode() {
+    var lay = currentLayout();
+    document.body.classList.toggle('layout-board', lay === 'board');
+    document.body.classList.toggle('layout-hub', lay === 'hub');
+    document.body.classList.toggle('layout-classic', lay === 'classic' || !lay);
+  }
+
+  function boardTimeCell(g) {
+    if (g.live) return '<span style="color:#4ade80">LIVE</span>';
+    var t = g.startTime || g.start || g.gameTime;
+    if (!t) return '—';
+    try {
+      var d = new Date(t);
+      if (isNaN(d.getTime())) return String(t).slice(0, 8);
+      return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    } catch (e) { return '—'; }
+  }
+
+  function boardMatchup(g) {
+    var title = g.eventTitle || g.title || ((g.away || '') + ' @ ' + (g.home || '')) || '—';
+    title = String(title).replace(/\s+vs\.?\s+/i, ' vs ');
+    var lg = String(g.league || g.sport || '').toUpperCase();
+    return '<div class="mu"><b>' + escapeHtml(title) + '</b><span class="mu-sub">' + escapeHtml(lg) + (g.live ? ' · LIVE' : '') + '</span></div>';
+  }
+
+  function boardMarket(g) {
+    var mt = String(g.marketType || g.market || 'ML');
+    if (/money|ml/i.test(mt)) return 'Moneyline';
+    if (/spread/i.test(mt)) return 'Spread' + (g.spreadLine != null ? ' ' + g.spreadLine : (g.line != null ? ' ' + g.line : ''));
+    if (/total|ou|over|under/i.test(mt)) return 'Total' + (g.totalLine != null ? ' ' + g.totalLine : (g.line != null ? ' ' + g.line : ''));
+    if (/team.?total/i.test(mt)) return 'Team total';
+    if (/player|prop/i.test(mt)) return 'Player prop';
+    if (/nrfi|yrfi/i.test(mt)) return String(mt).toUpperCase();
+    return mt;
+  }
+
+  function boardPick(g) {
+    var p = g.modelPick || g.pick || g.side || '—';
+    var line = g.spreadLine != null ? g.spreadLine : (g.totalLine != null ? g.totalLine : g.line);
+    if (line != null && !/over|under/i.test(String(p)) && /spread|total/i.test(String(g.marketType || ''))) {
+      return String(p) + ' ' + line;
+    }
+    return String(p);
+  }
+
+  function boardPct(v) {
+    if (v == null || v === '' || isNaN(Number(v))) return '—';
+    var n = Number(v);
+    if (n <= 1 && n >= 0) n = n * 100;
+    return (Math.round(n * 10) / 10) + '%';
+  }
+
+  function boardEdge(g) {
+    var e = g.edge != null ? g.edge : (g.probability_edge != null ? g.probability_edge : g.edgePp);
+    if (e == null || isNaN(Number(e))) return { t: '—', c: 'eo-edge-zero' };
+    var n = Number(e);
+    if (Math.abs(n) < 1 && Math.abs(n) > 0) n = n * 100; // fraction → pp
+    var t = (n >= 0 ? '+' : '') + (Math.round(n * 10) / 10) + (Math.abs(n) < 20 ? 'pp' : '');
+    if (String(t).indexOf('pp') < 0 && Math.abs(n) < 30) t = (n >= 0 ? '+' : '') + (Math.round(n * 10) / 10) + 'pp';
+    return { t: t, c: n > 0.2 ? 'eo-edge-pos' : (n < -0.2 ? 'eo-edge-neg' : 'eo-edge-zero') };
+  }
+
+  function boardRankPill(g) {
+    var r = String(g.rank || 'Pass').toLowerCase();
+    var label = String(g.rank || 'Pass');
+    var cls = 'pass';
+    if (/potd|super/.test(r)) cls = 'potd';
+    else if (/elite/.test(r)) cls = 'elite';
+    else if (/good/.test(r)) cls = 'good';
+    return '<span class="eo-rank-pill ' + cls + '">' + escapeHtml(label) + '</span>';
+  }
+
+  function boardVenueTag(g) {
+    var v = String(g.venue || g.source || venue || 'polymarket').toLowerCase();
+    if (v.indexOf('kal') >= 0) return '<span class="eo-venue-tag kal">Kalshi</span>';
+    if (v.indexOf('nov') >= 0) return '<span class="eo-venue-tag nv">Novig</span>';
+    return '<span class="eo-venue-tag pm">Polymarket</span>';
+  }
+
+  function modelPctOf(g) {
+    if (g.model_probability != null) return g.model_probability;
+    if (g.fair != null) return g.fair;
+    if (g.modelPct != null) return g.modelPct;
+    return null;
+  }
+
+  function mktPctOf(g) {
+    if (g.market_probability != null) return g.market_probability;
+    if (g.mkt != null) return g.mkt;
+    if (g.yesPrice != null) {
+      var y = Number(g.yesPrice);
+      return y <= 1 ? y * 100 : y;
+    }
+    return null;
+  }
+
+  function renderBoardTable(list) {
+    applyLayoutMode();
+    window.__lastBoardGames = list || [];
+    var tb = $('board-tbody');
+    var meta = $('board-meta');
+    if (!tb) return;
+    if (!list || !list.length) {
+      tb.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#6b7c94;padding:2rem">No markets for these filters</td></tr>';
+      if (meta) meta.textContent = '0 markets';
+      if ($('board-detail')) $('board-detail').innerHTML = '<div class="bd-empty">Select a row for game detail</div>';
+      return;
+    }
+    var html = '';
+    list.forEach(function (g, idx) {
+      var id = g.id || g.slug || ('row-' + idx);
+      var edge = boardEdge(g);
+      var on = window.__boardSelectedId === id ? ' on' : '';
+      html += '<tr data-board-id="' + escapeHtml(String(id)) + '" class="' + on + '">' +
+        '<td>' + boardTimeCell(g) + '</td>' +
+        '<td class="mu">' + boardMatchup(g) + '</td>' +
+        '<td>' + escapeHtml(boardMarket(g)) + '</td>' +
+        '<td><b>' + escapeHtml(boardPick(g)) + '</b></td>' +
+        '<td>' + boardPct(mktPctOf(g)) + '</td>' +
+        '<td>' + boardPct(modelPctOf(g)) + '</td>' +
+        '<td class="' + edge.c + '">' + edge.t + '</td>' +
+        '<td>' + boardRankPill(g) + '</td>' +
+        '<td>' + boardVenueTag(g) + '</td>' +
+        '</tr>';
+    });
+    tb.innerHTML = html;
+    if (meta) {
+      var eN = 0, gN = 0;
+      list.forEach(function (x) {
+        var r = String(x.rank || '').toLowerCase();
+        if (/elite|potd|super/.test(r)) eN++;
+        else if (/good/.test(r)) gN++;
+      });
+      meta.textContent = list.length + ' markets · Elite ' + eN + ' · Good ' + gN;
+    }
+    // re-select
+    if (window.__boardSelectedId) {
+      var found = list.filter(function (g) { return String(g.id || g.slug) === String(window.__boardSelectedId); })[0];
+      if (found) renderBoardDetail(found);
+    }
+  }
+
+  function renderBoardDetail(g) {
+    var el = $('board-detail');
+    if (!el || !g) return;
+    var title = g.eventTitle || g.title || '—';
+    var pick = boardPick(g);
+    var edge = boardEdge(g);
+    var trade = (typeof tradeHrefFor === 'function') ? tradeHrefFor(g) : (g.marketUrl || g.url || '#');
+    el.innerHTML =
+      '<div class="bd-head">' +
+        '<div class="bd-match">' + escapeHtml(title) + '</div>' +
+        '<div class="bd-sub">' + escapeHtml(String(g.league || '').toUpperCase()) +
+          (g.live ? ' · <span class="bd-live">LIVE</span>' : '') +
+          (g.startTime ? ' · ' + escapeHtml(String(g.startTime).replace('T', ' ').slice(0, 16)) : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="bd-pick"><b>MODEL PICK</b> · ' + escapeHtml(pick) +
+        ' · Edge <span class="' + edge.c + '">' + edge.t + '</span></div>' +
+      '<div class="bd-stats">' +
+        '<div class="bd-stat"><b>' + boardPct(mktPctOf(g)) + '</b><span>MKT</span></div>' +
+        '<div class="bd-stat"><b>' + boardPct(modelPctOf(g)) + '</b><span>MODEL</span></div>' +
+        '<div class="bd-stat"><b>' + escapeHtml(String(g.rank || '—')) + '</b><span>RANK</span></div>' +
+      '</div>' +
+      '<div class="bd-actions">' +
+        '<a class="pri" href="' + escapeHtml(trade) + '" target="_blank" rel="noopener">Trade</a>' +
+        '<button type="button" data-bd-act="combo">+ Combo</button>' +
+        '<button type="button" data-bd-act="log">Log</button>' +
+        '<button type="button" data-bd-act="share">Share</button>' +
+      '</div>';
+    el.setAttribute('data-gid', g.id || '');
+  }
+
+  document.addEventListener('click', function (ev) {
+    var tr = ev.target && ev.target.closest && ev.target.closest('#board-tbody tr[data-board-id]');
+    if (tr) {
+      var id = tr.getAttribute('data-board-id');
+      window.__boardSelectedId = id;
+      document.querySelectorAll('#board-tbody tr').forEach(function (r) {
+        r.classList.toggle('on', r.getAttribute('data-board-id') === id);
+      });
+      var g = (window.__lastBoardGames || []).filter(function (x) {
+        return String(x.id || x.slug) === String(id);
+      })[0];
+      if (g) renderBoardDetail(g);
+      return;
+    }
+    var act = ev.target && ev.target.getAttribute && ev.target.getAttribute('data-bd-act');
+    if (act && $('board-detail')) {
+      var gid = $('board-detail').getAttribute('data-gid');
+      var gg = (window.__lastBoardGames || []).filter(function (x) { return String(x.id || x.slug) === String(gid); })[0];
+      if (!gg) return;
+      if (act === 'combo' && typeof addToCombo === 'function') addToCombo(gg);
+      else if (act === 'log' && typeof logBet === 'function') logBet(gg);
+      else if (act === 'share') {
+        var text = (gg.eventTitle || gg.title || '') + ' · ' + boardPick(gg) + ' · ' + (gg.rank || '');
+        if (navigator.share) navigator.share({ text: text }).catch(function () {});
+        else if (navigator.clipboard) navigator.clipboard.writeText(text);
+      }
+    }
+  });
+
+
   function renderGameList(box, list) {
     // Hide Pass only when Rank is Good+ or Elite-only (not All / Pass)
     try {
-      var __rf = ($('f-rank') && $('f-rank').value) || 'good';
-      if (__rf !== 'pass' && __rf !== 'all' && Array.isArray(list)) {
+      var __rf = ($('sc-rank') && $('sc-rank').value) || ($('f-rank') && $('f-rank').value) || 'good';
+      if (__rf !== 'pass' && __rf !== 'all' && __rf !== 'good_potd' && Array.isArray(list)) {
+        list = list.filter(function (g) {
+          var r = String(g.rank || '').toLowerCase();
+          if (__rf === 'elite') return r === 'elite' || r === 'potd' || r === 'super elite' || r === 'super_elite';
+          return r === 'good' || r === 'elite' || r === 'potd' || r === 'super elite' || r === 'super_elite';
+        });
+      } else if (__rf === 'good_potd' && Array.isArray(list)) {
         list = list.filter(function (g) {
           var r = String(g.rank || '').toLowerCase();
           return r === 'good' || r === 'elite' || r === 'potd' || r === 'super elite' || r === 'super_elite';
         });
       }
     } catch (eNP) {}
+
+    applyLayoutMode();
+    if (currentLayout() === 'board') {
+      renderBoardTable(list || []);
+      // still keep box in sync for dual mode remnants
+      if (box && list) { /* board owns UI */ }
+      return;
+    }
 
     if (!box) return;
     if (document.body.classList.contains('boards-mode') && typeof sortBoardsList === 'function') {
@@ -10020,8 +10419,12 @@ async function loadGames() {
           }
         } else if (venue === 'novig') {
           var stN = settings();
-          var dataN = await fetchJsonTimeout(novigQuery(mt, rankF), tMs2);
+          // Novig: fetch with loose rank so empty board isn't just filter; client still can tighten
+          var dataN = await fetchJsonTimeout(novigQuery(mt, 'all'), Math.max(tMs2, 35000));
           list = (dataN && dataN.games) ? dataN.games : [];
+          if (dataN && dataN.catalogCount != null && !list.length) {
+            console.warn('Novig catalogCount', dataN.catalogCount, dataN.fetchAttempt, dataN.hint);
+          }
           if ((!dataN.ok && !list.length) || (dataN.error === 'missing_keys')) {
             if (box) box.innerHTML = '<div class="novig-setup-card"><h3>Novig board</h3>' +
               '<p>No markets yet — keys required (free Paper API).</p>' +
@@ -10036,11 +10439,18 @@ async function loadGames() {
             if (boxK) boxK.innerHTML = '';
           } else {
             games = filterGamesClient(dedupeGameCards(list));
+            // If rank/day filters wiped Novig but catalog had rows, show catalog rows (Pass ok)
+            if (!games.length && list.length) {
+              games = dedupeGameCards(list).filter(function (g) { return !g.ended; }).slice(0, 60);
+            }
             games.forEach(function (g) { g.venue = 'novig'; g.source = 'novig'; });
             renderGameList(box, games);
             if (boxP) boxP.innerHTML = '';
             if (boxK) boxK.innerHTML = '';
-            if ($('meta')) $('meta').textContent = 'Novig board · ' + (dataN.host || 'paper') + ' · ' + games.length + ' mkts';
+            if ($('meta')) {
+              var cat = dataN.catalogCount != null ? dataN.catalogCount : '?';
+              $('meta').textContent = 'Novig · ' + (dataN.host || '') + ' · ' + games.length + ' shown · catalog ' + cat;
+            }
           }
         } else if (venue === 'compare') {
           // Odds checker: pull PM + Kalshi (+ Novig if keys) and show price rows
@@ -12563,6 +12973,12 @@ function renderSlate() {
     try { loadGames(); } catch (e) {}
   });
   document.addEventListener('change', function (ev) {
+      if (ev.target && ev.target.id === 'sc-layout') {
+        applyLayoutMode();
+        if (typeof loadGames === 'function') loadGames();
+        return;
+      }
+
     if (!ev.target) return;
     if (ev.target.id === 'boards-sort') {
       window.__boardsSort = ev.target.value || 'edge';
