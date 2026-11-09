@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.8.4</title>
+  <title>EliteOdds v3.9.0</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -2289,6 +2289,40 @@
       min-height: 0;
     }
 
+  
+    /* 3.8.5 card actions + live focus mobile */
+    body.v3 .v3-actions {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 0.4rem !important;
+      grid-template-columns: none !important;
+    }
+    body.v3 .v3-actions button,
+    body.v3 .v3-actions a {
+      flex: 1 1 calc(33.33% - 0.4rem) !important;
+      min-width: 5.5rem !important;
+      text-align: center !important;
+      font-size: 11px !important;
+      font-weight: 650 !important;
+      padding: 0.55rem 0.4rem !important;
+    }
+    body.v3 .v3-actions .btn-live-focus {
+      background: rgba(248,113,113,0.12) !important;
+      border-color: rgba(248,113,113,0.4) !important;
+      color: #fca5a5 !important;
+    }
+    body.v3 .v3-actions .btn-books {
+      background: rgba(96,165,250,0.12) !important;
+      border-color: rgba(96,165,250,0.4) !important;
+      color: #bfdbfe !important;
+    }
+
+  
+    body.v3.theme-novig { --eo-accent: #22d3ee; }
+    article.novig-card { border-color: rgba(34,211,238,0.35) !important; }
+    article.novig-card .gcard-accent { background: linear-gradient(90deg,#22d3ee,#a78bfa) !important; }
+    .venue.n { color: #67e8f9 !important; }
+
   </style>
 </head>
 <body class="v3">
@@ -2313,7 +2347,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.8.4</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.9.0</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -2579,6 +2613,7 @@
                   <select class="se-venue">
                     <option value="polymarket">Polymarket</option>
                     <option value="kalshi">Kalshi</option>
+                    <option value="novig">Novig</option>
                   </select>
                 </label>
                 <label>Window
@@ -2759,6 +2794,7 @@
                   <select class="se-venue">
                     <option value="polymarket">Polymarket</option>
                     <option value="kalshi">Kalshi</option>
+                    <option value="novig">Novig</option>
                   </select>
                 </label>
                 <label>Window
@@ -3173,8 +3209,33 @@
               <p id="live-test-out" class="text-[10px] text-bb-muted whitespace-pre-wrap hidden"></p>
               <p class="text-[10px] text-bb-muted border border-bb-border rounded-lg px-2 py-1.5 leading-snug">
                 <strong class="text-white">Paper</strong> auto-logs fills to journal/paper · <strong class="text-white">Dry-run</strong> only messages ·
-                <strong class="text-white">Live</strong> hits venue APIs (Kalshi sign / Polymarket US orders). Start Paper or Dry-run first.
+                <strong class="text-white">Live</strong> hits venue APIs (Kalshi sign / Polymarket US orders / Novig when enabled). Start Paper or Dry-run first.
               </p>
+                <div class="mt-3 pt-2 border-t border-bb-border space-y-2">
+                  <p class="text-[10px] font-semibold text-white">Venue &amp; performance</p>
+                  <label class="block text-[10px] text-bb-muted">Auto venue
+                    <select id="auto-venue" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs text-white">
+                      <option value="polymarket">Polymarket only</option>
+                      <option value="kalshi">Kalshi only</option>
+                      <option value="both" selected>Both PM + Kalshi</option>
+                      <option value="novig">Novig only</option>
+                    </select>
+                  </label>
+                  <label class="flex items-center gap-2 text-xs cursor-pointer">
+                    <input type="checkbox" id="auto-perf-on" class="rounded" checked />
+                    Performance gates (Elite paper L10)
+                  </label>
+                  <label class="block text-[10px] text-bb-muted">Pause / tighten if L10 win% below
+                    <input id="auto-perf-min-wr" type="number" min="0" max="100" value="35" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs text-white" />
+                  </label>
+                  <label class="block text-[10px] text-bb-muted">Extra edge pp when cold
+                    <input id="auto-perf-extra-edge" type="number" min="0" max="20" step="0.5" value="2" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs text-white" />
+                  </label>
+                  <label class="block text-[10px] text-bb-muted">Max autos per day (per venue)
+                    <input id="auto-max-day" type="number" min="1" max="50" value="8" class="mt-1 w-full bg-bb-bg border border-bb-border rounded-lg px-2 py-1.5 text-xs text-white" />
+                  </label>
+                  <p class="text-[10px] text-bb-muted">Cold sport/market lanes need more edge or skip. Kalshi → Discord 2. Novig uses Settings keys (Paper first).</p>
+                </div>
             </div>
               </div>
             </details>
@@ -3333,6 +3394,33 @@
             </details>
 
 
+            
+            <details class="set-box" open>
+              <summary>Novig (prediction market)</summary>
+              <div class="set-body space-y-2 text-[11px] text-bb-muted">
+                <p class="text-[10px]">Free trader API — create keys at <b>paper.novig.com</b> → Profile → Settings → Novig API. LP $30k deposit is <b>not</b> required. Start on <b>Paper</b>.</p>
+                <label class="block">Key ID
+                  <input id="novig-key-id" type="text" class="w-full mt-0.5 rounded-lg border border-bb-border bg-bb-bg px-2 py-1.5 text-white text-xs" placeholder="uuid from Novig API" autocomplete="off" />
+                </label>
+                <label class="block">Private key PEM
+                  <textarea id="novig-pem" rows="3" class="w-full mt-0.5 rounded-lg border border-bb-border bg-bb-bg px-2 py-1.5 text-white text-[10px] font-mono" placeholder="-----BEGIN PRIVATE KEY----- ..."></textarea>
+                </label>
+                <label class="block">Environment
+                  <select id="novig-env" class="w-full mt-0.5 rounded-lg border border-bb-border bg-bb-bg px-2 py-1.5 text-white text-xs">
+                    <option value="paper">Paper (recommended)</option>
+                    <option value="prod">Production (real money)</option>
+                  </select>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="novig-enabled" class="rounded border-bb-border" />
+                  <span>Enable Novig venue in Scanner</span>
+                </label>
+                <button type="button" id="btn-save-novig" class="px-3 py-1.5 rounded-lg border border-emerald-500/40 text-emerald-300 text-xs">Save Novig keys</button>
+                <button type="button" id="btn-test-novig" class="px-3 py-1.5 rounded-lg border border-bb-border text-bb-muted text-xs">Test connection</button>
+                <p id="novig-test-status" class="text-[10px] text-bb-muted"></p>
+              </div>
+            </details>
+
             <details class="set-box" open>
               <summary>Edge display</summary>
               <div class="set-body">
@@ -3364,7 +3452,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.8.4</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.9.0</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -3405,6 +3493,7 @@
                   <select class="se-venue">
                     <option value="polymarket">Polymarket</option>
                     <option value="kalshi">Kalshi</option>
+                    <option value="novig">Novig</option>
                   </select>
                 </label>
                 <label>Window
@@ -3495,7 +3584,8 @@
   <nav class="v3-bottom" id="v3-bottom-nav" aria-label="Primary">
     <button type="button" data-tab="scanner" data-v3nav="scanner" class="on"><span class="ico">◎</span>Scanner</button>
     <button type="button" data-tab="scanner" data-v3nav="boards"><span class="ico">▦</span>Boards</button>
-    <button type="button" data-tab="scanner" data-v3nav="auto-pm"><span class="ico">⚡</span>Auto PM</button>
+    <button type="button" data-tab="scanner" data-v3nav="live"><span class="ico">◷</span>Live</button>
+    <button type="button" data-tab="scanner" data-v3nav="auto-pm"><span class="ico">⚡</span>Auto</button>
     <button type="button" data-tab="settings" data-v3nav="settings"><span class="ico">☰</span>More</button>
   </nav>
 <script>
@@ -3753,8 +3843,27 @@
   };
 
   
-  var APP_VERSION = '3.8.4';
+  var APP_VERSION = '3.9.0';
   var APP_CHANGELOG = [
+    {
+      version: '3.9.0',
+      title: 'Novig venue · Auto PM+Kalshi · performance gates',
+      notes: [
+        'Novig — Paper/Prod catalog API as third venue (free trader keys; not LP $30k).',
+        'Auto — Venue PM / Kalshi / Both + performance pause when L10 cold.',
+        'Settings — Novig Key ID, PEM, env; Auto performance thresholds.',
+        'Cards — Novig badge; Trade opens novig.com until deep links stabilize.'
+      ]
+    },
+    {
+      version: '3.8.5',
+      title: 'Kalshi deep links · card actions · Live Focus mobile',
+      notes: [
+        'Kalshi Trade — path-safe series/event URLs (no bad encode) + search fallback so Trade opens the game not home.',
+        'Cards — Books, AI Verdict, Log, Share, Live focus visible in action row.',
+        'Mobile — Live Focus added to bottom nav for premium in-game board.'
+      ]
+    },
     {
       version: '3.8.4',
       title: 'Remove mobile filter card · stable PM board',
@@ -5178,11 +5287,16 @@
     if (!g) return 'https://polymarket.us';
     var isK = g.venue === 'kalshi' || g.source === 'kalshi';
     if (isK) {
-      // Prefer full series/event URLs already built by the API
-      if (g.kalshiUrl && /kalshi\.com/i.test(String(g.kalshiUrl))) return g.kalshiUrl;
-      if (g.tradeUrl && /kalshi\.com/i.test(String(g.tradeUrl))) return g.tradeUrl;
-      if (g.marketUrl && /kalshi\.com\/markets\/[^/]+\/[^/?#]+/i.test(String(g.marketUrl))) return g.marketUrl;
-      if (g.url && /kalshi\.com\/markets\/[^/]+\/[^/?#]+/i.test(String(g.url))) return g.url;
+      function kalshiPathOk(u) {
+        return /kalshi\.com\/markets\/[a-z0-9-]+\/[a-z0-9-]+/i.test(String(u || ''));
+      }
+      // Prefer API-built deep links first
+      if (kalshiPathOk(g.kalshiUrl)) return g.kalshiUrl;
+      if (kalshiPathOk(g.tradeUrl)) return g.tradeUrl;
+      if (kalshiPathOk(g.marketUrl)) return g.marketUrl;
+      if (kalshiPathOk(g.url)) return g.url;
+      if (g.marketUrl && /kalshi\.com\/markets\//i.test(String(g.marketUrl))) return g.marketUrl;
+      if (g.url && /kalshi\.com\/markets\//i.test(String(g.url))) return g.url;
       var et = String(g.eventTicker || g.event_ticker || '').trim();
       var mt = String(g.marketTicker || g.ticker || g.marketSlug || g.slug || '').trim();
       var ser = String(g.series || g.seriesTicker || g.series_ticker || '').trim();
@@ -5320,6 +5434,7 @@
   function hubCardHtml(group) {
     var g = group.primary;
     var isKalshi = String(g.venue || g.source || '').toLowerCase().indexOf('kalshi') >= 0;
+    var isNovig = String(g.venue || g.source || '').toLowerCase().indexOf('novig') >= 0;
     var title = String(g.eventTitle || g.title || '').replace(/</g, '');
     var lines = group.lines || [];
     var show = lines.slice(0, 6);
@@ -5344,10 +5459,10 @@
     if (more > 0) {
       linesHtml += '<p class="text-[10px] text-bb-muted mt-0.5">+' + more + ' more · set Market to All or use Classic for every line</p>';
     }
-    return '<article class="glass p-3 space-y-2 hub-card min-w-0 overflow-hidden' + (isKalshi ? ' kalshi-card' : '') + '" data-hub="1">' +
+    return '<article class="glass p-3 space-y-2 hub-card min-w-0 overflow-hidden' + (isKalshi ? ' kalshi-card' : '') + (isNovig ? ' novig-card' : '') + '" data-hub="1">' +
       '<div class="flex justify-between gap-2">' +
         '<div class="min-w-0"><p class="text-[9px] uppercase tracking-wide mb-0.5 ' + (isKalshi ? 'text-bb-green' : 'text-violet-300') + '">' +
-          (isKalshi ? 'Kalshi' : 'Polymarket') + ' · By game</p>' +
+          (isNovig ? 'Novig' : (isKalshi ? 'Kalshi' : 'Polymarket')) + ' · By game</p>' +
           '<p class="font-medium text-sm leading-snug">' + title + '</p>' +
           '<p class="text-[10px] text-bb-muted mt-0.5">' + String(g.league || '').toUpperCase() +
           (g.live ? ' · <span class="text-bb-red">LIVE</span>' : '') +
@@ -6365,6 +6480,7 @@
     var form = (g.evaluate && g.evaluate.matchup && g.evaluate.matchup.detail) ? String(g.evaluate.matchup.detail).replace(/</g, '') : '';
 
     var isKalshi = String(g.venue || g.source || '').toLowerCase().indexOf('kalshi') >= 0;
+    var isNovig = String(g.venue || g.source || '').toLowerCase().indexOf('novig') >= 0;
     var rankU = String(g.rank || 'PASS').toUpperCase();
     var rankMod = rankU === 'ELITE' ? 'rank-elite' : (rankU === 'GOOD' ? 'rank-good' : 'rank-pass');
     var rankPill = rankU === 'ELITE' ? 'rank-pill-e' : (rankU === 'GOOD' ? 'rank-pill-g' : '');
@@ -6383,7 +6499,7 @@
         '</div>' +
         '<div class="badges">' +
           '<span class="rank ' + (rankU === 'ELITE' ? 'e' : (rankU === 'GOOD' ? 'g' : 'p')) + '">' + rankU + '</span>' +
-          '<span class="venue' + (isKalshi ? ' k' : '') + '">' + (isKalshi ? 'Kalshi' : 'Polymarket') + '</span>' +
+          '<span class="venue' + (isNovig ? ' n' : (isKalshi ? ' k' : '')) + '">' + (isNovig ? 'Novig' : (isKalshi ? 'Kalshi' : 'Polymarket')) + '</span>' +
         '</div>' +
       '</div>' +
       '<div class="pick-block">' +
@@ -6412,14 +6528,15 @@
       '<div class="gcard-actions v3-actions">' +
         '<button type="button" class="btn-combo">+ Combo</button>' +
         '<a class="btn-trade" href="' + tradeHrefFor(g) + '" target="_blank" rel="noopener">Trade</a>' +
-        '<button type="button" class="btn-verdict">AI verdict</button>' +
-        '<button type="button" class="btn-focus">Details</button>' +
+        '<button type="button" class="btn-books">Books</button>' +
+        '<button type="button" class="btn-verdict">AI Verdict</button>' +
+        '<button type="button" class="btn-log">Log</button>' +
         '<button type="button" class="btn-share">Share</button>' +
+        '<button type="button" class="btn-live-focus">Live Focus</button>' +
+        '<button type="button" class="btn-focus">Details</button>' +
         '<button type="button" class="btn-discord">Discord</button>' +
         '<button type="button" class="btn-discord2">Disc 2</button>' +
-        '<button type="button" class="btn-log">Log</button>' +
         '<button type="button" class="btn-place">Place</button>' +
-        '<button type="button" class="btn-books">Books</button>' +
         '<button type="button" class="btn-ticket">Ticket</button>' +
       '</div>' +
       '<div class="smart-panel hidden text-[11px] text-bb-muted bg-bb-elev/60 rounded-lg p-2 mx-4 mb-2"></div>' +
@@ -7471,6 +7588,15 @@
       var vd = art.querySelector('.btn-verdict');
       if (vd) vd.onclick = function () { runVerdict(art, g); };
       if (lg) lg.onclick = function () { logBet(g); };
+      var lf = art.querySelector('.btn-live-focus');
+      if (lf) lf.onclick = function () {
+        try {
+          document.body.classList.add('live-focus-mode');
+          mode = 'live';
+          if (typeof openModal === 'function') openModal(g);
+          else if (typeof openLiveFocus === 'function') openLiveFocus(g);
+        } catch (e) { try { openModal(g); } catch (e2) {} }
+      };
     });
   }
 
@@ -7794,7 +7920,7 @@
     var resKey = String(row.result || '').toLowerCase();
     var venue = String(row.venue || row.source || 'polymarket').toLowerCase();
     var isKalshi = venue === 'kalshi' || venue === 'kal';
-    var venueLabel = isKalshi ? 'Kalshi' : 'Polymarket';
+    var venueLabel = isNovig ? 'Novig' : (isKalshi ? 'Kalshi' : 'Polymarket');
     // Prefer dedicated win/loss webhooks; Kalshi falls back to Discord 2
     var wh;
     if (resKey === 'won') {
@@ -9423,7 +9549,24 @@
     }
     return merged;
   }
-  function kalQuery(mt, strict, allowMkt) {
+  
+  function novigQuery(mt, rankF) {
+    var st = settings();
+    var keyId = (st.novigKeyId || ($('novig-key-id') && $('novig-key-id').value) || '').trim();
+    var pem = (st.novigPem || ($('novig-pem') && $('novig-pem').value) || '').trim();
+    var env = (st.novigEnv || ($('novig-env') && $('novig-env').value) || 'paper').trim();
+    var lim = 40;
+    var q = '/api/novig-games?league=' + encodeURIComponent(sport && sport !== 'all' ? resolveSportLeague(sport) : 'all') +
+      '&marketType=' + encodeURIComponent(mt || 'all') +
+      '&rank=' + encodeURIComponent(rankF || 'all') +
+      '&env=' + encodeURIComponent(env);
+    // Prefer server env; pass keys only if user saved in browser (personal deploy)
+    if (keyId) q += '&keyId=' + encodeURIComponent(keyId);
+    if (pem) q += '&pem=' + encodeURIComponent(pem);
+    return q;
+  }
+
+function kalQuery(mt, strict, allowMkt) {
     var lim = (sport === 'all' || mt === 'all') ? 60 : 35;
     var kq = '/api/kalshi-games?mode=' + encodeURIComponent(apiMode()) +
       '&league=' + encodeURIComponent(sport && sport !== 'all' ? resolveSportLeague(sport) : 'all') +
@@ -9619,6 +9762,7 @@
       document.body.classList.toggle('theme-both', vNow === 'both');
       document.body.classList.toggle('theme-poly', vNow === 'polymarket');
       document.body.classList.toggle('theme-kalshi', vNow === 'kalshi');
+      document.body.classList.toggle('theme-novig', vNow === 'novig');
       if (vNow !== 'both') {
         if ($('games-dual')) $('games-dual').style.display = 'none';
         if ($('games')) $('games').style.display = 'grid';
@@ -9721,6 +9865,18 @@
           if ($('meta')) {
             $('meta').textContent = 'BOTH · PM ' + polyG2.length + ' + Kal ' + kalG2.length + ' · Elite ' + eN2 + ' · Good ' + gN2 + ' · Pass ' + pN2;
           }
+        } else if (venue === 'novig') {
+          var dataN = await fetchJsonTimeout(novigQuery(mt, rankF), tMs2);
+          if (!dataN.ok && !(dataN.games && dataN.games.length)) {
+            throw new Error(dataN.error || dataN.hint || 'Novig failed — save Paper keys in Settings');
+          }
+          list = dataN.games || [];
+          games = filterGamesClient(dedupeGameCards(list));
+          games.forEach(function (g) { g.venue = 'novig'; g.source = 'novig'; });
+          renderGameList(box, games);
+          if (boxP) boxP.innerHTML = '';
+          if (boxK) boxK.innerHTML = '';
+          if ($('meta')) $('meta').textContent = 'Novig · ' + (dataN.host || '') + ' · ' + games.length + ' mkts';
         } else if (venue === 'kalshi') {
           var dataK = await fetchJsonTimeout(kalQuery(mt, strict, allowMkt), tMs2);
           if (!dataK.ok && !(dataK.games && dataK.games.length)) throw new Error(dataK.error || 'Kalshi failed');
@@ -11807,7 +11963,7 @@ function renderSlate() {
     var rankEmoji = rank === 'ELITE' ? '🎯' : rank === 'GOOD' ? '✅' : '📋';
     var isKalshi = venue === 'kalshi' || resolveVenue(g) === 'kalshi';
     var color = isKalshi ? 0x22c55e : 0x3b82f6;
-    var venueLabel = isKalshi ? 'Kalshi' : 'Polymarket';
+    var venueLabel = isNovig ? 'Novig' : (isKalshi ? 'Kalshi' : 'Polymarket');
     var venueEmoji = isKalshi ? '🟢' : '🔵';
 
     var mktType = String(g.marketType || 'moneyline').replace(/_/g, ' ');
@@ -13218,6 +13374,89 @@ function renderSlate() {
       renderEliteReview();
     };
   });
+
+
+  // Novig settings
+  function loadNovigIntoForm() {
+    try {
+      var st = settings();
+      if ($('novig-key-id') && st.novigKeyId) $('novig-key-id').value = st.novigKeyId;
+      if ($('novig-pem') && st.novigPem) $('novig-pem').value = st.novigPem;
+      if ($('novig-env') && st.novigEnv) $('novig-env').value = st.novigEnv;
+      if ($('novig-enabled')) $('novig-enabled').checked = !!st.novigEnabled;
+      if ($('auto-venue') && st.autoVenue) $('auto-venue').value = st.autoVenue;
+      if ($('auto-perf-on')) $('auto-perf-on').checked = st.autoPerfOn !== false;
+      if ($('auto-perf-min-wr') && st.autoPerfMinWr != null) $('auto-perf-min-wr').value = st.autoPerfMinWr;
+      if ($('auto-perf-extra-edge') && st.autoPerfExtraEdge != null) $('auto-perf-extra-edge').value = st.autoPerfExtraEdge;
+      if ($('auto-max-day') && st.autoMaxDay != null) $('auto-max-day').value = st.autoMaxDay;
+    } catch (e) {}
+  }
+  function saveNovigSettings() {
+    var st = settings();
+    st.novigKeyId = ($('novig-key-id') && $('novig-key-id').value || '').trim();
+    st.novigPem = ($('novig-pem') && $('novig-pem').value || '').trim();
+    st.novigEnv = ($('novig-env') && $('novig-env').value) || 'paper';
+    st.novigEnabled = !!( $('novig-enabled') && $('novig-enabled').checked );
+    st.autoVenue = ($('auto-venue') && $('auto-venue').value) || 'both';
+    st.autoPerfOn = !!( $('auto-perf-on') && $('auto-perf-on').checked );
+    st.autoPerfMinWr = Number($('auto-perf-min-wr') && $('auto-perf-min-wr').value) || 35;
+    st.autoPerfExtraEdge = Number($('auto-perf-extra-edge') && $('auto-perf-extra-edge').value) || 2;
+    st.autoMaxDay = Number($('auto-max-day') && $('auto-max-day').value) || 8;
+    localStorage.setItem('bb_settings', JSON.stringify(st));
+    try { status('Novig / Auto settings saved'); } catch (e) {}
+  }
+  var _bsn = document.getElementById('btn-save-novig');
+  if (_bsn) _bsn.onclick = function () { saveNovigSettings(); };
+  var _btn = document.getElementById('btn-test-novig');
+  if (_btn) _btn.onclick = async function () {
+    saveNovigSettings();
+    var el = $('novig-test-status');
+    if (el) el.textContent = 'Testing…';
+    try {
+      var data = await fetchJsonTimeout(novigQuery('moneyline', 'all'), 20000);
+      if (el) el.textContent = data.ok
+        ? ('OK · ' + (data.host || '') + ' · ' + ((data.games && data.games.length) || 0) + ' markets')
+        : ('Fail · ' + (data.error || data.hint || 'check keys'));
+    } catch (e) {
+      if (el) el.textContent = 'Error · ' + (e.message || e);
+    }
+  };
+  loadNovigIntoForm();
+
+  /** Performance gate: raise edge or drop game if that sport L10 is cold */
+  function applyAutoPerformanceGates(list) {
+    var st = settings();
+    if (st.autoPerfOn === false) return list || [];
+    var minWr = Number(st.autoPerfMinWr != null ? st.autoPerfMinWr : 35);
+    var extra = Number(st.autoPerfExtraEdge != null ? st.autoPerfExtraEdge : 2);
+    // Build simple L10 by league from elite ledger if present
+    var byLg = {};
+    try {
+      var led = (typeof eliteLedger === 'function') ? eliteLedger() : [];
+      led.forEach(function (row) {
+        var r = String(row.result || '').toLowerCase();
+        if (r !== 'win' && r !== 'loss') return;
+        var lg = String(row.league || row.sport || '').toLowerCase() || 'all';
+        if (!byLg[lg]) byLg[lg] = { w: 0, n: 0 };
+        byLg[lg].n++;
+        if (r === 'win') byLg[lg].w++;
+      });
+    } catch (e) {}
+    return (list || []).filter(function (g) {
+      var lg = String(g.league || g.sport || '').toLowerCase();
+      var stats = byLg[lg];
+      if (!stats || stats.n < 5) return true; // not enough sample
+      var wr = (stats.w / stats.n) * 100;
+      if (wr >= minWr) return true;
+      var edge = Number(g.probability_edge != null ? g.probability_edge : g.netEdge);
+      if (!isFinite(edge)) edge = 0;
+      // cold: require extra edge
+      if (edge < extra) return false;
+      g._perfCold = true;
+      g._perfNote = 'Cold L10 ' + Math.round(wr) + '% · +' + extra + 'pp gate';
+      return true;
+    });
+  }
 
   loadGames();
 })();
