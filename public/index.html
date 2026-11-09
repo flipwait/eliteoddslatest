@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.9.6</title>
+  <title>EliteOdds v3.9.8</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -2353,6 +2353,18 @@
       .compare-row { grid-template-columns: 1fr; }
     }
 
+  
+    .sc-chip.novig { border-color: rgba(34,211,238,0.45); color: #67e8f9; }
+    .sc-chip.novig.on, .sc-chip[data-sc-venue="novig"].on {
+      background: rgba(34,211,238,0.18) !important;
+      border-color: rgba(34,211,238,0.55) !important;
+      color: #a5f3fc !important;
+    }
+    .sc-chip[data-sc-venue="compare"].on {
+      background: rgba(167,139,250,0.2) !important;
+      border-color: rgba(167,139,250,0.5) !important;
+    }
+
   </style>
 </head>
 <body class="v3">
@@ -2377,7 +2389,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.9.6</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.9.8</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -2520,7 +2532,8 @@
               <div class="sc-chips">
                 <button type="button" class="sc-chip on" data-sc-venue="polymarket">Polymarket</button>
                 <button type="button" class="sc-chip kalshi" data-sc-venue="kalshi">Kalshi</button>
-                <button type="button" class="sc-chip" data-sc-venue="both">Both</button>
+                <button type="button" class="sc-chip novig" data-sc-venue="novig">Novig</button>
+                <button type="button" class="sc-chip" data-sc-venue="compare">Compare</button>
                 <button type="button" class="sc-chip" id="sc-refresh" title="Refresh">↻ Scan</button>
               </div>
             </div>
@@ -2596,6 +2609,9 @@
               <label>Venue
                 <select id="apm-venue">
                   <option value="polymarket" selected>Polymarket</option>
+                  <option value="kalshi">Kalshi</option>
+                  <option value="novig">Novig</option>
+                  <option value="compare">Compare (odds check)</option>
                   <option value="both">PM + Kalshi</option>
                 </select>
               </label>
@@ -3429,7 +3445,7 @@
             <details class="set-box" open>
               <summary>Novig (prediction market)</summary>
               <div class="set-body space-y-2 text-[11px] text-bb-muted">
-                <p class="text-[10px]">Free trader API — create keys at <b>paper.novig.com</b> → Profile → Settings → Novig API. LP $30k deposit is <b>not</b> required. Start on <b>Paper</b>.</p>
+                <p class="text-[10px]"><b>Live keys OK.</b> Create trader API keys at <b>novig.com</b> (production) or paper.novig.com. Profile → Settings → Novig API. Copy Key ID + PEM. LP $30k is <b>not</b> required. Set Environment to <b>Production</b> for live market boards.</p>
                 <label class="block">Key ID
                   <input id="novig-key-id" type="text" class="w-full mt-0.5 rounded-lg border border-bb-border bg-bb-bg px-2 py-1.5 text-white text-xs" placeholder="uuid from Novig API" autocomplete="off" />
                 </label>
@@ -3438,8 +3454,8 @@
                 </label>
                 <label class="block">Environment
                   <select id="novig-env" class="w-full mt-0.5 rounded-lg border border-bb-border bg-bb-bg px-2 py-1.5 text-white text-xs">
-                    <option value="paper">Paper (recommended)</option>
-                    <option value="prod">Production (real money)</option>
+                    <option value="prod" selected>Production (live keys / real markets)</option>
+                    <option value="paper">Paper (test keys only)</option>
                   </select>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer">
@@ -3483,7 +3499,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.9.6</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.9.8</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -3874,8 +3890,25 @@
   };
 
   
-  var APP_VERSION = '3.9.6';
+  var APP_VERSION = '3.9.8';
   var APP_CHANGELOG = [
+    {
+      version: '3.9.8',
+      title: 'Live Novig keys + fixed Kalshi/Novig board routes',
+      notes: [
+        'Kalshi + Novig call /api/venues directly (query params no longer dropped by rewrite).',
+        'Novig Settings default Production for live keys.',
+        'Clearer Kalshi empty state; longer Kalshi timeout.'
+      ]
+    },
+    {
+      version: '3.9.7',
+      title: 'Novig on Scanner chips',
+      notes: [
+        'Scanner toolbar now has Polymarket | Kalshi | Novig | Compare.',
+        'Previously Novig only lived on header toggle — easy to miss on mobile/desktop scanner.'
+      ]
+    },
     {
       version: '3.9.6',
       title: '6 serverless functions (Hobby)',
@@ -9631,7 +9664,7 @@
     var pem = (st.novigPem || ($('novig-pem') && $('novig-pem').value) || '').trim();
     var env = (st.novigEnv || ($('novig-env') && $('novig-env').value) || 'paper').trim();
     var lim = 40;
-    var q = '/api/novig-games?league=' + encodeURIComponent(sport && sport !== 'all' ? resolveSportLeague(sport) : 'all') +
+    var q = '/api/venues?v=novig&league=' + encodeURIComponent(sport && sport !== 'all' ? resolveSportLeague(sport) : 'all') +
       '&marketType=' + encodeURIComponent(mt || 'all') +
       '&rank=' + encodeURIComponent(rankF || 'all') +
       '&env=' + encodeURIComponent(env);
@@ -9643,7 +9676,7 @@
 
 function kalQuery(mt, strict, allowMkt) {
     var lim = (sport === 'all' || mt === 'all') ? 60 : 35;
-    var kq = '/api/kalshi-games?mode=' + encodeURIComponent(apiMode()) +
+    var kq = '/api/venues?v=kalshi&mode=' + encodeURIComponent(apiMode()) +
       '&league=' + encodeURIComponent(sport && sport !== 'all' ? resolveSportLeague(sport) : 'all') +
       '&marketType=' + encodeURIComponent(mt || 'all') +
       '&strict=' + encodeURIComponent(strict) +
@@ -10031,9 +10064,16 @@ async function loadGames() {
           if (boxK) boxK.innerHTML = '';
           if ($('meta')) $('meta').textContent = 'Compare · ' + games.length + ' lines across books';
         } else if (venue === 'kalshi') {
-          var dataK = await fetchJsonTimeout(kalQuery(mt, strict, allowMkt), tMs2);
-          if (!dataK.ok && !(dataK.games && dataK.games.length)) throw new Error(dataK.error || 'Kalshi failed');
-          list = dataK.games || [];
+          var dataK = await fetchJsonTimeout(kalQuery(mt, strict, allowMkt), Math.max(tMs2, 45000));
+          list = (dataK && dataK.games) ? dataK.games : [];
+          if ((!dataK || (!dataK.ok && !list.length))) {
+            if (box) box.innerHTML = '<div class="novig-setup-card" style="border-color:rgba(34,197,94,0.35)"><h3 style="color:#86efac">Kalshi board</h3>' +
+              '<p>No markets returned. Try <b>All sports</b> + <b>All ranks</b> + <b>Next 3 days</b>, then Scan again.</p>' +
+              '<p style="opacity:.85;margin-top:8px">' + ((dataK && (dataK.error || dataK.hint)) || 'Empty response from /api/venues?v=kalshi') + '</p></div>';
+            if ($('meta')) $('meta').textContent = 'Kalshi · 0 games';
+            if (boxP) boxP.innerHTML = '';
+            if (boxK) boxK.innerHTML = '';
+          } else {
           games = filterGamesClient(dedupeGameCards(list));
           games.forEach(function (g) { g.venue = 'kalshi'; g.source = 'kalshi'; });
           renderGameList(box, games);
@@ -10051,6 +10091,7 @@ async function loadGames() {
             });
             $('meta').textContent = 'KALSHI · ' + games.length + ' markets · Elite ' + eN + ' · Good ' + gN + ' · Pass ' + pN + hint;
           }
+          } // end kalshi else has-games
         } else if (sport === 'all') {
           list = await fetchPolyAllLeagues(mt, rankF, minEv, minEdge, minSc, strict, allowMkt);
           games = filterGamesClient(dedupeGameCards(list));

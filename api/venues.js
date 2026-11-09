@@ -1,13 +1,13 @@
 /**
- * Kalshi + Novig board under one Hobby-safe function.
- * Rewrites: /api/kalshi-games → venues?v=kalshi, /api/novig-games → venues?v=novig
+ * Kalshi + Novig boards (Hobby-safe single function).
+ * Prefer client calls: /api/venues?v=kalshi|novig&league=...&marketType=...
  */
 'use strict';
 
 function which(req) {
   const q = req.query || {};
-  if (q.v) return String(q.v).toLowerCase();
-  if (q.venue) return String(q.venue).toLowerCase();
+  const v = String(q.v || q.venue || '').toLowerCase();
+  if (v === 'novig' || v === 'kalshi') return v;
   const u = String(req.url || '').toLowerCase();
   if (u.indexOf('novig') >= 0) return 'novig';
   if (u.indexOf('kalshi') >= 0) return 'kalshi';
@@ -22,9 +22,17 @@ module.exports = async function handler(req, res) {
 
   const v = which(req);
   try {
-    if (v === 'novig') return require('../lib/routes/novig-games')(req, res);
+    if (v === 'novig') {
+      return require('../lib/routes/novig-games')(req, res);
+    }
     return require('../lib/routes/kalshi-games')(req, res);
   } catch (e) {
-    return res.status(500).json({ ok: false, error: String(e.message || e), venue: v });
+    return res.status(200).json({
+      ok: false,
+      venue: v,
+      error: String(e.message || e),
+      games: [],
+      summary: { total: 0, elite: 0, good: 0, live: 0, upcoming: 0 },
+    });
   }
 };
