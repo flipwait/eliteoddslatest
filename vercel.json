@@ -3,18 +3,15 @@
   "outputDirectory": "public",
   "functions": {
     "api/**/*.js": {
-      "maxDuration": 30,
-      "memory": 1024
+      "maxDuration": 30
     }
   },
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
-      ]
-    }
+  "rewrites": [
+    { "source": "/api/discord", "destination": "/api/misc?action=discord" },
+    { "source": "/api/combo", "destination": "/api/misc?action=combo" },
+    { "source": "/api/feed", "destination": "/api/misc?action=feed" },
+    { "source": "/api/placed", "destination": "/api/misc?action=placed" },
+    { "source": "/api/settle-ml", "destination": "/api/misc?action=settle-ml" },
+    { "source": "/api/tools", "destination": "/api/misc?action=tools" }
   ]
 }
