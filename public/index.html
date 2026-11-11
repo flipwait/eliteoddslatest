@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.12.0</title>
+  <title>EliteOdds Board v3.12.2</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -2844,6 +2844,101 @@
       .eo-board-body { grid-template-columns: 1fr !important; }
     }
 
+  
+    /* ===== FIX: Board product always visible (mockup layout) ===== */
+    body.eo-board-product.layout-board #board-shell {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      position: relative !important;
+      z-index: 5 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-height: calc(100vh - 20px) !important;
+      background: #0a0c12 !important;
+    }
+    body.eo-board-product #panel-scanner {
+      display: block !important;
+    }
+    body.eo-board-product.layout-board #games,
+    body.eo-board-product.layout-board #games-dual {
+      display: none !important;
+    }
+    /* Desk sidebar off by default so it doesn't steal the screen */
+    body.eo-board-product .eo-desk {
+      display: none !important;
+    }
+    body.eo-board-product.desk-open .eo-desk {
+      display: block !important;
+      position: fixed;
+      right: 0; top: 0;
+      height: 100vh;
+      z-index: 40;
+      border-left: 1px solid rgba(30,41,59,0.95);
+      box-shadow: -8px 0 24px rgba(0,0,0,0.4);
+    }
+    /* Hide legacy center filter chrome on board product — Board has its own filters */
+    body.eo-board-product .eo-filters,
+    body.eo-board-product .eo-center > .hidden.md\\:flex {
+      display: none !important;
+    }
+    body.eo-board-product .eo-center {
+      padding: 0 !important;
+      max-width: 100% !important;
+    }
+    body.eo-board-product .eo-main-wrap {
+      display: block !important;
+      width: 100% !important;
+    }
+    /* Hide left rail — mockup is full-bleed board */
+    body.eo-board-product .eo-rail {
+      display: none !important;
+    }
+    body.eo-board-product header.eo-top {
+      display: none !important;
+    }
+    body.eo-board-product #scanner-toolbar {
+      display: none !important;
+    }
+    body.eo-board-product #auto-pm-bar,
+    body.eo-board-product #live-focus-bar {
+      display: none !important;
+    }
+    /* Ensure dash header text is visible */
+    body.eo-board-product .dash-top,
+    body.eo-board-product .dash-filters {
+      display: flex !important;
+      background: #0a0c12 !important;
+      color: #e2e8f0 !important;
+    }
+    body.eo-board-product .dash-top {
+      display: grid !important;
+      grid-template-columns: 1fr auto 1fr;
+    }
+    body.eo-board-product .eo-board-body {
+      display: grid !important;
+      grid-template-columns: 1fr minmax(300px, 380px) !important;
+      min-height: calc(100vh - 140px) !important;
+      background: #0a0c12 !important;
+    }
+    body.eo-board-product .eo-board-table {
+      width: 100% !important;
+      color: #e2e8f0 !important;
+    }
+    body.eo-board-product .eo-board-table th {
+      color: #64748b !important;
+      background: #0c1018 !important;
+    }
+    body.eo-board-product .eo-board-table td {
+      color: #d1d9e6 !important;
+    }
+    @media (max-width: 959px) {
+      body.eo-board-product .eo-board-body {
+        grid-template-columns: 1fr !important;
+      }
+      body.eo-board-product .eo-rail { display: none !important; }
+    }
+
   </style>
 </head>
 <body class="v3 layout-board eo-board-product">
@@ -4444,8 +4539,17 @@
   };
 
   
-  var APP_VERSION = '3.12.1';
+  var APP_VERSION = '3.12.2';
   var APP_CHANGELOG = [
+    {
+      version: '3.12.2',
+      title: 'Board mockup forced as main view',
+      notes: [
+        'Fixed empty black screen: Board shell forced visible full-width.',
+        'Desk sidebar hidden by default (View Full Desk opens it).',
+        'Auto-scan on load so table is not blank.'
+      ]
+    },
     {
       version: '3.12.1',
       title: 'Edge display toggle (EV% vs pp), remove cap',
@@ -10283,6 +10387,10 @@ function kalQuery(mt, strict, allowMkt) {
   
   /* Dashboard filter bridges (mockup chrome → existing scan state) */
   document.addEventListener('click', function (ev) {
+    if (ev.target && (ev.target.classList && ev.target.classList.contains('eo-open-desk') || (ev.target.closest && ev.target.closest('.eo-open-desk')))) {
+      document.body.classList.toggle('desk-open');
+      return;
+    }
     var vbtn = ev.target && ev.target.closest && ev.target.closest('.dash-venue[data-sc-venue]');
     if (vbtn) {
       var v = vbtn.getAttribute('data-sc-venue');
@@ -14630,6 +14738,34 @@ function renderSlate() {
         }
       }
     });
+  })();
+
+
+  /* Boot Board product UI */
+  (function bootBoardProduct() {
+    try {
+      document.body.classList.add('v3', 'layout-board', 'eo-board-product');
+      document.body.classList.remove('desk-open');
+      var shell = document.getElementById('board-shell');
+      if (shell) {
+        shell.style.display = 'block';
+        shell.style.visibility = 'visible';
+      }
+      var panel = document.getElementById('panel-scanner');
+      if (panel) panel.classList.remove('hidden');
+      // Hide other panels
+      ['panel-slate', 'panel-journal', 'panel-settings', 'panel-lineshop'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+    } catch (e) {}
+    // Auto-scan shortly after load so Board is not empty black
+    setTimeout(function () {
+      try {
+        if (typeof applyLayoutMode === 'function') applyLayoutMode();
+        if (typeof loadGames === 'function') loadGames();
+      } catch (e2) {}
+    }, 400);
   })();
 
 </script>
