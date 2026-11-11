@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds v3.10.0</title>
+  <title>EliteOdds v3.12.0</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -2481,14 +2481,377 @@
     body.layout-board #board-shell { display: block !important; }
     body:not(.layout-board) #board-shell { display: none !important; }
 
+  
+    /* =========================================================
+       EliteOdds BOARD PRODUCT — desktop staple (mockup #2)
+       Not a theme: this IS the app chrome on desktop
+       ========================================================= */
+    body.eo-board-product {
+      background: #070b12 !important;
+      color: #d1d9e6;
+    }
+    body.eo-board-product.layout-board #games,
+    body.eo-board-product.layout-board #games-dual {
+      display: none !important;
+    }
+    body.eo-board-product #board-shell {
+      display: block !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
+      border: none !important;
+      min-height: calc(100vh - 120px);
+      box-shadow: none !important;
+      background: #0a0e18 !important;
+    }
+    body.eo-board-product .eo-rail {
+      background: #080c14 !important;
+      border-right: 1px solid rgba(30,42,61,0.95) !important;
+      width: 168px;
+    }
+    body.eo-board-product .eo-logo {
+      letter-spacing: -0.02em;
+    }
+    body.eo-board-product .eo-logo span { color: #a78bfa; }
+    body.eo-board-product .eo-top {
+      background: #0a0e18 !important;
+      border-bottom: 1px solid rgba(30,42,61,0.95) !important;
+      padding: 0.55rem 1rem !important;
+    }
+    body.eo-board-product #scanner-toolbar {
+      background: #0a0e18;
+      border-bottom: 1px solid rgba(30,42,61,0.9);
+      padding: 0.65rem 1rem 0.75rem;
+    }
+    body.eo-board-product .sc-title {
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.14em !important;
+      text-transform: uppercase !important;
+      color: #c4b5fd !important;
+    }
+    body.eo-board-product .sc-title em {
+      font-style: normal;
+      color: #4ade80;
+      letter-spacing: 0.1em;
+    }
+    body.eo-board-product .sc-chips .sc-chip {
+      border-radius: 8px !important;
+      font-size: 11px !important;
+      padding: 0.35rem 0.75rem !important;
+      background: transparent;
+      border: 1px solid rgba(40,52,72,0.95);
+      color: #8b9bb4;
+    }
+    body.eo-board-product .sc-chips .sc-chip.on {
+      background: rgba(139,92,246,0.18) !important;
+      border-color: rgba(167,139,250,0.5) !important;
+      color: #ede9fe !important;
+    }
+    body.eo-board-product .sc-chips .sc-chip.kalshi.on {
+      background: rgba(34,197,94,0.15) !important;
+      border-color: rgba(74,222,128,0.4) !important;
+      color: #bbf7d0 !important;
+    }
+    body.eo-board-product .sc-chips .sc-chip.novig.on {
+      background: rgba(34,211,238,0.12) !important;
+      border-color: rgba(34,211,238,0.4) !important;
+      color: #a5f3fc !important;
+    }
+    body.eo-board-product .sc-filters select {
+      background: #0e1524 !important;
+      border: 1px solid rgba(40,52,72,0.95) !important;
+      color: #c5d0e0 !important;
+      border-radius: 8px !important;
+      font-size: 11px !important;
+      padding: 0.4rem 0.55rem !important;
+    }
+    body.eo-board-product .eo-board-head {
+      background: #0c1220 !important;
+      padding: 0.7rem 1.1rem !important;
+    }
+    body.eo-board-product .eo-board-title {
+      font-size: 13px !important;
+      color: #ddd6fe !important;
+      letter-spacing: 0.16em !important;
+    }
+    body.eo-board-product .eo-board-body {
+      grid-template-columns: 1fr minmax(300px, 360px) !important;
+      min-height: calc(100vh - 200px) !important;
+    }
+    body.eo-board-product .eo-board-table thead th {
+      background: #0c1220 !important;
+      font-size: 10px !important;
+      letter-spacing: 0.08em !important;
+      color: #6b7c94 !important;
+      padding: 0.7rem 0.85rem !important;
+    }
+    body.eo-board-product .eo-board-table td {
+      padding: 0.75rem 0.85rem !important;
+      font-size: 12.5px !important;
+    }
+    body.eo-board-product .eo-board-table tbody tr:hover {
+      background: rgba(139,92,246,0.07) !important;
+    }
+    body.eo-board-product .eo-board-table tbody tr.on {
+      background: rgba(139,92,246,0.14) !important;
+      box-shadow: inset 3px 0 0 #a78bfa !important;
+    }
+    body.eo-board-product .eo-board-detail {
+      background: #0b101c !important;
+      padding: 1.1rem 1.15rem !important;
+    }
+    body.eo-board-product .bd-match {
+      font-size: 16px !important;
+      font-weight: 700 !important;
+      color: #f8fafc !important;
+    }
+    body.eo-board-product .v3-side-nav button {
+      border-radius: 8px;
+      margin: 2px 8px;
+      font-size: 12px;
+    }
+    body.eo-board-product .v3-side-nav button.on {
+      background: rgba(139,92,246,0.16) !important;
+      color: #ede9fe !important;
+    }
+    /* Desktop: hide mobile clutter */
+    @media (min-width: 900px) {
+      body.eo-board-product header.eo-top .day-btn,
+      body.eo-board-product header.eo-top .mode-btn {
+        font-size: 10px !important;
+      }
+      body.eo-board-product #scanner-toolbar .sc-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+      }
+    }
+    @media (max-width: 899px) {
+      body.eo-board-product .eo-board-body {
+        grid-template-columns: 1fr !important;
+        min-height: auto !important;
+      }
+      body.eo-board-product .eo-rail { display: none; }
+    }
+
+  
+    /* ===== EliteOdds Board Dashboard (screenshot fidelity) ===== */
+    body.eo-board-product {
+      background: #0a0c12 !important;
+      color: #e2e8f0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif !important;
+    }
+    /* Hide old rail on desktop product board - full width like mockup */
+    @media (min-width: 960px) {
+      body.eo-board-product .eo-rail { display: none !important; }
+      body.eo-board-product header.eo-top { display: none !important; }
+      body.eo-board-product #scanner-toolbar { display: none !important; }
+      body.eo-board-product #auto-pm-bar,
+      body.eo-board-product #live-focus-bar { display: none !important; }
+    }
+    body.eo-board-product #board-shell {
+      display: block !important;
+      margin: 0 !important;
+      border: none !important;
+      border-radius: 0 !important;
+      min-height: 100vh;
+      background: #0a0c12 !important;
+      box-shadow: none !important;
+    }
+    .dash-top {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0.85rem 1.25rem 0.55rem;
+      gap: 1rem;
+    }
+    .dash-brand {
+      display: flex; align-items: center; gap: 0.55rem;
+    }
+    .dash-brand-icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: linear-gradient(135deg, #7c3aed, #a78bfa);
+      display: grid; place-items: center;
+      font-weight: 900; font-size: 14px; color: #fff;
+    }
+    .dash-brand-text { line-height: 1.15; }
+    .dash-brand-text b { display: block; font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
+    .dash-brand-text b span { color: #a78bfa; }
+    .dash-brand-text small {
+      font-size: 8px; letter-spacing: 0.14em; color: #64748b; font-weight: 600;
+    }
+    .dash-center-title {
+      text-align: center;
+      font-size: 13px; font-weight: 700; letter-spacing: 0.18em;
+      color: #c4b5fd; text-transform: uppercase;
+    }
+    .dash-center-title .live {
+      color: #a78bfa; letter-spacing: 0.12em;
+    }
+    .dash-center-title .dot { color: #a78bfa; margin: 0 0.25rem; }
+    .dash-right-meta {
+      text-align: right; font-size: 11px; color: #94a3b8;
+      font-variant-numeric: tabular-nums;
+    }
+    .dash-filters {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+      padding: 0.35rem 1.25rem 0.85rem;
+      border-bottom: 1px solid rgba(30,41,59,0.9);
+    }
+    .dash-venue {
+      border: 1px solid rgba(51,65,85,0.9);
+      background: transparent;
+      color: #94a3b8;
+      font-size: 12px;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .dash-venue.on {
+      background: rgba(124,58,237,0.25);
+      border-color: rgba(167,139,250,0.55);
+      color: #ede9fe;
+      font-weight: 600;
+    }
+    .dash-venue.kal.on {
+      background: rgba(34,197,94,0.15);
+      border-color: rgba(74,222,128,0.4);
+      color: #bbf7d0;
+    }
+    .dash-venue.nv.on {
+      background: rgba(34,211,238,0.12);
+      border-color: rgba(34,211,238,0.4);
+      color: #a5f3fc;
+    }
+    .dash-select {
+      background: #111827;
+      border: 1px solid rgba(51,65,85,0.95);
+      color: #e2e8f0;
+      border-radius: 8px;
+      font-size: 12px;
+      padding: 0.4rem 0.65rem;
+      min-width: 120px;
+    }
+    .dash-select label {
+      display: block; font-size: 9px; color: #64748b; letter-spacing: 0.06em; margin-bottom: 2px;
+    }
+    .dash-count {
+      margin-left: auto;
+      display: flex; align-items: center; gap: 0.75rem;
+      font-size: 11px; color: #94a3b8;
+    }
+    .dash-count .n { color: #e2e8f0; font-weight: 600; }
+    .dash-count .dot-live {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #4ade80; box-shadow: 0 0 8px #4ade80;
+      display: inline-block;
+    }
+    .dash-refresh {
+      border: 1px solid rgba(51,65,85,0.9);
+      background: transparent;
+      color: #a78bfa;
+      font-size: 11px;
+      padding: 0.35rem 0.7rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .eo-board-body {
+      display: grid !important;
+      grid-template-columns: 1fr minmax(320px, 380px) !important;
+      min-height: calc(100vh - 130px) !important;
+    }
+    .eo-board-table-wrap { overflow: auto; max-height: calc(100vh - 130px); }
+    .eo-board-table thead th {
+      background: #0c1018 !important;
+      color: #64748b !important;
+      font-size: 10px !important;
+      letter-spacing: 0.08em !important;
+      padding: 0.65rem 0.7rem !important;
+      border-bottom: 1px solid rgba(30,41,59,0.95) !important;
+    }
+    .eo-board-table td {
+      padding: 0.7rem 0.7rem !important;
+      font-size: 12.5px !important;
+      border-bottom: 1px solid rgba(15,23,42,0.9) !important;
+    }
+    .eo-board-table tbody tr:hover { background: rgba(124,58,237,0.06) !important; }
+    .eo-board-table tbody tr.on {
+      background: rgba(124,58,237,0.12) !important;
+      box-shadow: inset 2px 0 0 #a78bfa !important;
+    }
+    .mu-logo {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 4px;
+      background: rgba(51,65,85,0.6); font-size: 9px; margin-right: 6px;
+      color: #cbd5e1; font-weight: 700; vertical-align: middle;
+    }
+    .eo-board-detail {
+      background: #0b0f18 !important;
+      border-left: 1px solid rgba(30,41,59,0.95) !important;
+      padding: 0 !important;
+      display: flex; flex-direction: column;
+    }
+    .bd-panel-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(30,41,59,0.9);
+    }
+    .bd-panel-head b {
+      font-size: 11px; letter-spacing: 0.1em; color: #c4b5fd;
+      background: rgba(124,58,237,0.2);
+      padding: 0.35rem 0.65rem; border-radius: 6px 6px 0 0;
+    }
+    .bd-panel-body { padding: 0.9rem 1rem 1.1rem; overflow: auto; flex: 1; }
+    .bd-tabs {
+      display: flex; gap: 0.75rem; margin: 0.5rem 0 0.85rem;
+      font-size: 10px; color: #64748b; letter-spacing: 0.04em;
+    }
+    .bd-tabs span.on { color: #c4b5fd; border-bottom: 2px solid #a78bfa; padding-bottom: 2px; }
+    .bd-section-title {
+      font-size: 10px; letter-spacing: 0.1em; color: #64748b;
+      margin: 0.85rem 0 0.45rem; font-weight: 600;
+    }
+    .bd-kpi-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem;
+    }
+    .bd-kpi {
+      background: rgba(15,23,42,0.85);
+      border: 1px solid rgba(30,41,59,0.9);
+      border-radius: 8px; padding: 0.5rem; text-align: center;
+    }
+    .bd-kpi b { display: block; font-size: 15px; color: #4ade80; }
+    .bd-kpi span { font-size: 9px; color: #64748b; letter-spacing: 0.05em; }
+    .bd-insights { font-size: 11px; color: #94a3b8; line-height: 1.45; padding-left: 0; margin: 0; list-style: none; }
+    .bd-insights li { margin: 0.3rem 0; padding-left: 0.75rem; position: relative; }
+    .bd-insights li::before {
+      content: ''; position: absolute; left: 0; top: 0.45rem;
+      width: 5px; height: 5px; border-radius: 50%; background: #a78bfa;
+    }
+    .bd-mkt-table { width: 100%; font-size: 11px; border-collapse: collapse; }
+    .bd-mkt-table th {
+      text-align: left; color: #64748b; font-size: 9px; letter-spacing: 0.06em;
+      padding: 0.25rem 0.2rem; border-bottom: 1px solid rgba(30,41,59,0.8);
+    }
+    .bd-mkt-table td { padding: 0.35rem 0.2rem; color: #cbd5e1; border-bottom: 1px solid rgba(15,23,42,0.8); }
+    .hide-old-board-head .eo-board-head { display: none !important; }
+    @media (max-width: 959px) {
+      body.eo-board-product .eo-rail { display: flex !important; }
+      body.eo-board-product header.eo-top { display: flex !important; }
+      body.eo-board-product #scanner-toolbar { display: block !important; }
+      .dash-top, .dash-filters { padding-left: 0.75rem; padding-right: 0.75rem; }
+      .eo-board-body { grid-template-columns: 1fr !important; }
+    }
+
   </style>
 </head>
-<body class="v3">
+<body class="v3 layout-board eo-board-product">
   <div class="flex min-h-screen">
     <!-- Icon sport rail -->
     <aside class="eo-rail" id="eo-rail">
       <div class="eo-logo">Elite<span>Odds</span>
-        <small>v3 · scanner cards</small>
+        <small>BOARD · LIVE</small>
       </div>
       <nav class="v3-side-nav" id="v3-side-nav">
         <button type="button" class="on" data-v3nav="scanner" data-tab="scanner"><span>◎</span> Scanner</button>
@@ -2505,7 +2868,7 @@
 
     <div class="flex-1 flex flex-col min-w-0">
       <header class="eo-top">
-        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.10.0</span></div>
+        <div class="eo-logo">Elite<span>Odds</span> <span id="app-version" class="text-[10px] text-bb-muted font-mono font-normal align-middle">v3.12.1</span></div>
         <div class="flex gap-1 items-center ml-2" id="mode-row">
           <button type="button" data-mode="pregame" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Pregame</button>
           <button type="button" data-mode="live" class="mode-btn px-3 py-1.5 rounded-full border border-bb-border text-[11px] text-bb-muted">Live</button>
@@ -2689,7 +3052,7 @@
                 <option value="bucket_tt">Team totals (FG · 1H · 2H)</option>
                 <option value="bucket_special">Special (NRFI/YRFI · Maps)</option>
               </select>
-              <select id="sc-layout" title="Layout">
+              <select id="sc-layout" title="Layout" class="sc-layout-hidden" style="display:none">
                 <option value="board" selected>Board</option>
                 <option value="classic">Classic cards</option>
                 <option value="hub">By game</option>
@@ -2701,10 +3064,52 @@
             </div>
           </div>
 
-          <div id="board-shell" class="eo-board" style="display:none">
-            <div class="eo-board-head">
-              <div class="eo-board-title">ELITEODDS BOARD <span class="eo-board-live">● LIVE</span></div>
-              <div class="eo-board-meta" id="board-meta">—</div>
+          <div id="board-shell" class="eo-board hide-old-board-head" style="display:block">
+            <div class="dash-top">
+              <div class="dash-brand">
+                <div class="dash-brand-icon">E</div>
+                <div class="dash-brand-text">
+                  <b>Elite<span>Odds</span></b>
+                  <small>PREMIUM PREDICTION MARKETS</small>
+                </div>
+              </div>
+              <div class="dash-center-title">ELITEODDS BOARD <span class="dot">·</span> <span class="live">LIVE</span></div>
+              <div class="dash-right-meta" id="board-meta">—</div>
+            </div>
+            <div class="dash-filters">
+              <button type="button" class="dash-venue on" data-sc-venue="polymarket">Polymarket</button>
+              <button type="button" class="dash-venue kal" data-sc-venue="kalshi">Kalshi</button>
+              <button type="button" class="dash-venue nv" data-sc-venue="novig">Novig</button>
+              <div>
+                <label style="display:block;font-size:9px;color:#64748b;letter-spacing:0.06em">SPORT</label>
+                <select class="dash-select" id="dash-sport">
+                  <option value="all">All Sports</option>
+                  <option value="nba">NBA</option>
+                  <option value="nfl">NFL</option>
+                  <option value="mlb">MLB</option>
+                  <option value="nhl">NHL</option>
+                  <option value="cfb">CFB</option>
+                  <option value="cbb">CBB</option>
+                  <option value="wnba">WNBA</option>
+                  <option value="soccer">Soccer</option>
+                  <option value="ufc">UFC</option>
+                  <option value="esports">Esports</option>
+                </select>
+              </div>
+              <div>
+                <label style="display:block;font-size:9px;color:#64748b;letter-spacing:0.06em">RANK</label>
+                <select class="dash-select" id="dash-rank">
+                  <option value="good">Good+Elite</option>
+                  <option value="good_potd">Good+Elite+POTD</option>
+                  <option value="elite">Elite only</option>
+                  <option value="all">All ranks</option>
+                </select>
+              </div>
+              <div class="dash-count">
+                <span><span class="n" id="dash-mkt-count">0</span> MARKETS</span>
+                <span class="dot-live" title="live"></span>
+                <button type="button" class="dash-refresh" id="dash-refresh">↻ AUTO-REFRESH</button>
+              </div>
             </div>
             <div class="eo-board-body">
               <div class="eo-board-table-wrap">
@@ -2726,7 +3131,10 @@
                 </table>
               </div>
               <aside class="eo-board-detail" id="board-detail">
-                <div class="bd-empty">Select a row for game detail</div>
+                <div class="bd-panel-head"><b>GAME DETAIL</b><span style="color:#64748b;cursor:pointer;font-size:14px" id="bd-close">×</span></div>
+                <div class="bd-panel-body">
+                  <div class="bd-empty">Select a row for game detail</div>
+                </div>
               </aside>
             </div>
           </div>
@@ -3626,13 +4034,13 @@
                   <input type="checkbox" id="edge-net-fees" />
                   Show net edge after fees (~2pp haircut)
                 </label>
-                <label class="flex items-center gap-2 text-xs">
-                  <input type="checkbox" id="edge-cap" checked />
-                  Cap displayed edge at
-                  <input type="number" id="edge-cap-pp" value="12" min="5" max="30" step="1" class="w-14 bg-bb-bg border border-bb-border rounded px-1.5 py-0.5 text-xs" />
-                  pp
+                <label class="block text-xs mt-2">Edge display
+                  <select id="edge-mode" class="w-full mt-0.5 rounded-lg border border-bb-border bg-bb-bg px-2 py-1.5 text-white text-xs">
+                    <option value="ev">EV % of stake (recommended) — e.g. +13%</option>
+                    <option value="pp">Probability gap (points) — e.g. +7.2pp</option>
+                  </select>
                 </label>
-                <p class="text-[10px] text-bb-muted">High raw edges still exist under the hood; the card just won’t show “+40pp” style noise when capped.</p>
+                <p class="text-[10px] text-bb-muted mt-1">EV% = (model ÷ market) − 1. Gap pp = model% − market%. No display cap.</p>
               </div>
             </details>
 
@@ -3645,7 +4053,7 @@
               <h3 class="text-sm font-semibold text-white">About &amp; release notes</h3>
               <p class="text-[11px] text-bb-muted mt-0.5">Product version and a short professional log of what changed.</p>
             </div>
-            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.10.0</span>
+            <span id="settings-version" class="text-xs font-mono px-2 py-1 rounded-lg border border-violet-400/40 text-violet-200 bg-violet-500/10">v3.12.1</span>
           </div>
           <div class="text-[11px] text-bb-muted space-y-1">
             <p><span class="text-white font-medium">EliteOdds</span> · dual-venue scanner (Polymarket + Kalshi) with form-aware ranks, Pick of the Day, Live Edge, and paper tracking.</p>
@@ -4036,10 +4444,28 @@
   };
 
   
-  var APP_VERSION = '3.10.0';
+  var APP_VERSION = '3.12.1';
   var APP_CHANGELOG = [
     {
-      version: '3.10.0',
+      version: '3.12.1',
+      title: 'Edge display toggle (EV% vs pp), remove cap',
+      notes: [
+        'Settings → Edge display: EV % of stake (default) or probability gap (pp).',
+        'Removed edge pp cap — full true edge shown.',
+        'Board EDGE column uses the same toggle.'
+      ]
+    },
+    {
+      version: '3.12.0',
+      title: 'Board is the product (mockup #2)',
+      notes: [
+        'Desktop staple is the terminal Board — not a theme or optional cover.',
+        'Full-width table + detail drawer, mockup-style chrome and rank pills.',
+        'Classic cards hidden by default; Board is the home experience.'
+      ]
+    },
+    {
+      version: '3.12.0',
       title: 'Board view (mockup #2) + richer Novig',
       notes: [
         'Scanner Board layout: terminal table TIME·MATCHUP·MARKET·PICK·MKT%·MODEL%·EDGE·RANK·VENUE + detail drawer.',
@@ -6089,21 +6515,19 @@
   }
 
 
-  function edgeDisplayOpts() {
+    function edgeDisplayOpts() {
     var st = settings();
-    var req = false, net = false, capOn = true, cap = 12;
+    var req = false, net = false, mode = 'ev';
     try {
       if ($('edge-require-form')) req = !!$('edge-require-form').checked;
       else req = !!st.edgeRequireForm;
       if ($('edge-net-fees')) net = !!$('edge-net-fees').checked;
       else net = !!st.edgeNetFees;
-      if ($('edge-cap')) capOn = !!$('edge-cap').checked;
-      else capOn = st.edgeCapOn !== false;
-      if ($('edge-cap-pp') && $('edge-cap-pp').value !== '') cap = Number($('edge-cap-pp').value);
-      else if (st.edgeCapPp != null) cap = Number(st.edgeCapPp);
+      if ($('edge-mode') && $('edge-mode').value) mode = String($('edge-mode').value);
+      else if (st.edgeMode) mode = String(st.edgeMode);
     } catch (e) {}
-    if (!(cap >= 5 && cap <= 40)) cap = 12;
-    return { requireForm: req, netFees: net, capOn: capOn, cap: cap };
+    if (mode !== 'pp' && mode !== 'ev') mode = 'ev';
+    return { requireForm: req, netFees: net, mode: mode, capOn: false, cap: 999 };
   }
 
   function resolveEdgeForCard(g) {
@@ -6137,9 +6561,9 @@
       var st = settings();
       st.edgeRequireForm = !!( $('edge-require-form') && $('edge-require-form').checked );
       st.edgeNetFees = !!( $('edge-net-fees') && $('edge-net-fees').checked );
-      st.edgeCapOn = !!( $('edge-cap') && $('edge-cap').checked );
-      st.edgeCapPp = ($('edge-cap-pp') && $('edge-cap-pp').value) ? Number($('edge-cap-pp').value) : 12;
-      try { persistEdgeDisplaySettings(); } catch (ePe) {}
+      st.edgeMode = ($('edge-mode') && $('edge-mode').value) ? String($('edge-mode').value) : 'ev';
+      delete st.edgeCapOn;
+      delete st.edgeCapPp;
       localStorage.setItem('bb_settings', JSON.stringify(st));
     } catch (e) {}
   }
@@ -9856,6 +10280,38 @@ function kalQuery(mt, strict, allowMkt) {
   }
   
   /* ===== Board layout (mockup #2) ===== */
+  
+  /* Dashboard filter bridges (mockup chrome → existing scan state) */
+  document.addEventListener('click', function (ev) {
+    var vbtn = ev.target && ev.target.closest && ev.target.closest('.dash-venue[data-sc-venue]');
+    if (vbtn) {
+      var v = vbtn.getAttribute('data-sc-venue');
+      venue = v;
+      document.querySelectorAll('.dash-venue').forEach(function (b) {
+        b.classList.toggle('on', b.getAttribute('data-sc-venue') === v);
+      });
+      document.querySelectorAll('#scanner-toolbar .sc-chip[data-sc-venue]').forEach(function (c) {
+        c.classList.toggle('on', c.getAttribute('data-sc-venue') === v);
+      });
+      if (typeof loadGames === 'function') loadGames();
+      return;
+    }
+    if (ev.target && ev.target.id === 'dash-refresh') {
+      if (typeof loadGames === 'function') loadGames();
+    }
+  });
+  document.addEventListener('change', function (ev) {
+    if (ev.target && ev.target.id === 'dash-sport') {
+      sport = ev.target.value || 'all';
+      if ($('sc-sport')) $('sc-sport').value = sport;
+      if (typeof loadGames === 'function') loadGames();
+    }
+    if (ev.target && ev.target.id === 'dash-rank') {
+      if ($('sc-rank')) $('sc-rank').value = ev.target.value;
+      if (typeof loadGames === 'function') loadGames();
+    }
+  });
+
   window.__lastBoardGames = [];
   function escapeHtml(str) {
     return String(str == null ? '' : str)
@@ -9866,17 +10322,25 @@ function kalQuery(mt, strict, allowMkt) {
   window.__boardSelectedId = null;
 
   function currentLayout() {
+    // Product staple = Board (mockup #2). Classic only if user forced via hidden select.
     try {
       var el = $('sc-layout');
-      return (el && el.value) || 'board';
+      if (el && el.value === 'classic') return 'classic';
+      if (el && el.value === 'hub') return 'hub';
+      return 'board';
     } catch (e) { return 'board'; }
   }
 
   function applyLayoutMode() {
     var lay = currentLayout();
+    document.body.classList.add('eo-board-product');
     document.body.classList.toggle('layout-board', lay === 'board');
     document.body.classList.toggle('layout-hub', lay === 'hub');
-    document.body.classList.toggle('layout-classic', lay === 'classic' || !lay);
+    document.body.classList.toggle('layout-classic', lay === 'classic');
+    if (lay === 'board') {
+      var shell = document.getElementById('board-shell');
+      if (shell) shell.style.display = 'block';
+    }
   }
 
   function boardTimeCell(g) {
@@ -9893,8 +10357,9 @@ function kalQuery(mt, strict, allowMkt) {
   function boardMatchup(g) {
     var title = g.eventTitle || g.title || ((g.away || '') + ' @ ' + (g.home || '')) || '—';
     title = String(title).replace(/\s+vs\.?\s+/i, ' vs ');
-    var lg = String(g.league || g.sport || '').toUpperCase();
-    return '<div class="mu"><b>' + escapeHtml(title) + '</b><span class="mu-sub">' + escapeHtml(lg) + (g.live ? ' · LIVE' : '') + '</span></div>';
+    var lg = String(g.league || g.sport || '').toUpperCase() || 'SP';
+    var badge = '<span class="mu-logo">' + escapeHtml(lg.slice(0, 3)) + '</span>';
+    return '<div class="mu">' + badge + '<b>' + escapeHtml(title) + '</b><span class="mu-sub">' + escapeHtml(lg) + (g.live ? ' · LIVE' : '') + '</span></div>';
   }
 
   function boardMarket(g) {
@@ -10005,7 +10470,10 @@ function kalQuery(mt, strict, allowMkt) {
         if (/elite|potd|super/.test(r)) eN++;
         else if (/good/.test(r)) gN++;
       });
-      meta.textContent = list.length + ' markets · Elite ' + eN + ' · Good ' + gN;
+      var clock = '';
+      try { clock = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' ET · '; } catch (eC) {}
+      meta.textContent = clock + list.length + ' MARKETS';
+      if ($('dash-mkt-count')) $('dash-mkt-count').textContent = String(list.length);
     }
     // re-select
     if (window.__boardSelectedId) {
@@ -10021,28 +10489,38 @@ function kalQuery(mt, strict, allowMkt) {
     var pick = boardPick(g);
     var edge = boardEdge(g);
     var trade = (typeof tradeHrefFor === 'function') ? tradeHrefFor(g) : (g.marketUrl || g.url || '#');
-    el.innerHTML =
-      '<div class="bd-head">' +
-        '<div class="bd-match">' + escapeHtml(title) + '</div>' +
-        '<div class="bd-sub">' + escapeHtml(String(g.league || '').toUpperCase()) +
-          (g.live ? ' · <span class="bd-live">LIVE</span>' : '') +
-          (g.startTime ? ' · ' + escapeHtml(String(g.startTime).replace('T', ' ').slice(0, 16)) : '') +
-        '</div>' +
+    var insights = [];
+    if (g.formNote) insights.push(escapeHtml(String(g.formNote)));
+    if (g.modelNote) insights.push(escapeHtml(String(g.modelNote)));
+    if (g.homeL10 || g.awayL10) insights.push('Form L10 home/away available on card model.');
+    if (!insights.length) insights.push('Model pick: ' + escapeHtml(pick) + ' at edge ' + edge.t);
+    if (g.hasForm) insights.push('Form-backed signal (not market-only).');
+    else insights.push('Thin form — treat edge cautiously.');
+    var body = el.querySelector('.bd-panel-body') || el;
+    body.innerHTML =
+      '<div class="bd-match">' + escapeHtml(title) +
+        (g.live ? ' <span class="bd-live">· LIVE</span>' : '') + '</div>' +
+      '<div class="bd-sub">' + escapeHtml(String(g.league || '').toUpperCase()) +
+        (g.startTime ? ' · ' + escapeHtml(String(g.startTime).replace('T', ' ').slice(0, 16)) : '') + '</div>' +
+      '<div class="bd-tabs"><span class="on">OVERVIEW</span><span>MARKETS</span><span>FORM</span></div>' +
+      '<div class="bd-section-title">TOP EDGE SUMMARY</div>' +
+      '<div class="bd-kpi-row">' +
+        '<div class="bd-kpi"><b class="' + edge.c + '">' + edge.t + '</b><span>MODEL EDGE</span></div>' +
+        '<div class="bd-kpi"><b>' + boardPct(mktPctOf(g)) + '</b><span>MKT</span></div>' +
+        '<div class="bd-kpi"><b>' + boardPct(modelPctOf(g)) + '</b><span>MODEL</span></div>' +
       '</div>' +
-      '<div class="bd-pick"><b>MODEL PICK</b> · ' + escapeHtml(pick) +
-        ' · Edge <span class="' + edge.c + '">' + edge.t + '</span></div>' +
-      '<div class="bd-stats">' +
-        '<div class="bd-stat"><b>' + boardPct(mktPctOf(g)) + '</b><span>MKT</span></div>' +
-        '<div class="bd-stat"><b>' + boardPct(modelPctOf(g)) + '</b><span>MODEL</span></div>' +
-        '<div class="bd-stat"><b>' + escapeHtml(String(g.rank || '—')) + '</b><span>RANK</span></div>' +
-      '</div>' +
+      '<div class="bd-section-title">KEY MODEL INSIGHTS</div>' +
+      '<ul class="bd-insights">' + insights.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>' +
+      '<div class="bd-section-title">PICK</div>' +
+      '<div class="bd-pick"><b>' + escapeHtml(String(g.rank || '—')) + '</b> · ' + escapeHtml(pick) +
+        ' · ' + escapeHtml(boardMarket(g)) + '</div>' +
       '<div class="bd-actions">' +
         '<a class="pri" href="' + escapeHtml(trade) + '" target="_blank" rel="noopener">Trade</a>' +
         '<button type="button" data-bd-act="combo">+ Combo</button>' +
         '<button type="button" data-bd-act="log">Log</button>' +
         '<button type="button" data-bd-act="share">Share</button>' +
       '</div>';
-    el.setAttribute('data-gid', g.id || '');
+    el.setAttribute('data-gid', g.id || g.slug || '');
   }
 
   document.addEventListener('click', function (ev) {
@@ -13193,14 +13671,18 @@ function renderSlate() {
       var st = settings();
       if ($('edge-require-form')) $('edge-require-form').checked = !!st.edgeRequireForm;
       if ($('edge-net-fees')) $('edge-net-fees').checked = !!st.edgeNetFees;
-      if ($('edge-cap')) $('edge-cap').checked = st.edgeCapOn !== false;
-      if ($('edge-cap-pp') && st.edgeCapPp != null) $('edge-cap-pp').value = String(st.edgeCapPp);
+      if ($('edge-mode')) $('edge-mode').value = (st.edgeMode === 'pp') ? 'pp' : 'ev';
     } catch (e) {}
   }
   document.addEventListener('change', function (ev) {
     if (!ev.target) return;
+    if (ev.target.id === 'edge-mode' || ev.target.id === 'edge-require-form' || ev.target.id === 'edge-net-fees') {
+      try { persistEdgeDisplaySettings(); } catch (e1) {}
+      if (typeof loadGames === 'function') try { loadGames(); } catch (e2) {}
+    }
+
     var id = ev.target.id || '';
-    if (id === 'edge-require-form' || id === 'edge-net-fees' || id === 'edge-cap' || id === 'edge-cap-pp') {
+    if (id === 'edge-require-form' || id === 'edge-net-fees' || id === 'edge-mode') {
       persistEdgeDisplaySettings();
       try { loadGames(); } catch (e) {}
     }
