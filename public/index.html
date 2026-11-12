@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds Board v3.12.5</title>
+  <title>EliteOdds Board v3.12.6</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -3072,7 +3072,7 @@
     }
 
   
-    /* v3.12.5 board polish */
+    /* v3.12.6 board polish */
     body.eo-board-product #board-shell {
       border-left: 3px solid #a78bfa !important;
       box-shadow: inset 1px 0 0 rgba(167,139,250,0.25) !important;
@@ -3131,6 +3131,50 @@
       overflow: auto; padding: 1rem;
     }
     body.eo-board-product.show-settings #board-shell { display: none !important; }
+  
+    .sport-pills { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .sp-pill {
+      border: 1px solid rgba(51,65,85,0.95); background: transparent; color: #94a3b8;
+      font-size: 11px; padding: 0.35rem 0.7rem; border-radius: 999px; cursor: pointer;
+    }
+    .sp-pill.on {
+      background: rgba(124,58,237,0.28); border-color: rgba(167,139,250,0.55);
+      color: #ede9fe; font-weight: 600;
+    }
+    .settings-shell { max-width: 720px; margin: 0 auto; padding: 1rem 1rem 3rem; }
+    .settings-top {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+      margin-bottom: 0.75rem; position: sticky; top: 0; z-index: 2;
+      background: rgba(7,11,18,0.96); padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(30,41,59,0.9);
+    }
+    .settings-top h1 { font-size: 16px; font-weight: 700; color: #e2e8f0; margin: 0; }
+    .settings-back, .set-save-btn, .dash-settings-btn {
+      border: 1px solid rgba(167,139,250,0.45); background: rgba(124,58,237,0.15);
+      color: #ddd6fe; font-size: 12px; padding: 0.45rem 0.9rem; border-radius: 8px; cursor: pointer;
+    }
+    .set-save-btn {
+      border-color: rgba(34,197,94,0.45); background: rgba(34,197,94,0.12); color: #86efac;
+    }
+    .set-box {
+      border: 1px solid rgba(30,41,59,0.95); border-radius: 12px;
+      background: rgba(12,18,28,0.9); margin-bottom: 0.75rem; overflow: hidden;
+    }
+    .set-box > summary {
+      padding: 0.75rem 1rem; font-weight: 600; font-size: 13px; color: #e2e8f0; cursor: pointer;
+    }
+    .set-body { padding: 0 1rem 1rem; }
+    .set-save-row {
+      display: flex; justify-content: flex-end; margin-top: 0.75rem; padding-top: 0.65rem;
+      border-top: 1px solid rgba(30,41,59,0.8);
+    }
+    #panel-stats-board { display: none; }
+    body.eo-board-product.show-stats #panel-stats-board {
+      display: block !important; position: fixed; inset: 0; z-index: 60;
+      background: rgba(7,11,18,0.96); overflow: auto;
+    }
+    .stats-shell { max-width: 900px; margin: 0 auto; padding: 1rem; }
+
   </style>
 </head>
 <body class="v3 layout-board eo-board-product">
@@ -3368,22 +3412,23 @@
               <button type="button" class="dash-venue kal" data-sc-venue="kalshi">Kalshi</button>
               <button type="button" class="dash-venue nv" data-sc-venue="novig">Novig</button>
               <button type="button" class="dash-venue cmp" data-sc-venue="compare">Compare</button>
-              <div>
-                <label style="display:block;font-size:9px;color:#64748b;letter-spacing:0.06em">SPORT (multi)</label>
-                <select class="dash-select dash-multi" id="dash-sport" multiple size="4" title="Cmd/Ctrl-click for multiple">
-                  <option value="all" selected>All Sports</option>
-                  <option value="nba">NBA</option>
-                  <option value="nfl">NFL</option>
-                  <option value="mlb">MLB</option>
-                  <option value="nhl">NHL</option>
-                  <option value="cfb">CFB</option>
-                  <option value="cbb">CBB</option>
-                  <option value="wnba">WNBA</option>
-                  <option value="soccer">Soccer</option>
-                  <option value="ufc">UFC</option>
-                  <option value="tennis">Tennis</option>
-                  <option value="esports">Esports</option>
-                </select>
+              <div class="dash-sport-wrap" style="flex:1 1 100%">
+                <label style="display:block;font-size:9px;color:#64748b;letter-spacing:0.06em;margin-bottom:4px">SPORT</label>
+                <div class="sport-pills" id="sport-pills">
+                  <button type="button" class="sp-pill on" data-sport="all">All</button>
+                  <button type="button" class="sp-pill" data-sport="nba">NBA</button>
+                  <button type="button" class="sp-pill" data-sport="nfl">NFL</button>
+                  <button type="button" class="sp-pill" data-sport="mlb">MLB</button>
+                  <button type="button" class="sp-pill" data-sport="nhl">NHL</button>
+                  <button type="button" class="sp-pill" data-sport="cfb">CFB</button>
+                  <button type="button" class="sp-pill" data-sport="cbb">CBB</button>
+                  <button type="button" class="sp-pill" data-sport="wnba">WNBA</button>
+                  <button type="button" class="sp-pill" data-sport="soccer">Soccer</button>
+                  <button type="button" class="sp-pill" data-sport="ufc">UFC</button>
+                  <button type="button" class="sp-pill" data-sport="tennis">Tennis</button>
+                  <button type="button" class="sp-pill" data-sport="esports">Esports</button>
+                </div>
+                <select id="dash-sport" class="hidden" aria-hidden="true"><option value="all" selected>all</option></select>
               </div>
               <div>
                 <label style="display:block;font-size:9px;color:#64748b;letter-spacing:0.06em">RANK</label>
@@ -3395,8 +3440,8 @@
                 </select>
               </div>
               <div>
-                <label style="display:block;font-size:9px;color:#64748b;letter-spacing:0.06em">MARKET (multi)</label>
-                <select class="dash-select dash-multi" id="dash-market" multiple size="4" title="Cmd/Ctrl-click for multiple">
+                <label style="display:block;font-size:9px;color:#64748b;letter-spacing:0.06em">MARKET</label>
+                <select class="dash-select" id="dash-market">
                   <option value="all" selected>All markets</option>
                   <option value="bucket_ml">Moneyline family</option>
                   <option value="bucket_spread">Spreads</option>
@@ -3407,6 +3452,8 @@
                 </select>
               </div>
               <button type="button" class="dash-settings-btn" id="dash-settings">⚙ Settings</button>
+              <button type="button" class="dash-settings-btn" id="dash-stats" style="border-color:rgba(34,197,94,0.4);color:#bbf7d0">Stats</button>
+              
               <div class="dash-count">
                 <span><span class="n" id="dash-mkt-count">0</span> MARKETS</span>
                 <span class="dot-live" title="live"></span>
@@ -3958,7 +4005,13 @@
         </section>
 
         <section id="panel-settings" class="hidden">
-          <div class="glass p-4 space-y-3 max-w-lg text-sm">
+          <div class="settings-shell text-sm">
+            <div class="settings-top">
+              <button type="button" class="settings-back" id="settings-back">← Back to Board</button>
+              <h1>Settings</h1>
+              <button type="button" class="set-save-btn" id="settings-save-all">Save all</button>
+            </div>
+            <p class="text-[11px] text-bb-muted mb-3">Organized by section — use <b>Save section</b> or <b>Save all</b> at the top.</p>
             <details class="set-box" open>
               <summary>Discord webhooks</summary>
               <div class="set-body">
@@ -4747,8 +4800,13 @@
   };
 
   
-  var APP_VERSION = '3.12.5';
+  var APP_VERSION = '3.12.6';
   var APP_CHANGELOG = [
+    {
+      version: '3.12.6',
+      title: 'Settings Back + sport pills + Stats',
+      notes: ['Back to Board, Save section/all', 'Sport pills (no shift)', 'Stats panel']
+    },
     {
       version: '3.12.5',
       title: 'Board polish — time, live, multi filters, settings',
@@ -10677,12 +10735,8 @@ function kalQuery(mt, strict, allowMkt) {
     }
   });
   document.addEventListener('change', function (ev) {
-    if (ev.target && (ev.target.id === 'dash-sport' || ev.target.id === 'dash-market')) {
-      var sports = selectedDashValues('dash-sport');
-      sport = (!sports.length || sports.indexOf('all') >= 0) ? 'all' : (sports.length === 1 ? sports[0] : 'all');
-      if ($('sc-sport')) $('sc-sport').value = sport;
-      var mk = selectedDashValues('dash-market');
-      marketType = (!mk.length || mk.indexOf('all') >= 0) ? 'all' : (mk.length === 1 ? mk[0] : 'all');
+    if (ev.target && ev.target.id === 'dash-market') {
+      marketType = ($('dash-market') && $('dash-market').value) || 'all';
       if ($('sc-market')) try { $('sc-market').value = marketType; } catch (eM) {}
       if ($('market-select')) try { $('market-select').value = marketType; } catch (eM2) {}
       if (typeof loadGames === 'function') loadGames();
@@ -15136,6 +15190,145 @@ function renderSlate() {
     });
   })();
 
+
+
+  window.__selectedSports = ['all'];
+  function syncSportPills() {
+    var selected = window.__selectedSports || ['all'];
+    document.querySelectorAll('#sport-pills .sp-pill').forEach(function (p) {
+      p.classList.toggle('on', selected.indexOf(p.getAttribute('data-sport')) >= 0);
+    });
+    sport = (selected.indexOf('all') >= 0 || selected.length !== 1) ? (selected.indexOf('all') >= 0 || !selected.length ? 'all' : 'all') : selected[0];
+    if (selected.indexOf('all') < 0 && selected.length === 1) sport = selected[0];
+    else sport = 'all';
+  }
+  function boardSportFilter(list) {
+    var selected = window.__selectedSports || ['all'];
+    if (!selected.length || selected.indexOf('all') >= 0) return list;
+    var set = {};
+    selected.forEach(function (x) { set[String(x).toLowerCase()] = true; });
+    return (list || []).filter(function (g) {
+      var lg = String(g.league || g.sport || '').toLowerCase();
+      if (set[lg]) return true;
+      if (set.soccer && /epl|mls|soccer|uefa|liga|bundes|serie/.test(lg)) return true;
+      if (set.tennis && /atp|wta|tennis/.test(lg)) return true;
+      if (set.esports && /csgo|dota|lol|valorant|esport/.test(lg)) return true;
+      return false;
+    });
+  }
+  function boardMarketFilter(list) {
+    var el = $('dash-market');
+    var k = el ? String(el.value || 'all') : 'all';
+    if (!k || k === 'all') return list;
+    return (list || []).filter(function (g) {
+      var m = String(g.marketType || g.market || g.category || '').toLowerCase();
+      try { if (typeof boardMarket === 'function') m += ' ' + String(boardMarket(g) || '').toLowerCase(); } catch (e) {}
+      if (k === 'bucket_ml' && /ml|moneyline|winner|1h win|2h win|f5 win|match/.test(m)) return true;
+      if (k === 'bucket_spread' && /spread|run line|puck|handicap|cover/.test(m)) return true;
+      if (k === 'bucket_ou' && /total|over|under|o\/u/.test(m)) return true;
+      if (k === 'bucket_tt' && /team total/.test(m)) return true;
+      if (k === 'bucket_special' && /nrfi|yrfi|map |method/.test(m)) return true;
+      if (k === 'player_props' && /prop|points|rebounds|assists|strikeout|hits|pra/.test(m)) return true;
+      return false;
+    });
+  }
+  function renderBoardStats() {
+    function loadLS(keys) {
+      for (var i = 0; i < keys.length; i++) {
+        try {
+          var raw = localStorage.getItem(keys[i]);
+          if (!raw) continue;
+          var parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed;
+          if (parsed && Array.isArray(parsed.items)) return parsed.items;
+          if (parsed && Array.isArray(parsed.bets)) return parsed.bets;
+        } catch (e) {}
+      }
+      return [];
+    }
+    function summarize(arr, title) {
+      if (!arr.length) return '<p>No ' + title + ' entries yet.</p>';
+      var w = 0, l = 0, o = 0;
+      arr.forEach(function (x) {
+        var r = String(x.result || x.status || x.outcome || '').toLowerCase();
+        if (r === 'win' || r === 'won' || r === 'w') w++;
+        else if (r === 'loss' || r === 'lost' || r === 'l') l++;
+        else o++;
+      });
+      var lines = arr.slice(-15).reverse().map(function (x) {
+        var label = x.title || x.pick || x.matchup || x.eventTitle || x.id || 'Bet';
+        return '<div style="padding:0.35rem 0;border-bottom:1px solid rgba(30,41,59,0.7)"><b style="color:#e2e8f0">' +
+          String(label).slice(0, 70) + '</b> <span style="color:#94a3b8">· ' + String(x.result || x.status || 'open') + '</span></div>';
+      }).join('');
+      return '<p style="margin:0 0 0.5rem"><b style="color:#e2e8f0">' + arr.length + '</b> tracked · <span style="color:#86efac">W ' + w + '</span> · <span style="color:#f87171">L ' + l + '</span> · other ' + o + '</p>' + lines;
+    }
+    var ep = $('stats-elite-paper');
+    var jr = $('stats-journal');
+    if (ep) ep.innerHTML = summarize(loadLS(['bb_elite_paper','elitePaper','bb_elite_paper_pm','bb_elite_paper_kalshi','bb_paper_elite']), 'elite paper');
+    if (jr) jr.innerHTML = summarize(loadLS(['bb_journal','journal','bb_manual_journal','trackedBets','bb_bets']), 'journal');
+  }
+  function injectSettingSaves() {
+    document.querySelectorAll('#panel-settings details.set-box .set-body').forEach(function (body) {
+      if (body.querySelector('.set-save-row')) return;
+      var row = document.createElement('div');
+      row.className = 'set-save-row';
+      row.innerHTML = '<button type="button" class="set-save-btn">Save section</button>';
+      body.appendChild(row);
+    });
+  }
+  document.addEventListener('click', function (ev) {
+    var pill = ev.target && ev.target.closest && ev.target.closest('#sport-pills .sp-pill');
+    if (pill) {
+      var sp = pill.getAttribute('data-sport');
+      var cur = (window.__selectedSports || ['all']).slice();
+      if (sp === 'all') cur = ['all'];
+      else {
+        cur = cur.filter(function (x) { return x !== 'all'; });
+        var ix = cur.indexOf(sp);
+        if (ix >= 0) cur.splice(ix, 1); else cur.push(sp);
+        if (!cur.length) cur = ['all'];
+      }
+      window.__selectedSports = cur;
+      syncSportPills();
+      if (typeof loadGames === 'function') loadGames();
+      return;
+    }
+    if (ev.target && (ev.target.id === 'settings-back' || (ev.target.closest && ev.target.closest('#settings-back')))) {
+      document.body.classList.remove('show-settings');
+      var ps = $('panel-settings'); if (ps) ps.classList.add('hidden');
+      var pscan = $('panel-scanner'); if (pscan) pscan.classList.remove('hidden');
+      try { if (typeof switchTab === 'function') switchTab('scanner'); } catch (e) {}
+      return;
+    }
+    if (ev.target && (ev.target.id === 'stats-back' || (ev.target.closest && ev.target.closest('#stats-back')))) {
+      document.body.classList.remove('show-stats');
+      return;
+    }
+    if (ev.target && (ev.target.id === 'dash-stats' || (ev.target.closest && ev.target.closest('#dash-stats')))) {
+      document.body.classList.add('show-stats');
+      try { renderBoardStats(); } catch (e) {}
+      return;
+    }
+    if (ev.target && (ev.target.id === 'settings-save-all' || (ev.target.classList && ev.target.classList.contains('set-save-btn')))) {
+      try {
+        if (typeof persistEdgeDisplaySettings === 'function') persistEdgeDisplaySettings();
+        var st = settings();
+        var map = {
+          webhook: 'webhook', 'webhook-2': 'webhook2', 'webhook-super': 'webhookSuper',
+          'webhook-placed': 'webhookPlaced', 'webhook-won': 'webhookWon', 'webhook-lost': 'webhookLost',
+          openai: 'openai', 'novig-key-id': 'novigKeyId', 'novig-pem': 'novigPem', 'novig-env': 'novigEnv'
+        };
+        Object.keys(map).forEach(function (id) {
+          var el = $(id); if (el) st[map[id]] = el.value;
+        });
+        localStorage.setItem('bb_settings', JSON.stringify(st));
+        var t = ev.target; var prev = t.textContent; t.textContent = 'Saved ✓';
+        setTimeout(function () { t.textContent = prev; }, 1000);
+      } catch (e) {}
+      return;
+    }
+  });
+  setTimeout(function () { try { injectSettingSaves(); syncSportPills(); } catch (e) {} }, 200);
 
   /* Boot Board product UI */
   (function bootBoardProduct() {
