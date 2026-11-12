@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds Board v3.12.4</title>
+  <title>EliteOdds Board v3.12.5</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -3071,6 +3071,66 @@
       }
     }
 
+  
+    /* v3.12.5 board polish */
+    body.eo-board-product #board-shell {
+      border-left: 3px solid #a78bfa !important;
+      box-shadow: inset 1px 0 0 rgba(167,139,250,0.25) !important;
+      margin-left: 0 !important;
+    }
+    body.eo-board-product .dash-top,
+    body.eo-board-product .dash-filters {
+      border-left: none;
+    }
+    .dash-multi {
+      min-width: 140px !important;
+      min-height: 64px !important;
+      max-height: 88px !important;
+      padding: 0.25rem !important;
+    }
+    .dash-multi option {
+      padding: 0.2rem 0.35rem;
+      border-radius: 4px;
+    }
+    .dash-settings-btn {
+      border: 1px solid rgba(167,139,250,0.45);
+      background: rgba(124,58,237,0.15);
+      color: #ddd6fe;
+      font-size: 11px;
+      padding: 0.4rem 0.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .live-pill {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #86efac;
+      background: rgba(34,197,94,0.15);
+      border: 1px solid rgba(74,222,128,0.35);
+      padding: 0.12rem 0.4rem;
+      border-radius: 999px;
+    }
+    .live-off { color: #64748b; font-size: 10px; }
+    .bd-pick-box {
+      background: rgba(139,92,246,0.12);
+      border: 1px solid rgba(167,139,250,0.35);
+      border-radius: 10px;
+      padding: 0.65rem 0.75rem;
+      margin: 0.5rem 0;
+      font-size: 13px;
+      color: #e9d5ff;
+    }
+
+  
+    body.eo-board-product.show-settings #panel-settings {
+      display: block !important;
+      position: fixed; inset: 0; z-index: 60;
+      background: rgba(7,11,18,0.96);
+      overflow: auto; padding: 1rem;
+    }
+    body.eo-board-product.show-settings #board-shell { display: none !important; }
   </style>
 </head>
 <body class="v3 layout-board eo-board-product">
@@ -3309,9 +3369,9 @@
               <button type="button" class="dash-venue nv" data-sc-venue="novig">Novig</button>
               <button type="button" class="dash-venue cmp" data-sc-venue="compare">Compare</button>
               <div>
-                <label style="display:block;font-size:9px;color:#64748b;letter-spacing:0.06em">SPORT</label>
-                <select class="dash-select" id="dash-sport">
-                  <option value="all">All Sports</option>
+                <label style="display:block;font-size:9px;color:#64748b;letter-spacing:0.06em">SPORT (multi)</label>
+                <select class="dash-select dash-multi" id="dash-sport" multiple size="4" title="Cmd/Ctrl-click for multiple">
+                  <option value="all" selected>All Sports</option>
                   <option value="nba">NBA</option>
                   <option value="nfl">NFL</option>
                   <option value="mlb">MLB</option>
@@ -3321,6 +3381,7 @@
                   <option value="wnba">WNBA</option>
                   <option value="soccer">Soccer</option>
                   <option value="ufc">UFC</option>
+                  <option value="tennis">Tennis</option>
                   <option value="esports">Esports</option>
                 </select>
               </div>
@@ -3333,6 +3394,19 @@
                   <option value="all">All ranks</option>
                 </select>
               </div>
+              <div>
+                <label style="display:block;font-size:9px;color:#64748b;letter-spacing:0.06em">MARKET (multi)</label>
+                <select class="dash-select dash-multi" id="dash-market" multiple size="4" title="Cmd/Ctrl-click for multiple">
+                  <option value="all" selected>All markets</option>
+                  <option value="bucket_ml">Moneyline family</option>
+                  <option value="bucket_spread">Spreads</option>
+                  <option value="bucket_ou">Over / Under</option>
+                  <option value="bucket_tt">Team totals</option>
+                  <option value="bucket_special">Special (NRFI · Maps)</option>
+                  <option value="player_props">Player props</option>
+                </select>
+              </div>
+              <button type="button" class="dash-settings-btn" id="dash-settings">⚙ Settings</button>
               <div class="dash-count">
                 <span><span class="n" id="dash-mkt-count">0</span> MARKETS</span>
                 <span class="dot-live" title="live"></span>
@@ -3344,7 +3418,7 @@
                 <table class="eo-board-table" id="board-table">
                   <thead>
                     <tr>
-                      <th>TIME</th>
+                      <th>DATE / TIME</th>
                       <th>MATCHUP</th>
                       <th>MARKET</th>
                       <th>PICK</th>
@@ -3353,6 +3427,7 @@
                       <th>EDGE</th>
                       <th>RANK</th>
                       <th>VENUE</th>
+                      <th>LIVE</th>
                     </tr>
                   </thead>
                   <tbody id="board-tbody"></tbody>
@@ -4672,8 +4747,17 @@
   };
 
   
-  var APP_VERSION = '3.12.4';
+  var APP_VERSION = '3.12.5';
   var APP_CHANGELOG = [
+    {
+      version: '3.12.5',
+      title: 'Board polish — time, live, multi filters, settings',
+      notes: [
+        'Date/time column; live-first then chronological sort; LIVE column.',
+        'Multi-select Sport + Market; Settings button; app-style left border.',
+        'Venue switch auto-refreshes; richer GAME DETAIL insights; Compare on Board.'
+      ]
+    },
     {
       version: '3.12.4',
       title: 'Venue boards + Compare fix',
@@ -10562,7 +10646,30 @@ function kalQuery(mt, strict, allowMkt) {
       document.querySelectorAll('#scanner-toolbar .sc-chip[data-sc-venue]').forEach(function (c) {
         c.classList.toggle('on', c.getAttribute('data-sc-venue') === v);
       });
+      try {
+        var tb0 = $('board-tbody');
+        if (tb0) tb0.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:2rem">Loading ' + escapeHtml(v) + '…</td></tr>';
+        if ($('dash-mkt-count')) $('dash-mkt-count').textContent = '…';
+        if ($('meta')) $('meta').textContent = 'Loading ' + v + '…';
+      } catch (eL) {}
       if (typeof loadGames === 'function') loadGames();
+      return;
+    }
+    if (ev.target && (ev.target.id === 'dash-settings' || (ev.target.closest && ev.target.closest('#dash-settings')))) {
+      try {
+        if (typeof switchTab === 'function') switchTab('settings');
+        else {
+          var ps = $('panel-settings');
+          if (ps) {
+            ['panel-scanner','panel-slate','panel-journal','panel-lineshop'].forEach(function (id) {
+              var el = $(id); if (el) el.classList.add('hidden');
+            });
+            ps.classList.remove('hidden');
+          }
+        }
+        // settings panels must be visible even in board product mode
+        document.body.classList.add('show-settings');
+      } catch (eS) {}
       return;
     }
     if (ev.target && ev.target.id === 'dash-refresh') {
@@ -10570,9 +10677,14 @@ function kalQuery(mt, strict, allowMkt) {
     }
   });
   document.addEventListener('change', function (ev) {
-    if (ev.target && ev.target.id === 'dash-sport') {
-      sport = ev.target.value || 'all';
+    if (ev.target && (ev.target.id === 'dash-sport' || ev.target.id === 'dash-market')) {
+      var sports = selectedDashValues('dash-sport');
+      sport = (!sports.length || sports.indexOf('all') >= 0) ? 'all' : (sports.length === 1 ? sports[0] : 'all');
       if ($('sc-sport')) $('sc-sport').value = sport;
+      var mk = selectedDashValues('dash-market');
+      marketType = (!mk.length || mk.indexOf('all') >= 0) ? 'all' : (mk.length === 1 ? mk[0] : 'all');
+      if ($('sc-market')) try { $('sc-market').value = marketType; } catch (eM) {}
+      if ($('market-select')) try { $('market-select').value = marketType; } catch (eM2) {}
       if (typeof loadGames === 'function') loadGames();
     }
     if (ev.target && ev.target.id === 'dash-rank') {
@@ -10613,14 +10725,84 @@ function kalQuery(mt, strict, allowMkt) {
   }
 
   function boardTimeCell(g) {
-    if (g.live) return '<span style="color:#4ade80">LIVE</span>';
     var t = g.startTime || g.start || g.gameTime;
+    if (!t && g.live) return '<span style="color:#4ade80;font-weight:700">LIVE now</span>';
     if (!t) return '—';
     try {
       var d = new Date(t);
-      if (isNaN(d.getTime())) return String(t).slice(0, 8);
-      return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      if (isNaN(d.getTime())) return escapeHtml(String(t).slice(0, 16));
+      var datePart = d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      var timePart = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      var liveBit = g.live ? ' <span style="color:#4ade80;font-weight:700">· LIVE</span>' : '';
+      return '<span style="white-space:nowrap">' + datePart + '</span><br><span style="color:#94a3b8">' + timePart + '</span>' + liveBit;
     } catch (e) { return '—'; }
+  }
+
+  function boardLiveCell(g) {
+    if (g.live) return '<span class="live-pill">LIVE</span>';
+    return '<span class="live-off">—</span>';
+  }
+
+  function sortBoardGames(list) {
+    list = (list || []).slice();
+    list.sort(function (a, b) {
+      var al = a.live ? 0 : 1;
+      var bl = b.live ? 0 : 1;
+      if (al !== bl) return al - bl;
+      var at = a.startTime || a.start || a.gameTime || '';
+      var bt = b.startTime || b.start || b.gameTime || '';
+      var am = at ? new Date(at).getTime() : Number.MAX_SAFE_INTEGER;
+      var bm = bt ? new Date(bt).getTime() : Number.MAX_SAFE_INTEGER;
+      if (isNaN(am)) am = Number.MAX_SAFE_INTEGER;
+      if (isNaN(bm)) bm = Number.MAX_SAFE_INTEGER;
+      return am - bm;
+    });
+    return list;
+  }
+
+  function selectedDashValues(id) {
+    var el = $(id);
+    if (!el) return [];
+    if (!el.multiple) return el.value ? [el.value] : [];
+    var out = [];
+    for (var i = 0; i < el.options.length; i++) {
+      if (el.options[i].selected) out.push(el.options[i].value);
+    }
+    return out;
+  }
+
+  function boardSportFilter(list) {
+    var sports = selectedDashValues('dash-sport');
+    if (!sports.length || sports.indexOf('all') >= 0) return list;
+    var set = {};
+    sports.forEach(function (x) { set[String(x).toLowerCase()] = true; });
+    return (list || []).filter(function (g) {
+      var lg = String(g.league || g.sport || '').toLowerCase();
+      if (set[lg]) return true;
+      if (set.soccer && /epl|mls|soccer|uefa|liga|bundes|serie/.test(lg)) return true;
+      if (set.tennis && /atp|wta|tennis/.test(lg)) return true;
+      if (set.esports && /csgo|dota|lol|valorant|esport/.test(lg)) return true;
+      return false;
+    });
+  }
+
+  function boardMarketFilter(list) {
+    var mk = selectedDashValues('dash-market');
+    if (!mk.length || mk.indexOf('all') >= 0) return list;
+    return (list || []).filter(function (g) {
+      var m = String(g.marketType || g.market || g.category || boardMarket(g) || '').toLowerCase();
+      for (var i = 0; i < mk.length; i++) {
+        var k = mk[i];
+        if (k === 'bucket_ml' && /ml|moneyline|winner|1h win|2h win|f5 win|match/.test(m)) return true;
+        if (k === 'bucket_spread' && /spread|run line|puck|handicap|cover/.test(m)) return true;
+        if (k === 'bucket_ou' && /total|over|under|o\/u/.test(m)) return true;
+        if (k === 'bucket_tt' && /team total/.test(m)) return true;
+        if (k === 'bucket_special' && /nrfi|yrfi|map |method/.test(m)) return true;
+        if (k === 'player_props' && /prop|points|rebounds|assists|strikeout|hits|pra/.test(m)) return true;
+        if (k === m) return true;
+      }
+      return false;
+    });
   }
 
   function boardMatchup(g) {
@@ -10709,7 +10891,7 @@ function kalQuery(mt, strict, allowMkt) {
     var meta = $('board-meta');
     if (!tb) return;
     if (!list || !list.length) {
-      tb.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:3rem 1rem">' +
+      tb.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:3rem 1rem">' +
         '<div style="font-size:14px;color:#e2e8f0;margin-bottom:8px">No markets on the board yet</div>' +
         '<div style="font-size:12px;max-width:420px;margin:0 auto;line-height:1.45">Tap <b style="color:#a78bfa">AUTO-REFRESH</b> or wait for scan. ' +
         'Try Rank <b>All ranks</b> and Sport <b>All Sports</b> if filters are tight.</div></td></tr>';
@@ -10722,6 +10904,8 @@ function kalQuery(mt, strict, allowMkt) {
       }
       return;
     }
+    list = boardSportFilter(boardMarketFilter(sortBoardGames(list)));
+    window.__lastBoardGames = list;
     var html = '';
     list.forEach(function (g, idx) {
       var id = g.id || g.slug || ('row-' + idx);
@@ -10737,6 +10921,7 @@ function kalQuery(mt, strict, allowMkt) {
         '<td class="' + edge.c + '">' + edge.t + '</td>' +
         '<td>' + boardRankPill(g) + '</td>' +
         '<td>' + boardVenueTag(g) + '</td>' +
+        '<td>' + boardLiveCell(g) + '</td>' +
         '</tr>';
     });
     tb.innerHTML = html;
@@ -10767,12 +10952,22 @@ function kalQuery(mt, strict, allowMkt) {
     var edge = boardEdge(g);
     var trade = (typeof tradeHrefFor === 'function') ? tradeHrefFor(g) : (g.marketUrl || g.url || '#');
     var insights = [];
+    insights.push('<b>Pick:</b> ' + escapeHtml(pick) + ' · <b>Market:</b> ' + escapeHtml(boardMarket(g)));
+    insights.push('<b>Mkt</b> ' + boardPct(mktPctOf(g)) + ' · <b>Model</b> ' + boardPct(modelPctOf(g)) + ' · <b>Edge</b> ' + edge.t);
+    if (g.live) insights.push('Game is <b>LIVE</b> — prices move fast; size down and re-check the book before entry.');
+    var when = g.startTime || g.start || g.gameTime;
+    if (when) {
+      try {
+        var d0 = new Date(when);
+        insights.push('<b>Scheduled:</b> ' + d0.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }));
+      } catch (eT) {}
+    }
     if (g.formNote) insights.push(escapeHtml(String(g.formNote)));
     if (g.modelNote) insights.push(escapeHtml(String(g.modelNote)));
-    if (g.homeL10 || g.awayL10) insights.push('Form L10 home/away available on card model.');
-    if (!insights.length) insights.push('Model pick: ' + escapeHtml(pick) + ' at edge ' + edge.t);
+    if (g.homeL10 || g.awayL10) insights.push('Form L10 signals present for home/away splits.');
     if (g.hasForm) insights.push('Form-backed signal (not market-only).');
-    else insights.push('Thin form — treat edge cautiously.');
+    else insights.push('Thin form — treat large edges cautiously until form fills in.');
+    if (g.venue || g.source) insights.push('<b>Venue:</b> ' + escapeHtml(String(g.venue || g.source)));
     var body = el.querySelector('.bd-panel-body') || el;
     body.innerHTML =
       '<div class="bd-match">' + escapeHtml(title) +
@@ -13995,6 +14190,10 @@ function renderSlate() {
 
   function switchTab(name) {
     if (!name) return;
+    try {
+      if (name === 'settings') document.body.classList.add('show-settings');
+      else document.body.classList.remove('show-settings');
+    } catch (eSS) {}
     document.querySelectorAll('.tab').forEach(function (b) {
       var on = b.getAttribute('data-tab') === name;
       b.classList.toggle('pill-on', on);
@@ -14961,7 +15160,7 @@ function renderSlate() {
       try {
         if (typeof applyLayoutMode === 'function') applyLayoutMode();
         var tb = document.getElementById('board-tbody');
-        if (tb) tb.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:2rem">Loading markets…</td></tr>';
+        if (tb) tb.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:2rem">Loading markets…</td></tr>';
         if (typeof loadGames === 'function') loadGames();
       } catch (e2) {}
     }, 200);
