@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds Board v3.12.3</title>
+  <title>EliteOdds Board v3.12.4</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -2720,6 +2720,11 @@
       border-color: rgba(74,222,128,0.4);
       color: #bbf7d0;
     }
+    .dash-venue.cmp.on {
+      background: rgba(251,146,60,0.15) !important;
+      border-color: rgba(251,146,60,0.45) !important;
+      color: #fed7aa !important;
+    }
     .dash-venue.nv.on {
       background: rgba(34,211,238,0.12);
       border-color: rgba(34,211,238,0.4);
@@ -3302,6 +3307,7 @@
               <button type="button" class="dash-venue on" data-sc-venue="polymarket">Polymarket</button>
               <button type="button" class="dash-venue kal" data-sc-venue="kalshi">Kalshi</button>
               <button type="button" class="dash-venue nv" data-sc-venue="novig">Novig</button>
+              <button type="button" class="dash-venue cmp" data-sc-venue="compare">Compare</button>
               <div>
                 <label style="display:block;font-size:9px;color:#64748b;letter-spacing:0.06em">SPORT</label>
                 <select class="dash-select" id="dash-sport">
@@ -4666,8 +4672,17 @@
   };
 
   
-  var APP_VERSION = '3.12.3';
+  var APP_VERSION = '3.12.4';
   var APP_CHANGELOG = [
+    {
+      version: '3.12.4',
+      title: 'Venue boards + Compare fix',
+      notes: [
+        'Fixed 0 markets: desktop dual-column path skipped Board table render.',
+        'Board mode always uses Polymarket / Kalshi / Novig / Compare single fetch path.',
+        'Compare chip next to Novig; dash Rank drives filters.'
+      ]
+    },
     {
       version: '3.12.3',
       title: 'Full-width Board grid fix',
@@ -10189,6 +10204,16 @@
   }
 
 
+  
+  function currentRankFilter() {
+    try {
+      if ($('dash-rank') && $('dash-rank').value) return String($('dash-rank').value);
+      if ($('sc-rank') && $('sc-rank').value) return String($('sc-rank').value);
+      if ($('f-rank') && $('f-rank').value) return String($('f-rank').value);
+    } catch (e) {}
+    return 'good';
+  }
+
   function filterGamesClient(list) {
     list = list || [];
     // Drop completed Finals + expired / resolved junk
@@ -10251,7 +10276,7 @@
     if (minEvC > 0) {
       list = list.filter(function (g) { return (g.netEdge != null ? g.netEdge : 0) >= minEvC; });
     }
-    var rankF = ($('f-rank') && $('f-rank').value) || 'good';
+    var rankF = currentRankFilter();
     if (rankF === 'pass') {
       list = list.filter(function (g) { return String(g.rank||'').toLowerCase() === 'pass'; });
     } else if (rankF === 'elite') {
@@ -10808,7 +10833,7 @@ function kalQuery(mt, strict, allowMkt) {
   function renderGameList(box, list) {
     // Hide Pass only when Rank is Good+ or Elite-only (not All / Pass)
     try {
-      var __rf = ($('sc-rank') && $('sc-rank').value) || ($('f-rank') && $('f-rank').value) || 'good';
+      var __rf = currentRankFilter();
       if (__rf !== 'pass' && __rf !== 'all' && __rf !== 'good_potd' && Array.isArray(list)) {
         list = list.filter(function (g) {
           var r = String(g.rank || '').toLowerCase();
@@ -11082,7 +11107,15 @@ async function loadGames() {
       var strict = '1'; // 3.7.4 hard-coded strict truth
       var allowMkt = ($('f-allow-mkt-good') && $('f-allow-mkt-good').checked) ? '1' : '0';
       var dual = typeof window.matchMedia === 'function' && window.matchMedia('(min-width: 1100px)').matches;
-      var forceBoth = venue === 'both';
+      var forceBoth = venue === 'both' || venue === 'compare';
+      // Board product uses one table — dual columns left board empty (0 markets)
+      var boardMode = false;
+      try {
+        boardMode = document.body.classList.contains('eo-board-product') ||
+          document.body.classList.contains('layout-board') ||
+          (typeof currentLayout === 'function' && currentLayout() === 'board');
+      } catch (eBM) {}
+      if (boardMode) dual = false;
 
       if (dual && !forceBoth) {
         // Timeouts so one slow book cannot leave both columns on Loading forever
@@ -11110,6 +11143,12 @@ async function loadGames() {
           else renderGameList(boxK, kalG);
         }
         if (box) box.innerHTML = '';
+        // Keep Board table in sync if dual path ever runs
+        try {
+          if (typeof currentLayout === 'function' && currentLayout() === 'board') {
+            renderGameList(box || $('games'), games);
+          }
+        } catch (eBoardDual) {}
         if ($('meta')) {
           var errBits = [];
           if (polyRaw && polyRaw.error) errBits.push('PM ' + polyRaw.error);
@@ -11199,10 +11238,20 @@ async function loadGames() {
             if (dNv && dNv.games) (dNv.games || []).forEach(function (g) { g.venue = 'novig'; parts.push(g); });
           } catch (eN) {}
           games = filterGamesClient(dedupeGameCards(parts));
-          renderCompareBoard(box, games);
+          if (!games.length && parts.length) {
+            games = dedupeGameCards(parts).filter(function (g) { return !g.ended; }).slice(0, 80);
+          }
+          if (typeof currentLayout === 'function' && currentLayout() === 'board') {
+            renderGameList(box || $('games'), games);
+          } else if (typeof renderCompareBoard === 'function') {
+            renderCompareBoard(box, games);
+          } else {
+            renderGameList(box, games);
+          }
           if (boxP) boxP.innerHTML = '';
           if (boxK) boxK.innerHTML = '';
           if ($('meta')) $('meta').textContent = 'Compare · ' + games.length + ' lines across books';
+          if ($('dash-mkt-count')) $('dash-mkt-count').textContent = String(games.length);
         } else if (venue === 'kalshi') {
           var dataK = await fetchJsonTimeout(kalQuery(mt, strict, allowMkt), Math.max(tMs2, 45000));
           list = (dataK && dataK.games) ? dataK.games : [];
@@ -11256,8 +11305,12 @@ async function loadGames() {
           if (!data.ok && !(data.games && data.games.length)) throw new Error(data.error || 'Polymarket failed');
           list = data.games || [];
           games = filterGamesClient(dedupeGameCards(list));
+          if (!games.length && list.length) {
+            games = dedupeGameCards(list).filter(function (g) { return !g.ended; }).slice(0, 100);
+          }
           games.forEach(function (g) { g.venue = g.venue || 'polymarket'; g.source = g.source || 'polymarket'; });
           renderGameList(box, games);
+          if ($('dash-mkt-count')) $('dash-mkt-count').textContent = String(games.length);
           if (boxP) boxP.innerHTML = '';
           if (boxK) boxK.innerHTML = '';
           var hint = '';
