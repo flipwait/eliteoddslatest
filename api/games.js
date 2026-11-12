@@ -229,6 +229,10 @@ function classifyMarket(m) {
     if (/earned_runs|pitcher_er/.test(smt)) return 'pitcher_er';
     if (/hits_allowed/.test(smt)) return 'pitcher_ha';
     if (/walks_allowed|pitcher_bb/.test(smt)) return 'pitcher_bb';
+    if (/player_goals|hockey_player_goals|goals_scored/.test(smt)) return 'player_goals';
+    if (/player_shots|shots_on_goal|hockey_player_shots/.test(smt)) return 'player_shots';
+    if (/player_saves|hockey_player_saves/.test(smt)) return 'player_saves';
+    if (/player_points|hockey_player_points/.test(smt) && /hockey|nhl/.test(smt)) return 'player_pts';
     if (/player_/.test(smt) || /_player_/.test(smt) || /pitcher_/.test(smt) || /batter_/.test(smt)) return 'player_prop';
     if (/full_game_spread|team_full_game_spread|spread/.test(smt) && /first_half|1h/.test(smt)) return 'spread_1h';
     if (/full_game_spread|team_.*_spread/.test(smt)) return 'spread';
@@ -478,7 +482,8 @@ function scoreOne(m, ev, matchup, rankOpts, yesIsHome) {
 
   return buildSignal({
     id,
-    question: m.question || ev.title,
+    question: m.question || m.title || ev.title,
+    sportsMarketType: m.sportsMarketType || m.marketType || null,
     yesPrice: m.yesPrice,
     noPrice: m.noPrice,
     volume: m.volume || 0,
