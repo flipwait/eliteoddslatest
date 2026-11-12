@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds Board v3.12.2</title>
+  <title>EliteOdds Board v3.12.3</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -2939,6 +2939,133 @@
       body.eo-board-product .eo-rail { display: none !important; }
     }
 
+  
+    /* ===== v3.12.3 HARD layout lock — full-width Board mockup ===== */
+    html, body.eo-board-product {
+      width: 100% !important;
+      max-width: 100% !important;
+      overflow-x: hidden;
+    }
+    body.eo-board-product .flex.min-h-screen {
+      display: block !important;
+      width: 100% !important;
+    }
+    body.eo-board-product .eo-main-wrap,
+    body.eo-board-product .eo-center,
+    body.eo-board-product #panel-scanner {
+      display: block !important;
+      width: 100% !important;
+      max-width: none !important;
+      min-width: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      float: none !important;
+    }
+    body.eo-board-product .eo-rail,
+    body.eo-board-product header.eo-top,
+    body.eo-board-product #scanner-toolbar,
+    body.eo-board-product #auto-pm-bar,
+    body.eo-board-product #live-focus-bar,
+    body.eo-board-product .eo-filters,
+    body.eo-board-product .eo-desk {
+      display: none !important;
+    }
+    body.eo-board-product.desk-open .eo-desk {
+      display: block !important;
+      position: fixed !important;
+      right: 0; top: 0; width: 17.5rem; height: 100vh; z-index: 50;
+    }
+    body.eo-board-product #board-shell {
+      display: block !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-height: 100vh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #0a0c12 !important;
+      box-sizing: border-box !important;
+    }
+    body.eo-board-product .dash-top {
+      display: grid !important;
+      grid-template-columns: minmax(180px, 1fr) auto minmax(180px, 1fr) !important;
+      align-items: center !important;
+      width: 100% !important;
+      padding: 0.85rem 1.5rem 0.5rem !important;
+      box-sizing: border-box !important;
+      gap: 1rem !important;
+    }
+    body.eo-board-product .dash-center-title {
+      white-space: nowrap !important;
+      text-align: center !important;
+      font-size: 13px !important;
+      letter-spacing: 0.16em !important;
+      color: #c4b5fd !important;
+    }
+    body.eo-board-product .dash-filters {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      align-items: flex-end !important;
+      gap: 0.5rem 0.65rem !important;
+      width: 100% !important;
+      padding: 0.4rem 1.5rem 0.9rem !important;
+      box-sizing: border-box !important;
+      border-bottom: 1px solid rgba(30,41,59,0.9) !important;
+    }
+    body.eo-board-product .dash-venue {
+      display: inline-flex !important;
+      flex-direction: row !important;
+    }
+    body.eo-board-product .dash-count {
+      margin-left: auto !important;
+    }
+    body.eo-board-product .eo-board-body {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) 360px !important;
+      width: 100% !important;
+      min-height: calc(100vh - 130px) !important;
+      box-sizing: border-box !important;
+    }
+    body.eo-board-product .eo-board-table-wrap {
+      display: block !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      overflow: auto !important;
+      max-height: calc(100vh - 130px) !important;
+      background: #0a0c12 !important;
+    }
+    body.eo-board-product .eo-board-table {
+      width: 100% !important;
+      min-width: 720px !important;
+      border-collapse: collapse !important;
+    }
+    body.eo-board-product .eo-board-detail {
+      display: flex !important;
+      flex-direction: column !important;
+      width: 360px !important;
+      min-width: 360px !important;
+      max-width: 360px !important;
+      border-left: 1px solid rgba(30,41,59,0.95) !important;
+      background: #0b0f18 !important;
+    }
+    @media (max-width: 900px) {
+      body.eo-board-product .eo-board-body {
+        grid-template-columns: 1fr !important;
+      }
+      body.eo-board-product .eo-board-detail {
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        border-left: none !important;
+        border-top: 1px solid rgba(30,41,59,0.95) !important;
+        max-height: 320px !important;
+      }
+      body.eo-board-product .dash-top {
+        grid-template-columns: 1fr !important;
+        text-align: left !important;
+      }
+    }
+
   </style>
 </head>
 <body class="v3 layout-board eo-board-product">
@@ -4539,8 +4666,17 @@
   };
 
   
-  var APP_VERSION = '3.12.2';
+  var APP_VERSION = '3.12.3';
   var APP_CHANGELOG = [
+    {
+      version: '3.12.3',
+      title: 'Full-width Board grid fix',
+      notes: [
+        'Fixed layout collapsed into a narrow left column.',
+        'Table + GAME DETAIL side-by-side on desktop like the mockup.',
+        'Clearer empty/loading states in the main table.'
+      ]
+    },
     {
       version: '3.12.2',
       title: 'Board mockup forced as main view',
@@ -10548,9 +10684,17 @@ function kalQuery(mt, strict, allowMkt) {
     var meta = $('board-meta');
     if (!tb) return;
     if (!list || !list.length) {
-      tb.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#6b7c94;padding:2rem">No markets for these filters</td></tr>';
-      if (meta) meta.textContent = '0 markets';
-      if ($('board-detail')) $('board-detail').innerHTML = '<div class="bd-empty">Select a row for game detail</div>';
+      tb.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:3rem 1rem">' +
+        '<div style="font-size:14px;color:#e2e8f0;margin-bottom:8px">No markets on the board yet</div>' +
+        '<div style="font-size:12px;max-width:420px;margin:0 auto;line-height:1.45">Tap <b style="color:#a78bfa">AUTO-REFRESH</b> or wait for scan. ' +
+        'Try Rank <b>All ranks</b> and Sport <b>All Sports</b> if filters are tight.</div></td></tr>';
+      if (meta) meta.textContent = '0 MARKETS';
+      if ($('dash-mkt-count')) $('dash-mkt-count').textContent = '0';
+      var bd = $('board-detail');
+      if (bd) {
+        var body = bd.querySelector('.bd-panel-body') || bd;
+        body.innerHTML = '<div class="bd-empty">Select a row for game detail</div>';
+      }
       return;
     }
     var html = '';
@@ -14763,9 +14907,11 @@ function renderSlate() {
     setTimeout(function () {
       try {
         if (typeof applyLayoutMode === 'function') applyLayoutMode();
+        var tb = document.getElementById('board-tbody');
+        if (tb) tb.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:2rem">Loading markets…</td></tr>';
         if (typeof loadGames === 'function') loadGames();
       } catch (e2) {}
-    }, 400);
+    }, 200);
   })();
 
 </script>
