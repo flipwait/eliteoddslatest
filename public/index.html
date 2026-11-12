@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EliteOdds Board v3.12.6</title>
+  <title>EliteOdds Board v3.13.0</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -3072,7 +3072,7 @@
     }
 
   
-    /* v3.12.6 board polish */
+    /* 3.12.7 board polish */
     body.eo-board-product #board-shell {
       border-left: 3px solid #a78bfa !important;
       box-shadow: inset 1px 0 0 rgba(167,139,250,0.25) !important;
@@ -3174,6 +3174,22 @@
       background: rgba(7,11,18,0.96); overflow: auto;
     }
     .stats-shell { max-width: 900px; margin: 0 auto; padding: 1rem; }
+
+  
+    select.dash-multi {
+      min-width: 150px !important;
+      min-height: 96px !important;
+      padding: 0.25rem !important;
+    }
+    select.dash-multi option { padding: 0.25rem 0.4rem; }
+    body.eo-board-product.show-stats #panel-stats-board {
+      display: block !important;
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 80 !important;
+      background: rgba(7,11,18,0.98) !important;
+      overflow: auto !important;
+    }
 
   </style>
 </head>
@@ -3412,23 +3428,22 @@
               <button type="button" class="dash-venue kal" data-sc-venue="kalshi">Kalshi</button>
               <button type="button" class="dash-venue nv" data-sc-venue="novig">Novig</button>
               <button type="button" class="dash-venue cmp" data-sc-venue="compare">Compare</button>
-              <div class="dash-sport-wrap" style="flex:1 1 100%">
-                <label style="display:block;font-size:9px;color:#64748b;letter-spacing:0.06em;margin-bottom:4px">SPORT</label>
-                <div class="sport-pills" id="sport-pills">
-                  <button type="button" class="sp-pill on" data-sport="all">All</button>
-                  <button type="button" class="sp-pill" data-sport="nba">NBA</button>
-                  <button type="button" class="sp-pill" data-sport="nfl">NFL</button>
-                  <button type="button" class="sp-pill" data-sport="mlb">MLB</button>
-                  <button type="button" class="sp-pill" data-sport="nhl">NHL</button>
-                  <button type="button" class="sp-pill" data-sport="cfb">CFB</button>
-                  <button type="button" class="sp-pill" data-sport="cbb">CBB</button>
-                  <button type="button" class="sp-pill" data-sport="wnba">WNBA</button>
-                  <button type="button" class="sp-pill" data-sport="soccer">Soccer</button>
-                  <button type="button" class="sp-pill" data-sport="ufc">UFC</button>
-                  <button type="button" class="sp-pill" data-sport="tennis">Tennis</button>
-                  <button type="button" class="sp-pill" data-sport="esports">Esports</button>
-                </div>
-                <select id="dash-sport" class="hidden" aria-hidden="true"><option value="all" selected>all</option></select>
+              <div>
+                <label style="display:block;font-size:9px;color:#64748b;letter-spacing:0.06em">SPORT <span style="opacity:.7">(multi)</span></label>
+                <select class="dash-select dash-multi" id="dash-sport" multiple size="5" title="Click to select one or more sports">
+                  <option value="all" selected>All Sports</option>
+                  <option value="nba">NBA</option>
+                  <option value="nfl">NFL</option>
+                  <option value="mlb">MLB</option>
+                  <option value="nhl">NHL</option>
+                  <option value="cfb">CFB</option>
+                  <option value="cbb">CBB</option>
+                  <option value="wnba">WNBA</option>
+                  <option value="soccer">Soccer</option>
+                  <option value="ufc">UFC</option>
+                  <option value="tennis">Tennis</option>
+                  <option value="esports">Esports</option>
+                </select>
               </div>
               <div>
                 <label style="display:block;font-size:9px;color:#64748b;letter-spacing:0.06em">RANK</label>
@@ -3440,8 +3455,8 @@
                 </select>
               </div>
               <div>
-                <label style="display:block;font-size:9px;color:#64748b;letter-spacing:0.06em">MARKET</label>
-                <select class="dash-select" id="dash-market">
+                <label style="display:block;font-size:9px;color:#64748b;letter-spacing:0.06em">MARKET <span style="opacity:.7">(multi)</span></label>
+                <select class="dash-select dash-multi" id="dash-market" multiple size="5" title="Click to select markets">
                   <option value="all" selected>All markets</option>
                   <option value="bucket_ml">Moneyline family</option>
                   <option value="bucket_spread">Spreads</option>
@@ -4800,8 +4815,23 @@
   };
 
   
-  var APP_VERSION = '3.12.6';
+  var APP_VERSION = '3.13.0';
   var APP_CHANGELOG = [
+    {
+      version: '3.13.0',
+      title: 'Rank gate sliders + Novig ESPN + Odds consensus',
+      notes: [
+        'Settings: Good/Elite edge & EV sliders saved per browser.',
+        'Gates passed on PM / Kalshi / Novig scans.',
+        'Novig re-scores with ESPN form when matched.',
+        'Optional Odds API consensus (ML, max 6 events/scan).'
+      ]
+    },
+    {
+      version: '3.12.7',
+      title: 'Labels, multi filters, Stats, Novig ranks',
+      notes: ['Clean Kalshi matchup/pick labels','Multi sport+market dropdowns','Stats panel fix','Novig real scoring + soft ranks']
+    },
     {
       version: '3.12.6',
       title: 'Settings Back + sport pills + Stats',
@@ -10666,6 +10696,7 @@
     // Prefer server env; pass keys only if user saved in browser (personal deploy)
     if (keyId) q += '&keyId=' + encodeURIComponent(keyId);
     if (pem) q += '&pem=' + encodeURIComponent(pem);
+    try { if (typeof appendRankGates === 'function') q = appendRankGates(q); } catch (eG) {}
     return q;
   }
 
@@ -10683,6 +10714,7 @@ function kalQuery(mt, strict, allowMkt) {
       var pst = typeof getPandascoreToken === 'function' ? getPandascoreToken() : (settings().pandascore || ($('pandascore') && $('pandascore').value) || '').trim();
       if (pst) kq += '&pandascore=' + encodeURIComponent(pst);
     } catch (e) {}
+    try { if (typeof appendRankGates === 'function') kq = appendRankGates(kq); } catch (eG) {}
     return kq;
   }
   
@@ -10735,8 +10767,11 @@ function kalQuery(mt, strict, allowMkt) {
     }
   });
   document.addEventListener('change', function (ev) {
-    if (ev.target && ev.target.id === 'dash-market') {
-      marketType = ($('dash-market') && $('dash-market').value) || 'all';
+    if (ev.target && (ev.target.id === 'dash-sport' || ev.target.id === 'dash-market')) {
+      var sports = selectedDashValues('dash-sport');
+      sport = (!sports.length || sports.indexOf('all') >= 0) ? 'all' : (sports.length === 1 ? sports[0] : 'all');
+      var mk = selectedDashValues('dash-market');
+      marketType = (!mk.length || mk.indexOf('all') >= 0) ? 'all' : (mk.length === 1 ? mk[0] : 'all');
       if ($('sc-market')) try { $('sc-market').value = marketType; } catch (eM) {}
       if ($('market-select')) try { $('market-select').value = marketType; } catch (eM2) {}
       if (typeof loadGames === 'function') loadGames();
@@ -10859,9 +10894,26 @@ function kalQuery(mt, strict, allowMkt) {
     });
   }
 
+  function cleanBoardTitle(g) {
+    if (g.away && g.home) return String(g.away) + ' vs ' + String(g.home);
+    var t = String(g.eventTitle || g.title || '').trim();
+    if (!t) return '—';
+    // strip Kalshi-style contract text from matchup line
+    t = t.replace(/\s*[·|]\s*.*$/, '');
+    t = t.replace(/\s+wins by (over\s+)?[\d.]+\s*points?.*$/i, '');
+    t = t.replace(/\s+wins by.*$/i, '');
+    t = t.replace(/\s+to win.*$/i, '');
+    t = t.replace(/\s+vs\.?\s*Tie\b/i, '');
+    t = t.replace(/\s+\/\s*Tie\b/i, '');
+    t = t.replace(/\bTie\s+vs\.?\s+/i, '');
+    t = t.replace(/\s+ML\b/gi, '');
+    t = t.replace(/\s{2,}/g, ' ').trim();
+    t = t.replace(/\s+vs\.?\s+/i, ' vs ');
+    return t || String(g.eventTitle || g.title || '—');
+  }
+
   function boardMatchup(g) {
-    var title = g.eventTitle || g.title || ((g.away || '') + ' @ ' + (g.home || '')) || '—';
-    title = String(title).replace(/\s+vs\.?\s+/i, ' vs ');
+    var title = cleanBoardTitle(g);
     var lg = String(g.league || g.sport || '').toUpperCase() || 'SP';
     var badge = '<span class="mu-logo">' + escapeHtml(lg.slice(0, 3)) + '</span>';
     return '<div class="mu">' + badge + '<b>' + escapeHtml(title) + '</b><span class="mu-sub">' + escapeHtml(lg) + (g.live ? ' · LIVE' : '') + '</span></div>';
@@ -10879,12 +10931,14 @@ function kalQuery(mt, strict, allowMkt) {
   }
 
   function boardPick(g) {
-    var p = g.modelPick || g.pick || g.side || '—';
+    var p = String(g.modelPick || g.pick || g.pickName || g.side || '—').trim();
+    // already embeds line e.g. "Minnesota -8.5" or "Over 8.5"
+    if (/[+-]?\d+(\.\d+)?/.test(p) || /over|under/i.test(p)) return p;
     var line = g.spreadLine != null ? g.spreadLine : (g.totalLine != null ? g.totalLine : g.line);
-    if (line != null && !/over|under/i.test(String(p)) && /spread|total/i.test(String(g.marketType || ''))) {
-      return String(p) + ' ' + line;
+    if (line != null && /spread|total|ou/i.test(String(g.marketType || ''))) {
+      return p + ' ' + line;
     }
-    return String(p);
+    return p;
   }
 
   function boardPct(v) {
@@ -11022,6 +11076,10 @@ function kalQuery(mt, strict, allowMkt) {
     if (g.hasForm) insights.push('Form-backed signal (not market-only).');
     else insights.push('Thin form — treat large edges cautiously until form fills in.');
     if (g.venue || g.source) insights.push('<b>Venue:</b> ' + escapeHtml(String(g.venue || g.source)));
+    if (g.booksNote) insights.push('<b>Odds books:</b> ' + escapeHtml(String(g.booksNote)));
+    if (g.oddsConsensus && g.oddsConsensus.noVigHome != null) {
+      insights.push('<b>No-vig books:</b> Home ' + g.oddsConsensus.noVigHome + '% · Away ' + g.oddsConsensus.noVigAway + '%');
+    }
     var body = el.querySelector('.bd-panel-body') || el;
     body.innerHTML =
       '<div class="bd-match">' + escapeHtml(title) +
@@ -15217,18 +15275,20 @@ function renderSlate() {
     });
   }
   function boardMarketFilter(list) {
-    var el = $('dash-market');
-    var k = el ? String(el.value || 'all') : 'all';
-    if (!k || k === 'all') return list;
+    var mk = selectedDashValues('dash-market');
+    if (!mk.length || mk.indexOf('all') >= 0) return list;
     return (list || []).filter(function (g) {
       var m = String(g.marketType || g.market || g.category || '').toLowerCase();
       try { if (typeof boardMarket === 'function') m += ' ' + String(boardMarket(g) || '').toLowerCase(); } catch (e) {}
-      if (k === 'bucket_ml' && /ml|moneyline|winner|1h win|2h win|f5 win|match/.test(m)) return true;
-      if (k === 'bucket_spread' && /spread|run line|puck|handicap|cover/.test(m)) return true;
-      if (k === 'bucket_ou' && /total|over|under|o\/u/.test(m)) return true;
-      if (k === 'bucket_tt' && /team total/.test(m)) return true;
-      if (k === 'bucket_special' && /nrfi|yrfi|map |method/.test(m)) return true;
-      if (k === 'player_props' && /prop|points|rebounds|assists|strikeout|hits|pra/.test(m)) return true;
+      for (var i = 0; i < mk.length; i++) {
+        var k = mk[i];
+        if (k === 'bucket_ml' && /ml|moneyline|winner|1h win|2h win|f5 win|match/.test(m)) return true;
+        if (k === 'bucket_spread' && /spread|run line|puck|handicap|cover/.test(m)) return true;
+        if (k === 'bucket_ou' && /total|over|under|o\/u/.test(m)) return true;
+        if (k === 'bucket_tt' && /team total/.test(m)) return true;
+        if (k === 'bucket_special' && /nrfi|yrfi|map |method/.test(m)) return true;
+        if (k === 'player_props' && /prop|points|rebounds|assists|strikeout|hits|pra/.test(m)) return true;
+      }
       return false;
     });
   }
@@ -15306,12 +15366,21 @@ function renderSlate() {
     }
     if (ev.target && (ev.target.id === 'dash-stats' || (ev.target.closest && ev.target.closest('#dash-stats')))) {
       document.body.classList.add('show-stats');
-      try { renderBoardStats(); } catch (e) {}
+      var sp = document.getElementById('panel-stats-board');
+      if (sp) { sp.style.display = 'block'; sp.style.zIndex = '80'; }
+      try { renderBoardStats(); } catch (e) { console.warn('stats', e); }
+      return;
+    }
+    if (ev.target && (ev.target.id === 'stats-back' || (ev.target.closest && ev.target.closest('#stats-back')))) {
+      document.body.classList.remove('show-stats');
+      var sp2 = document.getElementById('panel-stats-board');
+      if (sp2) sp2.style.display = 'none';
       return;
     }
     if (ev.target && (ev.target.id === 'settings-save-all' || (ev.target.classList && ev.target.classList.contains('set-save-btn')))) {
       try {
         if (typeof persistEdgeDisplaySettings === 'function') persistEdgeDisplaySettings();
+        if (typeof saveRankGateSettings === 'function') saveRankGateSettings();
         var st = settings();
         var map = {
           webhook: 'webhook', 'webhook-2': 'webhook2', 'webhook-super': 'webhookSuper',
@@ -15354,6 +15423,7 @@ function renderSlate() {
         if (typeof applyLayoutMode === 'function') applyLayoutMode();
         var tb = document.getElementById('board-tbody');
         if (tb) tb.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:2rem">Loading markets…</td></tr>';
+        if (typeof wireGateSliders === 'function') wireGateSliders();
         if (typeof loadGames === 'function') loadGames();
       } catch (e2) {}
     }, 200);

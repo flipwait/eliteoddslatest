@@ -1,5 +1,16 @@
 const { fetchAllSportsEvents, fetchLeagueEvents, fetchSoccerEvents, isSoccerLeague, LEAGUES, SOCCER_LEAGUES } = require('../lib/polymarket');
 const { buildSignal } = require('../lib/score');
+function rankOptsFromQuery(q, venue) {
+  const o = { venue: venue || 'polymarket', book: venue || 'polymarket' };
+  if (q.goodEdgePp != null && q.goodEdgePp !== '') o.goodEdgePp = Number(q.goodEdgePp);
+  if (q.eliteEdgePp != null && q.eliteEdgePp !== '') o.eliteEdgePp = Number(q.eliteEdgePp);
+  if (q.goodEv != null && q.goodEv !== '') o.goodEv = Number(q.goodEv);
+  if (q.eliteEv != null && q.eliteEv !== '') o.eliteEv = Number(q.eliteEv);
+  if (q.strict != null) o.strictTruth = String(q.strict) !== '0';
+  if (q.allowMarketGood != null) o.allowMarketGood = String(q.allowMarketGood) === '1';
+  return o;
+}
+
 const { buildLiveAnalysis } = require('../lib/live');
 const { pushPrice, getMove, getBook, setBook } = require('../lib/store');
 let matchupForEvent = async () => null;
@@ -817,7 +828,12 @@ module.exports = async function handler(req, res) {
       minGoodEv: req.query.minGoodEv != null ? parseFloat(req.query.minGoodEv) : undefined,
       minEliteEv: req.query.minEliteEv != null ? parseFloat(req.query.minEliteEv) : undefined,
       minGoodEdge: req.query.minGoodEdge != null ? parseFloat(req.query.minGoodEdge) : undefined,
-      minEliteEdge: req.query.minEliteEdge != null ? parseFloat(req.query.minEliteEdge) : undefined,
+      minEliteEdge: req.query.minEliteEdge != null ? parseFloat(req.query.minEliteEdge) : (req.query.eliteEdgePp != null ? parseFloat(req.query.eliteEdgePp) : undefined),
+      minGoodEdge: req.query.minGoodEdge != null ? parseFloat(req.query.minGoodEdge) : (req.query.goodEdgePp != null ? parseFloat(req.query.goodEdgePp) : undefined),
+      goodEdgePp: req.query.goodEdgePp != null ? parseFloat(req.query.goodEdgePp) : (req.query.minGoodEdge != null ? parseFloat(req.query.minGoodEdge) : undefined),
+      eliteEdgePp: req.query.eliteEdgePp != null ? parseFloat(req.query.eliteEdgePp) : (req.query.minEliteEdge != null ? parseFloat(req.query.minEliteEdge) : undefined),
+      venue: 'polymarket',
+      book: 'polymarket',
       minGoodScore: req.query.minGoodScore != null ? parseFloat(req.query.minGoodScore) : undefined,
       minEliteScore: req.query.minEliteScore != null ? parseFloat(req.query.minEliteScore) : undefined,
     };
